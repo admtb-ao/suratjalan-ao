@@ -1,1 +1,416 @@
-index
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Cetak Alamat Customer - CV ANDI OFFSET</title>
+    
+    <!-- Library CSS & Excel -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <!-- Library html2pdf untuk 1-Klik Download PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Times+New+Roman&display=swap');
+
+        .box-label {
+            border: 4px double #1e88e5; 
+            border-radius: 15px; 
+            padding: 15px 20px;
+            background-color: white;
+            text-align: center;
+            margin-bottom: 5px; 
+            position: relative;
+        }
+        .box-title {
+            position: absolute;
+            top: 12px;
+            left: 15px;
+            color: #d1d5db;
+            font-style: italic;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .font-serif-custom { font-family: 'Times New Roman', Times, serif; }
+        .drag-over { background-color: #eff6ff; border-color: #3b82f6 !important; }
+
+        /* CSS KHUSUS CETAK/PRINT */
+        @media print {
+            @page { size: A4 portrait; margin: 10mm; }
+            body { background: white !important; margin: 0 !important; padding: 0 !important; }
+            .no-print { display: none !important; }
+            #print-area { display: block !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
+            .label-wrapper {
+                width: 100% !important; height: 270mm !important;
+                page-break-inside: avoid !important; page-break-after: always !important;
+                break-after: page !important; margin-bottom: 0 !important; padding: 0 !important;
+                display: flex !important; flex-direction: column !important;
+            }
+            .label-wrapper:last-of-type { page-break-after: auto !important; break-after: auto !important; }
+            .unselected-print { display: none !important; }
+
+            .print-content { height: 100%; display: flex; flex-direction: column; justify-content: space-evenly; gap: 20px; }
+            .box-label { flex: 1; max-height: 45%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px !important; }
+
+            .box-title { font-size: 20px !important; top: 25px; left: 30px; }
+            .box-label .text-xl { font-size: 2.2rem !important; line-height: 1.3 !important; margin-bottom: 1rem !important; }
+            .box-label .text-lg { font-size: 1.8rem !important; line-height: 1.3 !important; margin-bottom: 0.8rem !important; }
+            .box-label img { height: 120px !important; margin-bottom: 1.5rem !important; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-6 no-print">
+            <h1 class="text-3xl font-bold text-blue-900">Sistem Cetak Label Alamat</h1>
+            <p class="text-gray-600 font-semibold">Terkoneksi ke Google Sheets Auto-Save</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            
+            <!-- PANEL KIRI (INPUT) -->
+            <div class="md:col-span-1 space-y-5 no-print">
+                <div class="bg-white p-4 rounded-lg shadow-md border-t-4 border-yellow-500">
+                    <h2 class="font-bold mb-2 text-sm">🔍 Cari Nama/Alamat</h2>
+                    <input type="text" id="search-input" onkeyup="searchLabel()" placeholder="Ketik pencarian..." class="w-full p-2 border rounded text-sm focus:ring-2 focus:ring-yellow-400">
+                </div>
+
+                <div class="bg-white p-4 rounded-lg shadow-md border-t-4 border-blue-600">
+                    <h2 class="font-bold mb-3">✍️ Input Manual</h2>
+                    <input type="text" id="in-nama" placeholder="Nama Instansi / Customer" class="w-full mb-2 p-2 border rounded text-sm">
+                    <textarea id="in-alamat" placeholder="Alamat Lengkap" class="w-full mb-2 p-2 border rounded text-sm" rows="3"></textarea>
+                    <input type="text" id="in-up" placeholder="UP (Nama Penerima)" class="w-full mb-2 p-2 border rounded text-sm">
+                    <input type="text" id="in-telp" placeholder="No. Telp" class="w-full mb-3 p-2 border rounded text-sm">
+                    <button id="btn-tambah" onclick="tambahManual()" class="w-full bg-blue-600 text-white font-bold py-2 rounded text-sm hover:bg-blue-700 disabled:opacity-50">
+                        + Tambah & Simpan ke DB
+                    </button>
+                </div>
+
+                <div class="bg-white p-4 rounded-lg shadow-md border-2 border-dashed border-gray-400 text-center" id="drop-zone">
+                    <h2 class="font-bold mb-1">📁 Upload Excel</h2>
+                    <p class="text-xs text-gray-500 mb-3">Sistem otomatis simpan ke Database.</p>
+                    <input type="file" id="file-input" class="hidden" accept=".xlsx, .xls" onchange="handleFile(event)">
+                    <button id="btn-excel" onclick="document.getElementById('file-input').click()" class="bg-gray-200 text-gray-700 px-4 py-2 rounded text-sm hover:bg-gray-300 w-full mb-3 font-semibold">
+                        Pilih File Excel
+                    </button>
+                    <button onclick="downloadTemplate()" class="w-full bg-green-50 text-green-700 border border-green-300 py-1.5 rounded text-sm hover:bg-green-100 font-semibold">
+                        ⬇️ Download Template
+                    </button>
+                </div>
+                
+                <button onclick="clearData()" class="w-full bg-red-100 text-red-600 font-bold py-2 rounded border border-red-300 hover:bg-red-200 text-sm">
+                    Bersihkan Layar Preview
+                </button>
+            </div>
+
+            <!-- PANEL KANAN (PREVIEW) -->
+            <div class="md:col-span-3">
+                <div class="bg-white p-4 rounded-lg shadow-md mb-4 border-t-4 border-green-500 flex flex-col gap-4 no-print">
+                    <div class="flex flex-wrap justify-between items-center gap-3">
+                        <div>
+                            <h2 class="font-bold text-lg">👀 Preview Web (Total: <span id="count">0</span>)</h2>
+                            <p class="text-sm text-gray-500">Siap dieksekusi: <span id="selected-count" class="font-bold text-red-600">0</span></p>
+                        </div>
+                        
+                        <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                            <button onclick="cetakPrinter()" class="flex-1 sm:flex-none bg-blue-600 text-white px-5 py-2.5 rounded hover:bg-blue-700 shadow font-bold flex items-center justify-center gap-2 transition">
+                                🖨️ Print Fisik
+                            </button>
+                            <button id="btn-download" onclick="downloadPDFLangsung()" class="flex-1 sm:flex-none bg-red-600 text-white px-5 py-2.5 rounded hover:bg-red-700 shadow font-bold flex items-center justify-center gap-2 transition">
+                                📄 Auto Download PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-3 bg-gray-50 p-2 rounded border">
+                        <button onclick="selectAll(true)" class="bg-white border text-gray-700 px-3 py-1 rounded text-sm hover:bg-gray-100">Pilih Semua</button>
+                        <button onclick="selectAll(false)" class="bg-white border text-gray-700 px-3 py-1 rounded text-sm hover:bg-gray-100">Hapus Pilihan</button>
+                        <div class="h-6 w-px bg-gray-300 mx-1"></div>
+                        <input type="text" id="custom-select" placeholder="Misal: 1, 3, 5-8" class="p-1 px-2 border rounded text-sm w-40">
+                        <button onclick="applyCustomSelect()" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">Terapkan</button>
+                    </div>
+                </div>
+
+                <!-- AREA PREVIEW -->
+                <div id="print-area" class="flex flex-wrap gap-y-4 justify-between"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // URL APPS SCRIPT ANDA SUDAH DIMASUKKAN DI SINI
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyhQAEgCO47nsnXLsRLxgZj73weKMMqHFTATKlBjtBiKFZ3GXqpXzvZ5DL8iDx8A2KV/exec";
+
+        let dataAlamat = [];
+        const LOGO_URL = "https://raw.githubusercontent.com/tlibrary-shop/tlibrary/main/Logo%20Penerbit%20Andi%20tok.png";
+
+        // MENGAMBIL DATA DARI DATABASE SAAT HALAMAN DIBUKA
+        window.onload = async function() {
+            const printArea = document.getElementById('print-area');
+            printArea.innerHTML = '<div class="w-full p-10 text-center font-bold text-blue-600">⏳ Sedang mengambil data dari Google Sheets...</div>';
+            
+            try {
+                const response = await fetch(SCRIPT_URL);
+                if (!response.ok) throw new Error("Network response was not ok");
+                
+                const result = await response.json();
+                
+                // Load ke variabel
+                dataAlamat = result.map(item => ({
+                    nama: item.nama || '',
+                    alamat: item.alamat || '',
+                    up: item.up || '-',
+                    telp: item.telp || '-',
+                    selected: false 
+                }));
+                updatePreview();
+            } catch (err) {
+                printArea.innerHTML = `
+                    <div class="w-full p-10 text-center">
+                        <p class="font-bold text-red-500 text-xl mb-2">❌ Gagal terhubung ke Database Google Sheets.</p>
+                        <p class="text-gray-600">Pastikan Script di-deploy ke "Anyone" (Semua Orang) dan nama Sheet Anda benar-benar "Database".</p>
+                    </div>`;
+                console.error("Fetch Error Detail:", err);
+            }
+        };
+
+        function renderLabel(data, index) {
+            const isSelected = data.selected ? 'checked' : '';
+            const opacityClass = data.selected ? 'opacity-100' : 'opacity-40 grayscale';
+            const printClass = data.selected ? '' : 'unselected-print';
+
+            return `
+            <div class="label-wrapper w-full sm:w-[49%] transition-all duration-300 ${opacityClass} ${printClass}" id="label-el-${index}">
+                <div class="mb-2 bg-blue-50 p-2 rounded border border-blue-200 flex justify-between items-center no-print">
+                    <label class="font-bold text-blue-800 cursor-pointer flex items-center gap-2 text-sm">
+                        <input type="checkbox" class="w-4 h-4 cursor-pointer" onchange="toggleSelect(${index})" ${isSelected}>
+                        Pilih Label Ini
+                    </label>
+                    <span class="text-xs font-bold text-gray-500 bg-white px-2 py-0.5 rounded border">#${index + 1}</span>
+                </div>
+
+                <div contenteditable="true" class="outline-none print-content">
+                    <div class="box-label min-h-[200px] flex flex-col justify-center">
+                        <div class="box-title">Kepada Yth:</div>
+                        <div class="font-bold text-xl uppercase mt-6 mb-4">${data.nama || '-'}</div>
+                        <div class="text-lg leading-snug mb-4">${data.alamat || '-'}</div>
+                        <div class="font-bold text-lg">UP: ${data.up || '-'}</div>
+                        <div class="font-bold text-lg">TELP. ${data.telp || '-'}</div>
+                    </div>
+                    <div class="box-label min-h-[200px] flex flex-col justify-center items-center font-serif-custom" contenteditable="false">
+                        <div class="box-title">Pengirim :</div>
+                        <img src="${LOGO_URL}" crossorigin="anonymous" class="h-16 w-auto object-contain mb-2" onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Eagle_icon.svg/512px-Eagle_icon.svg.png';">
+                        <div class="font-bold text-xl uppercase mb-3 tracking-wider">CV ANDI OFFSET</div>
+                        <div class="text-lg leading-tight mb-4">
+                            <div>Jl. Beo No.38-40 Demangan Baru</div>
+                            <div>Yogyakarta 55281</div>
+                        </div>
+                        <div class="font-bold text-lg">Telp : (0274) 561881</div>
+                        <div class="font-bold text-lg">Fax &nbsp;: (0274) 588282</div>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function updatePreview() {
+            const container = document.getElementById('print-area');
+            container.innerHTML = '';
+            let selectedCount = 0;
+            
+            [...dataAlamat].reverse().forEach((item, originalReverseIndex) => {
+                const index = dataAlamat.length - 1 - originalReverseIndex; 
+                container.innerHTML += renderLabel(item, index);
+                if(item.selected) selectedCount++;
+            });
+            
+            document.getElementById('count').innerText = dataAlamat.length;
+            document.getElementById('selected-count').innerText = selectedCount;
+            searchLabel(); 
+        }
+
+        // TAMBAH DATA MANUAL + AUTO SAVE API
+        async function tambahManual() {
+            const nama = document.getElementById('in-nama').value;
+            const alamat = document.getElementById('in-alamat').value;
+            const up = document.getElementById('in-up').value || '-';
+            const telp = document.getElementById('in-telp').value || '-';
+            
+            if(!nama && !alamat) return alert("Nama/Alamat wajib diisi!");
+
+            const btn = document.getElementById('btn-tambah');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = "⏳ Sedang menyimpan...";
+            btn.disabled = true;
+
+            const newData = { nama, alamat, up, telp, selected: true };
+
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(newData),
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                });
+
+                dataAlamat.push(newData);
+                updatePreview();
+                
+                document.getElementById('in-nama').value = '';
+                document.getElementById('in-alamat').value = '';
+                document.getElementById('in-up').value = '';
+                document.getElementById('in-telp').value = '';
+
+            } catch (err) {
+                alert("Gagal menyimpan ke database, cek koneksi internet atau pengaturan Apps Script.");
+            }
+
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+
+        // UPLOAD EXCEL + AUTO SAVE API
+        const dropZone = document.getElementById('drop-zone');
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+        dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('drag-over'); });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault(); dropZone.classList.remove('drag-over');
+            if (e.dataTransfer.files.length) bacaExcel(e.dataTransfer.files[0]);
+        });
+        function handleFile(e) { bacaExcel(e.target.files[0]); e.target.value = ''; }
+
+        function bacaExcel(file) {
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, {type: 'array'});
+                const excelRows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                
+                const dataToUpload = [];
+                excelRows.forEach(row => {
+                    const nama = row['NAMA INSTANSI'] || row['NAMA'] || '';
+                    const alamat = row['ALAMAT LENGKAP'] || row['ALAMAT'] || '';
+                    const up = row['UP'] || row['PIC'] || '-';
+                    const telp = row['NO TELP'] || row['TELP'] || '-';
+                    if(nama || alamat) dataToUpload.push({ nama, alamat, up, telp, selected: true }); 
+                });
+
+                if(dataToUpload.length > 0) {
+                    const btn = document.getElementById('btn-excel');
+                    const originalText = btn.innerHTML;
+                    btn.innerHTML = "⏳ Sinkronisasi ke Server...";
+                    btn.disabled = true;
+
+                    try {
+                        await fetch(SCRIPT_URL, {
+                            method: 'POST',
+                            body: JSON.stringify(dataToUpload),
+                            headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                        });
+                        
+                        dataAlamat = dataAlamat.concat(dataToUpload);
+                        updatePreview();
+                        alert(`${dataToUpload.length} Data berhasil di-upload ke sistem & tersimpan di database!`);
+                    } catch(err) {
+                        alert("Gagal sinkronisasi data ke Database.");
+                    }
+
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // FUNGSI LAINNYA
+        function cetakPrinter() {
+            const hasSelected = dataAlamat.some(item => item.selected);
+            if(dataAlamat.length === 0 || !hasSelected) return alert("Pilih minimal 1 label yang ingin dicetak!");
+            window.print();
+        }
+
+        function downloadPDFLangsung() {
+            const selectedData = dataAlamat.filter(item => item.selected);
+            if(selectedData.length === 0) return alert("Pilih minimal 1 label yang ingin didownload!");
+
+            let namaPertama = selectedData[0].nama || "Customer";
+            namaPertama = namaPertama.replace(/[^a-zA-Z0-9 ]/g, "").trim().replace(/\s+/g, "_");
+            let namaFile = `Kepada_${namaPertama}${selectedData.length > 1 ? `_dkk_${selectedData.length}_Alamat` : ""}.pdf`;
+
+            const tempContainer = document.createElement('div');
+            tempContainer.style.width = '170mm'; 
+            tempContainer.style.margin = '0 auto';
+            
+            selectedData.forEach((data, index) => {
+                const pageBreak = index === selectedData.length - 1 ? '' : 'page-break-after: always;'; 
+                tempContainer.innerHTML += `
+                    <div style="height: 270mm; display: flex; flex-direction: column; justify-content: space-evenly; padding-bottom: 5px; box-sizing: border-box; ${pageBreak}">
+                        <div style="width: 100%; box-sizing: border-box; border: 4px double #1e88e5; border-radius: 15px; padding: 40px; text-align: center; position: relative; height: 45%; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: white;">
+                            <div style="position: absolute; top: 25px; left: 30px; color: #d1d5db; font-style: italic; font-weight: bold; font-size: 20px;">Kepada Yth:</div>
+                            <div style="font-weight: bold; font-size: 32px; text-transform: uppercase; margin-top: 30px; margin-bottom: 16px;">${data.nama || '-'}</div>
+                            <div style="font-size: 24px; line-height: 1.4; margin-bottom: 16px;">${data.alamat || '-'}</div>
+                            <div style="font-weight: bold; font-size: 24px; margin-bottom: 8px;">UP: ${data.up || '-'}</div>
+                            <div style="font-weight: bold; font-size: 24px;">TELP. ${data.telp || '-'}</div>
+                        </div>
+                        <div style="height: 20px;"></div>
+                        <div style="width: 100%; box-sizing: border-box; border: 4px double #1e88e5; border-radius: 15px; padding: 40px; text-align: center; position: relative; height: 45%; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: white; font-family: 'Times New Roman', Times, serif;">
+                            <div style="position: absolute; top: 25px; left: 30px; color: #d1d5db; font-style: italic; font-weight: bold; font-size: 20px;">Pengirim :</div>
+                            <img src="${LOGO_URL}" crossorigin="anonymous" style="height: 120px; object-fit: contain; margin-bottom: 20px;">
+                            <div style="font-weight: bold; font-size: 32px; text-transform: uppercase; margin-bottom: 16px; letter-spacing: 1px;">CV ANDI OFFSET</div>
+                            <div style="font-size: 24px; line-height: 1.3; margin-bottom: 20px;"><div>Jl. Beo No.38-40 Demangan Baru</div><div>Yogyakarta 55281</div></div>
+                            <div style="font-weight: bold; font-size: 24px; margin-bottom: 8px;">Telp : (0274) 561881</div><div style="font-weight: bold; font-size: 24px;">Fax &nbsp;: (0274) 588282</div>
+                        </div>
+                    </div>`;
+            });
+
+            const opt = { margin: [10, 15], filename: namaFile, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
+            const btn = document.getElementById('btn-download'); const originalText = btn.innerHTML;
+            btn.innerHTML = '⏳ Memproses PDF...'; btn.classList.add('opacity-50', 'cursor-not-allowed');
+            
+            html2pdf().set(opt).from(tempContainer).save().then(() => { btn.innerHTML = originalText; btn.classList.remove('opacity-50', 'cursor-not-allowed'); })
+            .catch(() => { alert("Gagal membuat PDF."); btn.innerHTML = originalText; btn.classList.remove('opacity-50', 'cursor-not-allowed'); });
+        }
+
+        function downloadTemplate() {
+            const ws_data = [['NAMA INSTANSI', 'ALAMAT LENGKAP', 'UP', 'NO TELP'], ['PAUD PELANGI', 'Kebondowo, Kec.Banyubiru', 'Ibu Yan', '085640840258']];
+            const ws = XLSX.utils.aoa_to_sheet(ws_data);
+            ws['!cols'] = [{wch: 30}, {wch: 60}, {wch: 20}, {wch: 20}];
+            const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Database");
+            XLSX.writeFile(wb, "Template_Alamat.xlsx");
+        }
+
+        function searchLabel() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            dataAlamat.forEach((item, originalReverseIndex) => {
+                const index = dataAlamat.length - 1 - originalReverseIndex;
+                const el = document.getElementById(`label-el-${index}`);
+                if (!el) return;
+                const content = `${item.nama} ${item.alamat} ${item.up}`.toLowerCase();
+                el.style.display = content.includes(query) ? '' : 'none';
+            });
+        }
+
+        function applyCustomSelect() {
+            const input = document.getElementById('custom-select').value;
+            if(!input) return alert("Masukkan nomor (contoh: 1, 3, 5-8)");
+            dataAlamat.forEach(item => item.selected = false);
+            input.split(',').forEach(part => {
+                part = part.trim();
+                if(part.includes('-')) {
+                    const [start, end] = part.split('-');
+                    for(let i = parseInt(start); i <= parseInt(end); i++) if(dataAlamat[i - 1]) dataAlamat[i - 1].selected = true;
+                } else {
+                    const num = parseInt(part);
+                    if(dataAlamat[num - 1]) dataAlamat[num - 1].selected = true;
+                }
+            });
+            updatePreview();
+        }
+
+        function toggleSelect(index) { dataAlamat[index].selected = !dataAlamat[index].selected; updatePreview(); }
+        function selectAll(status) { dataAlamat.forEach(item => item.selected = status); updatePreview(); }
+        function clearData() { if(confirm("Bersihkan layar preview (Tidak akan menghapus data di Google Sheets)?")) { dataAlamat = []; updatePreview(); } }
+    </script>
+</body>
+</html>
