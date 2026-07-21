@@ -347,18 +347,18 @@
         .preview-subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 30px; }
 
         /* =========================================================
-           6. Halaman TwidyTools
+           6. Halaman TwidyTools & Address Label (Iframe Container)
         ========================================================= */
-        #view-twidytools { padding: 0; display: none; flex-direction: column; }
-        #view-twidytools.active { display: flex; }
+        #view-twidytools, #view-alamat { padding: 0; display: none; flex-direction: column; }
+        #view-twidytools.active, #view-alamat.active { display: flex; }
         
-        .twidy-header {
+        .sub-header-bar {
             padding: 16px 24px; background: var(--bg-card); 
             border-bottom: 1px solid rgba(0,0,0,0.05); 
             display: flex; align-items: center;
         }
 
-        #view-twidytools iframe {
+        .sub-header-bar iframe {
             flex: 1; width: 100%; border: none; height: 100%; min-height: calc(100vh - 65px); display: block;
         }
 
@@ -457,6 +457,11 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                     Surat Jalan
                 </div>
+                <!-- Menu Baru: Address Label -->
+                <div class="nav-item" id="nav-alamat" onclick="switchTab('alamat')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    Address Label
+                </div>
                 <div class="nav-item" id="nav-twidytools" onclick="switchTab('twidytools')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
                     TwidyTools
@@ -522,9 +527,17 @@
                         <p>Generate & Batch Processing PDF.<br>Upload banyak PDF sekaligus untuk diproses dengan format surat jalan yang rapi.</p>
                     </div>
 
+                    <div class="feature-card" onclick="switchTab('alamat')">
+                        <div class="card-icon">
+                            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        </div>
+                        <h3>📍 Address Label</h3>
+                        <p>Cetak label alamat otomatis.<br>Sinkronisasi langsung dengan database Google Sheets & export PDF.</p>
+                    </div>
+
                     <div class="feature-card" onclick="switchTab('twidytools')">
                         <div class="card-icon">
-                            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                         </div>
                         <h3>🛠 TwidyTools</h3>
                         <p>Kumpulan utilitas lengkap.<br>PDF • Image • AI • Converter • Utility.</p>
@@ -580,11 +593,23 @@
                 </div>
             </div>
 
+            <!-- ================= VIEW: ADDRESS LABEL ================= -->
+            <div id="view-alamat" class="view-section">
+                <div class="sub-header-bar">
+                    <button class="btn-back" onclick="switchTab('home')" style="margin-bottom: 0;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                        Kembali ke Dashboard
+                    </button>
+                </div>
+                <!-- Mengambil file dari folder lokal /alamat/ -->
+                <iframe src="./alamat/"></iframe>
+            </div>
+
             <!-- ================= VIEW: TWIDY TOOLS ================= -->
             <div id="view-twidytools" class="view-section">
-                <div class="twidy-header">
+                <div class="sub-header-bar">
                     <button class="btn-back" onclick="switchTab('home')" style="margin-bottom: 0;">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                         Kembali ke Dashboard
                     </button>
                 </div>
@@ -687,7 +712,7 @@
     </script>
 
     <!-- ==========================================
-         SCRIPT ORIGINAL PDF GENERATOR DENGAN PERBAIKAN LOGIKA "DOUBLE ENTER"
+         SCRIPT ORIGINAL PDF GENERATOR (DENGAN FIX PELANGGAN)
     =========================================== -->
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
@@ -751,18 +776,15 @@
                     itemsMap[yKey].push({x: x, text: text});
                 });
 
-                // Urutkan baris dari atas ke bawah (berdasarkan koordinat Y yang menurun)
                 let rows = Object.keys(itemsMap).map(y => ({ y: parseInt(y), cols: itemsMap[y].sort((a,b) => a.x - b.x) })).sort((a,b) => b.y - a.y);
                 
                 if (p === 1) {
                     let fullTextArray = rows.map(r => r.cols.map(c => c.text).join(" ")); 
                     let fullText = fullTextArray.join(" ");
 
-                    // 1. Ekstrak No SO (Sama seperti sebelumnya)
                     let matchSO = fullText.match(/(SO\d{4}-\d{5})/);
                     if (matchSO) noSO = matchSO[1];
 
-                    // 2. Ekstrak Keterangan (Diambil dari sisi kiri saja agar aman)
                     let leftSideTextArray = rows.map(r => r.cols.filter(c => c.x < 350).map(c => c.text).join(" ")).filter(t => t.trim() !== "");
                     let leftFullText = leftSideTextArray.join(" ");
                     let ketIndex = leftFullText.indexOf("Keterangan Nota");
@@ -777,27 +799,21 @@
                         }
                     }
 
-                    // 3. LOGIKA BARU UNTUK PELANGGAN (Deteksi "Double Enter" / Jarak Baris)
                     let isReadingPelanggan = false;
                     let pelangganLines = [];
                     let lastY = null;
 
                     for (let i = 0; i < rows.length; i++) {
                         let row = rows[i];
-                        
-                        // Fokuskan hanya membaca koordinat teks di sebelah kanan halaman (X >= 350)
                         let rightCols = row.cols.filter(c => c.x >= 350);
                         if (rightCols.length === 0) continue;
 
                         let rowText = rightCols.map(c => c.text).join(" ").trim();
                         if (!rowText) continue;
 
-                        // Jika menemukan kata kunci awal "Pelanggan"
                         if (rowText.match(/Pelanggan\s*:/i)) {
                             isReadingPelanggan = true;
                             lastY = row.y;
-                            
-                            // Jika ada teks setelah titik dua, ambil (meski jarang)
                             let textAfter = rowText.replace(/Pelanggan\s*:/i, "").trim();
                             if (textAfter && !textAfter.match(/^[\d\-\s]+$/)) {
                                 pelangganLines.push(textAfter);
@@ -805,42 +821,31 @@
                             continue;
                         }
 
-                        // Jika sedang dalam proses mengumpulkan baris nama pelanggan
                         if (isReadingPelanggan) {
-                            
-                            // ===== DETEKSI DOUBLE ENTER =====
                             if (lastY !== null) {
                                 let gap = lastY - row.y; 
-                                
-                                // Jika selisih Y (gap antar baris) melebihi 18 poin, 
-                                // itu artinya ada jarak spasi / enter kosong! HENTIKAN PEMBACAAN!
                                 if (gap > 18) {
                                     break; 
                                 }
                             }
 
-                            // Rambu berhenti tambahan jika tiba-tiba ketemu bagian lain
                             if (rowText.match(/Tipe\s*:/i) || rowText.match(/Sales\s*:/i)) {
                                 break;
                             }
 
-                            // Abaikan baris ID pelanggan yang biasanya berupa angka/strip (misal: "21-25120026")
                             if (rowText.match(/^[\d\-\s]+$/)) {
                                 lastY = row.y; 
                                 continue;
                             }
 
-                            // Jika lolos semua filter, ini pasti sambungan nama Pelanggan! Masukkan ke antrean
                             pelangganLines.push(rowText);
                             lastY = row.y;
                         }
                     }
 
-                    // Gabungkan baris-baris nama pelanggan dengan spasi
                     pelanggan = pelangganLines.join(" ");
                 }
 
-                // Logika pembacaan barang (Tidak Diubah)
                 let pageBarang = [];
                 let barangTemp = null;
 
