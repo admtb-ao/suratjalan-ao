@@ -358,8 +358,13 @@
             display: flex; align-items: center;
         }
 
-        .sub-header-bar iframe {
-            flex: 1; width: 100%; border: none; height: 100%; min-height: calc(100vh - 65px); display: block;
+        /* INI PERBAIKANNYA: CSS langsung menargetkan elemen iframe di dalamnya */
+        #view-twidytools iframe, #view-alamat iframe {
+            flex: 1; 
+            width: 100%; 
+            border: none; 
+            min-height: calc(100vh - 70px); 
+            display: block;
         }
 
         /* =========================================================
@@ -432,6 +437,8 @@
             .main-content { margin-left: 0; }
             .topbar { display: flex; }
             .view-section { padding: 24px 20px; }
+            /* Khusus penampil Iframe agar tidak ada padding ekstra di mobile */
+            #view-twidytools, #view-alamat { padding: 0; }
             .sidebar-overlay.show { display: block; opacity: 1; pointer-events: auto; }
             
             .datetime-weather-widget { width: 100%; justify-content: center; }
@@ -537,7 +544,7 @@
 
                     <div class="feature-card" onclick="switchTab('twidytools')">
                         <div class="card-icon">
-                            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                         </div>
                         <h3>🛠 TwidyTools</h3>
                         <p>Kumpulan utilitas lengkap.<br>PDF • Image • AI • Converter • Utility.</p>
@@ -712,7 +719,7 @@
     </script>
 
     <!-- ==========================================
-         SCRIPT ORIGINAL PDF GENERATOR (DENGAN FIX PELANGGAN)
+         SCRIPT ORIGINAL PDF GENERATOR
     =========================================== -->
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
