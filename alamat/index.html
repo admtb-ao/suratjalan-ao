@@ -382,12 +382,12 @@
 
         function searchLabel() {
             const query = document.getElementById('search-input').value.toLowerCase();
-            dataAlamat.forEach((item, originalReverseIndex) => {
-                const index = dataAlamat.length - 1 - originalReverseIndex;
+            dataAlamat.forEach((item, index) => {
                 const el = document.getElementById(`label-el-${index}`);
                 if (!el) return;
                 const content = `${item.nama} ${item.alamat} ${item.up}`.toLowerCase();
-                el.style.display = content.includes(query) ? '' : 'none';
+                if (content.includes(query)) el.style.display = '';
+                else el.style.display = 'none';
             });
         }
 
