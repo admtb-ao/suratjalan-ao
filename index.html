@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Twidy Dashboard - Generator Surat Jalan</title>
+    <title>Twidy Dashboard - Smart UI</title>
     
     <!-- Font Poppins -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- PDF Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
@@ -14,430 +14,322 @@
     
     <style>
         /* =========================================================
-           1. MODERN DASHBOARD VARIABLES & RESET
+           1. MODERN DARK DASHBOARD VARIABLES & RESET
         ========================================================= */
         :root {
-            --primary: #6C4CF5;
-            --secondary: #8B5CF6;
-            --accent: #EC4899;
-            --bg-body: #F7F8FC;
-            --bg-card: #FFFFFF;
-            --text-main: #1E293B;
-            --text-muted: #64748B;
-            --sidebar-width: 280px;
-            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --bg-outer: #2a3439;
+            --bg-app: #121212;
+            --bg-app-gradient: radial-gradient(circle at 30% 40%, #2a1610 0%, #121212 60%);
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-bg-hover: rgba(255, 255, 255, 0.08);
+            --primary: #4ADE80; /* Mint Green */
+            --primary-dark: #1E293B;
+            --text-main: #FFFFFF;
+            --text-muted: #9CA3AF;
+            --sidebar-width: 90px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: var(--bg-body);
+            background-color: var(--bg-outer);
             color: var(--text-main);
             overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
         }
 
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
+
         /* =========================================================
-           1.B. LOGIN SCREEN CSS
+           1.B. LOGIN SCREEN CSS (GLASSMORPHISM)
         ========================================================= */
         #login-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
-            background: linear-gradient(135deg, var(--bg-body) 0%, #E2E8F0 100%);
+            background: var(--bg-outer);
             display: flex; justify-content: center; align-items: center;
             z-index: 9999;
         }
         .login-card {
-            background: white; padding: 40px; border-radius: 24px;
-            box-shadow: 0 10px 40px rgba(108, 76, 245, 0.15);
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 40px; border-radius: 30px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             width: 100%; max-width: 380px; text-align: center;
         }
-        .login-card h2 { font-size: 24px; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
-        .login-card p { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; }
+        .login-card h2 { font-size: 24px; font-weight: 600; color: var(--text-main); margin-bottom: 8px; }
+        .login-card p { font-size: 13px; color: var(--text-muted); margin-bottom: 30px; }
         .login-input {
             width: 100%; padding: 14px 16px; margin-bottom: 16px;
-            border: 1px solid rgba(0,0,0,0.1); border-radius: 12px;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--glass-border); border-radius: 16px;
+            color: white;
             font-size: 14px; font-family: inherit; outline: none; transition: var(--transition);
         }
-        .login-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(108, 76, 245, 0.1); }
+        .login-input::placeholder { color: rgba(255,255,255,0.3); }
+        .login-input:focus { border-color: var(--primary); box-shadow: 0 0 0 1px var(--primary); }
         .btn-login {
-            width: 100%; padding: 14px; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: white; border: none; border-radius: 12px; font-weight: 600; font-size: 15px;
+            width: 100%; padding: 14px; background: var(--primary);
+            color: #000; border: none; border-radius: 16px; font-weight: 600; font-size: 15px;
             cursor: pointer; transition: var(--transition);
+            margin-top: 10px;
         }
-        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 8px 20px -5px rgba(108, 76, 245, 0.4); }
-        #login-error { color: #E11D48; font-size: 13px; font-weight: 500; margin-top: 12px; display: none; }
+        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 8px 20px -5px rgba(74, 222, 128, 0.4); }
+        #login-error { color: #ef4444; font-size: 13px; font-weight: 500; margin-top: 16px; display: none; }
         
-        #app-container { display: none; } /* Tersembunyi sebelum login */
+        #app-container { display: none; } 
 
         /* =========================================================
-           2. SIDEBAR & LAYOUT
+           2. SIDEBAR & MAIN LAYOUT
         ========================================================= */
         .dashboard-layout {
-            /* flex dipanggil dari javascript setelah login */
-            min-height: 100vh;
+            width: 100%; max-width: 1400px;
+            height: calc(100vh - 40px);
+            background: var(--bg-app-gradient);
+            border-radius: 30px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            overflow: hidden;
+            position: relative;
         }
 
         .sidebar {
             width: var(--sidebar-width);
-            background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
-            position: fixed;
-            top: 0; left: 0; bottom: 0;
-            display: flex;
-            flex-direction: column;
-            padding: 32px 24px;
-            color: white;
-            z-index: 100;
-            transition: var(--transition);
+            background: rgba(0, 0, 0, 0.2);
+            border-right: 1px solid var(--glass-border);
+            display: flex; flex-direction: column; align-items: center;
+            padding: 30px 0; z-index: 100;
         }
 
         .sidebar-brand {
-            font-size: 24px; font-weight: 700;
-            margin-bottom: 48px;
-            display: flex; align-items: center; gap: 12px;
-            cursor: pointer;
+            width: 50px; height: 50px; background: var(--glass-bg);
+            border-radius: 16px; display: flex; justify-content: center; align-items: center;
+            margin-bottom: 40px; cursor: pointer; border: 1px solid var(--glass-border);
         }
-        
-        .sidebar-brand svg { width: 28px; height: 28px; }
+        .sidebar-brand svg { width: 24px; height: 24px; color: var(--text-main); }
 
-        .nav-menu {
-            display: flex; flex-direction: column; gap: 12px; flex: 1;
-        }
+        .nav-menu { display: flex; flex-direction: column; gap: 20px; flex: 1; width: 100%; align-items: center; }
 
         .nav-item {
-            display: flex; align-items: center; gap: 14px;
-            padding: 14px 18px;
-            border-radius: 14px;
-            color: rgba(255,255,255,0.8);
-            font-weight: 500; font-size: 15px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .nav-item:hover, .nav-item.active {
-            background: rgba(255, 255, 255, 0.15);
-            color: white;
-            transform: translateX(4px);
-        }
-
-        .nav-item svg { width: 20px; height: 20px; }
-
-        /* Kartu Roket Sidebar */
-        .sidebar-promo-card {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 24px 20px;
-            text-align: center;
-            margin-top: 15px;
-        }
-
-        .sidebar-promo-card .icon-rocket {
-            font-size: 32px; margin-bottom: 12px; display: inline-block;
-        }
-
-        .sidebar-promo-card p {
-            font-size: 13px; color: rgba(255,255,255,0.9); line-height: 1.5; font-weight: 500;
-        }
-
-        .btn-logout {
-            margin-top: auto; 
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-        }
-        .btn-logout:hover { background: #E11D48 !important; color: white; }
-
-        /* =========================================================
-           3. MAIN CONTENT AREA, TOPBAR & BUTTONS
-        ========================================================= */
-        .main-content {
-            flex: 1;
-            margin-left: var(--sidebar-width);
-            display: flex; flex-direction: column;
-            min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            width: 50px; height: 50px; border-radius: 16px;
+            color: var(--text-muted); cursor: pointer; transition: var(--transition);
             position: relative;
         }
 
-        .topbar {
-            display: none;
-            padding: 20px 24px;
-            background: var(--bg-card);
-            align-items: center;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            position: sticky; top: 0; z-index: 90;
+        .nav-item:hover { color: var(--text-main); background: var(--glass-bg-hover); }
+        .nav-item.active { background: var(--primary); color: #000; box-shadow: 0 0 15px rgba(74, 222, 128, 0.3); }
+        .nav-item svg { width: 22px; height: 22px; }
+        
+        .nav-item::after {
+            content: attr(data-tooltip); position: absolute; left: 70px;
+            background: rgba(0,0,0,0.8); color: white; padding: 6px 12px; border-radius: 8px;
+            font-size: 12px; font-weight: 500; opacity: 0; pointer-events: none;
+            transition: var(--transition); white-space: nowrap; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .nav-item:hover::after { opacity: 1; transform: translateX(5px); }
+
+        .btn-logout { margin-top: auto; }
+        .btn-logout:hover { background: #ef4444; color: white; }
+
+        /* =========================================================
+           3. MAIN CONTENT AREA & HEADER
+        ========================================================= */
+        .main-content {
+            flex: 1; display: flex; flex-direction: column;
+            position: relative; height: 100%; overflow-y: auto;
         }
 
-        .menu-toggle {
-            background: none; border: none; cursor: pointer;
-            color: var(--text-main); display: flex; align-items: center;
+        .smart-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 30px 40px;
         }
 
-        /* Tombol Kembali (Back) */
-        .btn-back {
-            display: inline-flex; align-items: center; gap: 6px;
-            background: none; border: none;
-            color: var(--text-muted); font-size: 14px; font-weight: 500;
-            font-family: inherit; cursor: pointer;
-            transition: var(--transition);
+        .header-title-group h1 { font-size: 20px; font-weight: 500; letter-spacing: 0.5px; }
+        .header-title-group p { font-size: 13px; color: var(--text-muted); }
+
+        .header-status-group {
+            display: flex; align-items: center; gap: 24px;
+            background: rgba(0,0,0,0.3); padding: 10px 20px; border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.8);
         }
-        .btn-back:hover {
-            color: var(--primary);
-            transform: translateX(-4px);
-        }
-        .btn-back svg { width: 18px; height: 18px; }
+        .header-status-group span { display: flex; align-items: center; gap: 8px; }
+        .header-status-group svg { width: 16px; height: 16px; opacity: 0.7; }
 
         .view-section {
-            display: none;
-            padding: 40px;
-            animation: fadeSlideUp 0.3s ease forwards;
-            flex: 1;
+            display: none; padding: 0 40px 40px 40px;
+            animation: fadeIn 0.4s ease forwards; flex: 1;
         }
-
-        .view-section.active {
-            display: flex; flex-direction: column;
-        }
-
-        @keyframes fadeSlideUp {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .view-section.active { display: flex; flex-direction: column; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         /* =========================================================
-           4. Halaman Home / Landing Page + WIDGET CUACA
+           4. HALAMAN HOME (3D HOUSE INTERAKTIF)
         ========================================================= */
-        .home-header { 
-            margin-bottom: 48px; 
+        .home-layout {
+            display: grid; grid-template-columns: 1fr 380px; gap: 40px; height: 100%;
+        }
+
+        .hero-section {
+            display: flex; flex-direction: column; justify-content: flex-start;
+            position: relative; border-radius: 30px; padding: 30px;
+            overflow: hidden; box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
+        }
+
+        .hero-bg-image {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover; z-index: 0; transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .hero-section:hover .hero-bg-image { transform: scale(1.05); }
+
+        .hero-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.6) 100%);
+            z-index: 1;
+        }
+
+        .hero-content { position: relative; z-index: 2; }
+        
+        .floating-widget {
+            position: absolute; 
+            bottom: 30px; 
+            left: 30px; 
+            z-index: 3; 
+            background: rgba(20, 20, 20, 0.4);
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 24px;
+            padding: 20px 30px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            transition: var(--transition); 
+            cursor: default;
             display: flex; 
-            flex-direction: column; 
+            gap: 40px; 
             align-items: center; 
-            text-align: center; 
-            gap: 24px;
+            width: max-content;
         }
-        .home-header-text h1 { font-size: 36px; font-weight: 700; margin-bottom: 8px; color: var(--text-main); }
-        .home-header-text p { font-size: 16px; color: var(--text-muted); }
+        .floating-widget:hover { background: rgba(30, 30, 30, 0.5); border-color: rgba(255,255,255,0.2); }
 
-        /* WIDGET CUACA & JAM CSS */
-        .datetime-weather-widget {
-            display: inline-flex;
-            align-items: center;
-            gap: 20px;
-            background: var(--bg-card);
-            padding: 16px 28px;
-            border-radius: 20px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.03);
-            border: 1px solid rgba(0,0,0,0.04);
-            text-align: left; 
+        .widget-row { display: flex; align-items: center; gap: 20px; justify-content: space-between; }
+        .widget-left { display: flex; align-items: center; gap: 16px; }
+        .widget-icon { font-size: 24px; opacity: 0.8; }
+        .widget-text { display: flex; flex-direction: column; }
+        .widget-title { font-size: 15px; font-weight: 500; color: #fff; margin-bottom: 2px;}
+        .widget-sub { font-size: 11px; color: var(--text-muted); }
+        .widget-val { font-size: 18px; font-weight: 600; color: #facc15; }
+        .widget-val.humidity { color: var(--primary); }
+
+        /* Panel Kontrol Kanan */
+        .control-panel { display: flex; flex-direction: column; gap: 16px; padding-right: 10px; }
+        .glass-card {
+            background: rgba(20, 20, 20, 0.4); backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 20px;
+            display: flex; align-items: center; gap: 16px; cursor: pointer; transition: var(--transition);
         }
+        .glass-card:hover { background: rgba(30, 30, 30, 0.6); border-color: rgba(255,255,255,0.15); }
 
-        .time-container {
-            border-right: 1px solid rgba(0,0,0,0.1);
-            padding-right: 20px;
-            text-align: right;
+        .toggle-switch {
+            width: 44px; height: 24px; background: rgba(255,255,255,0.1); border-radius: 12px;
+            position: relative; transition: var(--transition);
         }
-
-        .time-container .time {
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--primary);
-            line-height: 1.1;
-            letter-spacing: -1px;
+        .toggle-switch::after {
+            content: ''; position: absolute; top: 3px; left: 3px;
+            width: 18px; height: 18px; background: #9CA3AF; border-radius: 50%; transition: var(--transition);
         }
+        .glass-card:hover .toggle-switch { background: var(--primary); }
+        .glass-card:hover .toggle-switch::after { background: #000; transform: translateX(20px); }
 
-        .time-container .date {
-            font-size: 12px;
-            color: var(--text-muted);
-            font-weight: 500;
-            margin-top: 2px;
-        }
-
-        .weather-container {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        .weather-icon {
-            font-size: 38px;
-            line-height: 1;
-        }
-
-        .weather-info {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .weather-info .temp-location {
-            display: flex;
-            align-items: baseline;
-            gap: 8px;
-        }
-
-        .weather-info .temp {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .weather-info .location {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-muted);
-        }
-
-        .weather-info .condition {
-            font-size: 12px;
-            color: var(--primary);
-            font-weight: 500;
-            margin-top: -2px;
-        }
-
-        .cards-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 48px;
-        }
-
-        .feature-card {
-            background: var(--bg-card);
-            border-radius: 24px; padding: 32px;
-            border: 1px solid rgba(0,0,0,0.04);
-            box-shadow: 0 4px 24px rgba(0,0,0,0.03);
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 16px 40px rgba(108, 76, 245, 0.12);
-            border-color: rgba(108, 76, 245, 0.3);
-        }
-
-        .feature-card .card-icon {
-            width: 56px; height: 56px; border-radius: 16px;
-            background: rgba(108, 76, 245, 0.1);
-            display: flex; align-items: center; justify-content: center;
-            color: var(--primary); margin-bottom: 24px;
-        }
-
-        .feature-card h3 { font-size: 20px; font-weight: 600; margin-bottom: 12px; }
-        .feature-card p { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
-
-        .info-badges {
-            display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: auto; padding-top: 40px;
-        }
-
-        .badge {
-            display: flex; align-items: center; gap: 8px;
-            background: white; padding: 10px 16px; border-radius: 12px;
-            font-size: 13px; font-weight: 500; color: var(--text-muted);
-            border: 1px solid rgba(0,0,0,0.05);
-        }
+        .feature-card-lg { flex-direction: column; align-items: stretch; padding: 24px; }
+        .feature-card-lg .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .feature-card-lg .header .title-area { display: flex; align-items: center; gap: 12px; }
+        .feature-card-lg .icon { width: 36px; height: 36px; background: var(--primary); color: #000; border-radius: 10px; display: flex; justify-content: center; align-items: center;}
 
         /* =========================================================
-           5. Halaman Surat Jalan
+           5. HALAMAN LAIN (SURAT JALAN, DLL)
         ========================================================= */
-        #view-surat-jalan { align-items: center; }
-
         .app-wrapper {
-            background: var(--bg-card);
-            padding: 40px; border-radius: 24px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.04);
-            width: 100%; max-width: 650px; text-align: center;
+            background: rgba(20, 20, 20, 0.5); backdrop-filter: blur(20px);
+            padding: 40px; border-radius: 30px; border: 1px solid var(--glass-border);
+            width: 100%; max-width: 700px; text-align: center; margin: 0 auto;
         }
 
-        .app-wrapper h2 { font-size: 24px; font-weight: 600; margin-bottom: 8px; }
-        .app-wrapper p.desc { font-size: 14px; color: var(--text-muted); margin-bottom: 32px; }
+        .app-wrapper h2 { font-size: 24px; font-weight: 500; margin-bottom: 8px; }
+        .app-wrapper p.desc { font-size: 13px; color: var(--text-muted); margin-bottom: 32px; }
 
         .drop-zone {
-            border: 2px dashed rgba(108, 76, 245, 0.3); border-radius: 20px; padding: 45px 20px;
-            background-color: rgba(108, 76, 245, 0.02); transition: var(--transition);
-            cursor: pointer; margin-bottom: 24px;
+            border: 2px dashed rgba(255,255,255,0.2); border-radius: 24px; padding: 50px 20px;
+            background-color: rgba(0,0,0,0.2); transition: var(--transition); cursor: pointer; margin-bottom: 24px;
         }
-        .drop-zone:hover, .drop-zone.dragover { border-color: var(--primary); background-color: rgba(108, 76, 245, 0.05); }
-        .drop-zone svg { width: 50px; height: 50px; color: var(--primary); margin-bottom: 15px; }
-        .drop-zone .title { font-size: 16px; font-weight: 600; margin-bottom: 8px; display: block; color: var(--text-main); }
-        .drop-zone .subtitle { font-size: 13px; color: var(--text-muted); display: block; }
+        .drop-zone:hover, .drop-zone.dragover { border-color: var(--primary); background-color: rgba(74, 222, 128, 0.05); }
+        .drop-zone svg { width: 50px; height: 50px; color: var(--primary); margin-bottom: 15px; opacity: 0.8; }
+        .drop-zone .title { font-size: 15px; font-weight: 500; margin-bottom: 8px; display: block; }
+        .drop-zone .subtitle { font-size: 12px; color: var(--text-muted); display: block; }
         .drop-zone input[type="file"] { display: none; }
         
         .file-info {
-            display: none; margin-top: 20px; padding: 16px; background: rgba(108, 76, 245, 0.05);
-            border: 1px solid rgba(108, 76, 245, 0.2); border-radius: 12px; font-size: 13px; font-weight: 500; 
-            color: var(--primary); max-height: 120px; overflow-y: auto; text-align: left;
+            display: none; margin-top: 20px; padding: 16px; background: rgba(255,255,255,0.05);
+            border-radius: 16px; font-size: 12px; color: var(--primary); max-height: 120px; overflow-y: auto; text-align: left;
         }
 
         .btn-process {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; border: none;
-            padding: 16px 28px; width: 100%; border-radius: 16px; font-size: 15px; font-weight: 600;
-            cursor: pointer; transition: var(--transition); display: inline-block;
+            background: var(--primary); color: #000; border: none; padding: 16px 28px; width: 100%;
+            border-radius: 16px; font-size: 14px; font-weight: 600; cursor: pointer; transition: var(--transition);
         }
-        .btn-process:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(108, 76, 245, 0.4); }
-        .btn-process:disabled { background: #E2E8F0; color: #94A3B8; cursor: not-allowed; box-shadow: none; }
-        
-        .btn-success { background: linear-gradient(135deg, #10B981 0%, #059669 100%); margin-top: 15px; }
-        .btn-success:hover:not(:disabled) { box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.4); }
-
-        #status-text { margin-top: 16px; font-size: 14px; font-weight: 500; color: var(--primary); min-height: 20px; }
+        .btn-process:hover:not(:disabled) { box-shadow: 0 10px 25px -5px rgba(74, 222, 128, 0.3); }
+        .btn-process:disabled { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.3); cursor: not-allowed; }
+        .btn-success { background: #34d399; margin-top: 15px; }
 
         #preview-section {
-            display: none; width: 100%; max-width: 950px; margin-top: 40px;
-            background: var(--bg-card); padding: 40px; border-radius: 24px; text-align: center;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.04);
+            display: none; width: 100%; max-width: 950px; margin: 40px auto 0;
+            background: rgba(20, 20, 20, 0.5); padding: 40px; border-radius: 30px; text-align: center;
+            border: 1px solid var(--glass-border); backdrop-filter: blur(20px);
         }
 
-        #preview-section h2 { margin-bottom: 8px; font-size: 22px; }
-        .preview-subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 30px; }
+        #status-text { margin-top: 16px; font-size: 13px; color: var(--primary); min-height: 20px; }
 
-        /* =========================================================
-           6. Halaman TwidyTools & Address Label (Iframe Container)
-        ========================================================= */
-        #view-twidytools, #view-alamat { padding: 0; display: none; flex-direction: column; }
-        #view-twidytools.active, #view-alamat.active { display: flex; }
-        
-        .sub-header-bar {
-            padding: 16px 24px; background: var(--bg-card); 
-            border-bottom: 1px solid rgba(0,0,0,0.05); 
-            display: flex; align-items: center;
+        .btn-back {
+            display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.05);
+            border: 1px solid var(--glass-border); color: white; padding: 10px 16px; border-radius: 12px;
+            font-size: 13px; cursor: pointer; transition: var(--transition); margin-bottom: 24px; width: fit-content;
         }
+        .btn-back:hover { background: rgba(255,255,255,0.1); }
 
-        #view-twidytools iframe, #view-alamat iframe {
-            flex: 1; 
-            width: 100%; 
-            border: none; 
-            min-height: calc(100vh - 70px); 
-            display: block;
+        #view-twidytools, #view-alamat { padding-top: 0; }
+        iframe {
+            flex: 1; width: 100%; border: 1px solid var(--glass-border); border-radius: 20px;
+            min-height: calc(100vh - 150px); background: rgba(255,255,255,0.95);
         }
 
         /* =========================================================
-           7. CSS CETAK & EXPORT PDF
+           6. CSS CETAK (TETAP PUTIH)
         ========================================================= */
-        .paper-container { margin-bottom: 40px; }
+        .paper-container { margin-bottom: 40px; display: flex; flex-direction: column; align-items: center; }
         .paper-wrapper {
-            background: white; width: 215.9mm; margin: 0 auto 20px auto;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: left;
-            overflow: visible; box-sizing: border-box; padding: 10mm;
+            background: #FFFFFF !important; width: 215.9mm; margin: 0 auto 20px auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: left; padding: 10mm;
+            color: #000000 !important; border-radius: 4px;
         }
-
-        .editable-field { border-bottom: 1px dashed #94a3b8; outline: none; padding: 1px 4px; display: inline-block; min-width: 20px; }
-        td[contenteditable="true"] { outline: none; transition: background-color 0.2s; }
-        .editable-field:focus, .editable-field:hover, td[contenteditable="true"]:focus, td[contenteditable="true"]:hover {
-            background-color: rgba(108, 76, 245, 0.1);
-        }
-
+        .editable-field { border-bottom: 1px dashed #cbd5e1; outline: none; padding: 1px 4px; display: inline-block; min-width: 20px; color: #000 !important; }
+        td[contenteditable="true"] { outline: none; transition: background-color 0.2s; color: #000 !important;}
+        .editable-field:focus, td[contenteditable="true"]:focus { background-color: rgba(74, 222, 128, 0.2); }
         body.exporting .editable-field, .exporting .editable-field { border-bottom: none !important; background-color: transparent !important; padding: 1px 0 !important; }
         body.exporting td[contenteditable="true"], .exporting td[contenteditable="true"] { background-color: transparent !important; }
-        body.exporting, body.exporting .paper-container, .exporting .paper-container { margin: 0 !important; padding: 0 !important; box-shadow: none !important; }
-
-        body.exporting .paper-wrapper, .exporting .paper-wrapper {
-            width: 182mm !important; max-width: 182mm !important;
-            padding: 12mm 0 0 0 !important; margin: 0 auto !important;
-            box-shadow: none !important; border: none !important;
-        }
-
-        body.exporting tr, .exporting tr, 
-        body.exporting .footer-note, .exporting .footer-note, 
-        body.exporting .ttd-table, .exporting .ttd-table {
-            page-break-inside: avoid !important; break-inside: avoid !important;
-        }
         
-        .cetakan-surat-jalan { width: 100%; background: white; box-sizing: border-box; font-family: Arial, sans-serif !important; color: #000000 !important; }
+        .cetakan-surat-jalan { width: 100%; font-family: Arial, sans-serif !important; color: #000000 !important; background: #fff !important; }
         .header-text { text-align: center; color: #000000; }
         .header-text .title1 { font-size: 14pt; font-weight: bold; }
         .header-text .title2 { font-size: 22pt; font-weight: bold; margin: 2px 0; }
@@ -454,207 +346,201 @@
         .keterangan-table { width: 100%; font-size: 10pt; margin-top: 15px; border-collapse: collapse; }
         .keterangan-table td { padding: 3px 0; vertical-align: top; }
         .main-table { width: 100%; border-collapse: collapse; font-size: 10.5pt; margin-top: 10px; border: 2px solid #000000; table-layout: fixed; }
-        .main-table th { border: 1px solid #000000; padding: 5px; font-weight: bold; text-align: center; border-bottom: 2px solid #000000; }
-        .main-table tbody td { border-left: 1px solid #000000; border-right: 1px solid #000000; border-top: none; border-bottom: none; padding: 5px; word-wrap: break-word; } 
+        .main-table th { border: 1px solid #000000; padding: 5px; font-weight: bold; text-align: center; border-bottom: 2px solid #000000; color: #000;}
+        .main-table tbody td { border-left: 1px solid #000000; border-right: 1px solid #000000; padding: 5px; word-wrap: break-word; color: #000;} 
         .text-center { text-align: center; }
-        .footer-note { font-size: 9pt; text-transform: uppercase; font-weight: bold; padding: 6px 5px; border-top: 2px solid #000000; }
-        .ttd-table { width: 100%; border-collapse: collapse; font-size: 10.5pt; text-align: center; font-weight: bold; margin-top: 25px; }
+        .footer-note { font-size: 9pt; font-weight: bold; padding: 6px 5px; border-top: 2px solid #000000; color: #000;}
+        .ttd-table { width: 100%; border-collapse: collapse; font-size: 10.5pt; text-align: center; font-weight: bold; margin-top: 25px; color: #000;}
         .ttd-table td { border: none !important; height: 70px; vertical-align: bottom; padding-bottom: 5px; }
 
-        /* =========================================================
-           8. RESPONSIVE MOBILE
-        ========================================================= */
-        .sidebar-overlay {
-            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.4); z-index: 95; opacity: 0; transition: var(--transition); pointer-events: none;
-        }
-
-        @media (max-width: 768px) {
-            .sidebar { transform: translateX(-100%); }
-            .sidebar.show { transform: translateX(0); }
-            .main-content { margin-left: 0; }
-            .topbar { display: flex; }
-            .view-section { padding: 24px 20px; }
-            #view-twidytools, #view-alamat { padding: 0; }
-            .sidebar-overlay.show { display: block; opacity: 1; pointer-events: auto; }
-            
-            .datetime-weather-widget { width: 100%; justify-content: center; }
+        @media (max-width: 900px) {
+            .dashboard-layout { height: 100vh; max-width: 100%; border-radius: 0; border: none; flex-direction: column;}
+            .sidebar { width: 100%; height: 60px; flex-direction: row; padding: 0 20px; justify-content: space-between; border-right: none; border-bottom: 1px solid var(--glass-border); }
+            .sidebar-brand { margin-bottom: 0; width: 40px; height: 40px; }
+            .nav-menu { flex-direction: row; justify-content: flex-end; gap: 10px; }
+            .nav-item { width: 40px; height: 40px; }
+            .nav-item::after { display: none; }
+            .home-layout { grid-template-columns: 1fr; }
+            .smart-header { flex-direction: column; align-items: flex-start; gap: 15px; padding: 20px; }
+            .view-section { padding: 20px; }
+            .floating-widget { flex-direction: column; bottom: 20px; left: 20px; gap: 20px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ================= VIEW: LOGIN SCREEN ================= -->
+    <!-- ================= VIEW: LOGIN ================= -->
     <div id="login-screen">
         <div class="login-card">
-            <div style="display:flex; justify-content:center; margin-bottom: 16px;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" width="48" height="48" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <div style="display:flex; justify-content:center; margin-bottom: 20px;">
+                <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" width="36" height="36" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                </div>
             </div>
             <h2>Tools AO</h2>
-            <p>Silakan otorisasi masuk ke sistem operasional AO.</p>
-            
+            <p>Sistem Operasi Terpusat</p>
             <input type="text" id="login-username" class="login-input" placeholder="Username">
             <input type="password" id="login-password" class="login-input" placeholder="Password" onkeypress="handleLoginEnter(event)">
-            
-            <button class="btn-login" onclick="prosesLogin()">Masuk Dashboard</button>
-            <div id="login-error">Username atau Password salah!</div>
+            <button class="btn-login" onclick="prosesLogin()">Masuk Sistem</button>
+            <div id="login-error">Akses ditolak. Coba lagi.</div>
         </div>
     </div>
 
-    <!-- ================= WRAPPER UTAMA (Disembunyikan sebelum login) ================= -->
+    <!-- ================= DASHBOARD LAYOUT ================= -->
     <div id="app-container" class="dashboard-layout">
-        <!-- Sidebar Navigation -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-brand" onclick="switchTab('home')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><path d="M3 9h18"></path><path d="M9 21V9"></path></svg>
-                Tools AO
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
             </div>
-            
             <nav class="nav-menu">
-                <div class="nav-item active" id="nav-home" onclick="switchTab('home')">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                    Beranda
+                <div class="nav-item active" id="nav-home" onclick="switchTab('home')" data-tooltip="Dashboard">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                 </div>
-                <div class="nav-item" id="nav-surat-jalan" onclick="switchTab('surat-jalan')">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                    Surat Jalan
+                <div class="nav-item" id="nav-surat-jalan" onclick="switchTab('surat-jalan')" data-tooltip="Surat Jalan">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
                 </div>
-                <div class="nav-item" id="nav-alamat" onclick="switchTab('alamat')">
+                <div class="nav-item" id="nav-alamat" onclick="switchTab('alamat')" data-tooltip="Address Label">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                    Address Label
                 </div>
-                <div class="nav-item" id="nav-twidytools" onclick="switchTab('twidytools')">
+                <div class="nav-item" id="nav-twidytools" onclick="switchTab('twidytools')" data-tooltip="TwidyTools">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
-                    TwidyTools
                 </div>
-
-                <!-- Tombol Logout -->
-                <div class="nav-item btn-logout" onclick="prosesLogout()">
+                <div class="nav-item btn-logout" onclick="prosesLogout()" data-tooltip="Logout">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-                    Keluar Sistem
                 </div>
             </nav>
-
-            <div class="sidebar-promo-card">
-                <span class="icon-rocket">🚀</span>
-                <p>Solusi cepat untuk surat jalan & tools bisnis Anda</p>
-            </div>
         </aside>
 
-        <!-- Overlay Mobile -->
-        <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleMobileMenu(false)"></div>
-
-        <!-- Main Content Area -->
         <main class="main-content">
-            <!-- Topbar Khusus Mobile -->
-            <header class="topbar">
-                <button class="menu-toggle" onclick="toggleMobileMenu()">
-                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                </button>
-                <div style="font-weight: 600; font-size: 16px; margin-left: 16px; cursor: pointer; color: var(--primary);" onclick="switchTab('home')">
-                    Dashboard
+            <header class="smart-header">
+                <div class="header-title-group">
+                    <h1 id="top-title">Workspace</h1>
+                    <p id="live-date">Memuat tanggal...</p>
+                </div>
+                <div class="header-status-group">
+                    <span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+                        <span id="live-temp">--°C</span>
+                    </span>
+                    <span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+                        <span id="live-condition">Cuaca</span>
+                    </span>
+                    <span style="color: var(--text-main); font-size: 15px; margin-left: 10px;" id="live-time">00:00</span>
                 </div>
             </header>
 
             <!-- ================= VIEW: HOME ================= -->
             <div id="view-home" class="view-section active">
-                
-                <!-- HEADER (DITENGAHKAN) -->
-                <div class="home-header">
-                    <div class="home-header-text">
-                        <h1>👋 Selamat Datang</h1>
-                        <p>Kelola Surat Jalan dan berbagai tools dalam satu dashboard.</p>
-                    </div>
-
-                    <!-- WIDGET JAM & CUACA LIVE -->
-                    <div class="datetime-weather-widget">
-                        <div class="time-container">
-                            <div class="time" id="live-time">00:00</div>
-                            <div class="date" id="live-date">Memuat tanggal...</div>
+                <div class="home-layout">
+                    
+                    <!-- 3D House Interaktif & Floating Widget -->
+                    <div class="hero-section">
+                        <!-- Source gambar diarahkan ke image_619674.jpg yang kamu minta -->
+                        <img src="image_619674.jpg" class="hero-bg-image" alt="3D Smart House with Garden">
+                        
+                        <div class="hero-overlay"></div>
+                        
+                        <div class="hero-content">
+                            <h2 style="font-size: 28px; font-weight: 300; margin-bottom: 5px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">AO <strong>Dashboard</strong></h2>
+                            <p style="color: rgba(255,255,255,0.9); font-size: 13px; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">Sistem operasional terpadu terpusat.</p>
                         </div>
-                        <div class="weather-container">
-                            <div class="weather-icon" id="weather-icon">☀️</div>
-                            <div class="weather-info">
-                                <div class="temp-location">
-                                    <span class="temp" id="live-temp">--°C</span>
-                                    <span class="location">Yogyakarta</span>
+
+                        <!-- Floating Widget Suhu & Kelembaban -->
+                        <div class="floating-widget">
+                            <div class="widget-row">
+                                <div class="widget-left">
+                                    <div class="widget-icon">
+                                        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"></path></svg>
+                                    </div>
+                                    <div class="widget-text">
+                                        <span class="widget-title">Temperature</span>
+                                        <span class="widget-sub">Optimally: 20-24 °C</span>
+                                    </div>
                                 </div>
-                                <div class="condition" id="live-condition">Memuat cuaca...</div>
+                                <div class="widget-val">22°C</div>
+                            </div>
+                            
+                            <!-- Hapus HR, jadikan berjejer ke samping -->
+                            
+                            <div class="widget-row">
+                                <div class="widget-left">
+                                    <div class="widget-icon">
+                                        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+                                    </div>
+                                    <div class="widget-text">
+                                        <span class="widget-title">Humidity</span>
+                                        <span class="widget-sub">Optimally: 40-60 %</span>
+                                    </div>
+                                </div>
+                                <div class="widget-val humidity">55%</div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="cards-grid">
-                    <div class="feature-card" onclick="switchTab('surat-jalan')">
-                        <div class="card-icon">
-                            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    <!-- Panel Kanan (Kontrol Modul) -->
+                    <div class="control-panel">
+                        <div class="glass-card feature-card-lg" onclick="switchTab('surat-jalan')">
+                            <div class="header">
+                                <div class="title-area">
+                                    <div class="icon"><svg viewBox="0 0 24 24" width="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg></div>
+                                    <h4 style="margin:0; font-size: 16px;">Surat Jalan Generator</h4>
+                                </div>
+                                <div class="toggle-switch"></div>
+                            </div>
+                            <p style="color: var(--text-muted); font-size: 12px; margin-top: -5px;">Upload batch PDF Sales Order dan jadikan Surat Jalan.</p>
                         </div>
-                        <h3>📄 Surat Jalan</h3>
-                        <p>Generate & Batch Processing PDF.<br>Upload banyak PDF sekaligus untuk diproses dengan format surat jalan yang rapi.</p>
-                    </div>
-
-                    <div class="feature-card" onclick="switchTab('alamat')">
-                        <div class="card-icon">
-                            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        <div class="glass-card feature-card-lg" onclick="switchTab('alamat')">
+                            <div class="header">
+                                <div class="title-area">
+                                    <div class="icon" style="background: #3b82f6;"><svg viewBox="0 0 24 24" width="18" fill="none" stroke="#fff" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path></svg></div>
+                                    <h4 style="margin:0; font-size: 16px;">Address Label</h4>
+                                </div>
+                                <div class="toggle-switch"></div>
+                            </div>
+                            <p style="color: var(--text-muted); font-size: 12px; margin-top: -5px;">Cetak label alamat langsung terhubung database.</p>
                         </div>
-                        <h3>📍 Address Label</h3>
-                        <p>Cetak label alamat otomatis.<br>Sinkronisasi langsung dengan database Google Sheets & export PDF.</p>
-                    </div>
-
-                    <div class="feature-card" onclick="switchTab('twidytools')">
-                        <div class="card-icon">
-                            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                        <div class="glass-card feature-card-lg" onclick="switchTab('twidytools')">
+                            <div class="header">
+                                <div class="title-area">
+                                    <div class="icon" style="background: #f43f5e;"><svg viewBox="0 0 24 24" width="18" fill="none" stroke="#fff" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94z"></path></svg></div>
+                                    <h4 style="margin:0; font-size: 16px;">TwidyTools</h4>
+                                </div>
+                                <div class="toggle-switch"></div>
+                            </div>
+                            <p style="color: var(--text-muted); font-size: 12px; margin-top: -5px;">Koleksi utilitas, PDF converter, dan AI tools.</p>
                         </div>
-                        <h3>🛠 TwidyTools</h3>
-                        <p>Kumpulan utilitas lengkap.<br>PDF • Image • AI • Converter • Utility.</p>
                     </div>
-                </div>
-
-                <!-- BADGE BAWAH DITENGAHKAN JUGA -->
-                <div class="info-badges">
-                    <div class="badge">✨ Batch PDF</div>
-                    <div class="badge">⚡ Cepat & Akurat</div>
-                    <div class="badge">🔒 100% Client Side</div>
                 </div>
             </div>
 
             <!-- ================= VIEW: SURAT JALAN ================= -->
             <div id="view-surat-jalan" class="view-section">
-                <div style="width: 100%; max-width: 650px; text-align: left; margin-bottom: 20px;">
-                    <button class="btn-back" onclick="switchTab('home')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                        Kembali
-                    </button>
-                </div>
-
+                <button class="btn-back" onclick="switchTab('home')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    Tutup Modul
+                </button>
                 <div class="app-wrapper">
-                    <h2>Generator Surat Jalan</h2>
-                    <p class="desc">Sistem Batch Processing (Upload Banyak PDF Sekaligus)</p>
-
+                    <h2>Ekstrak Surat Jalan</h2>
+                    <p class="desc">Sistem Batch Processing File PDF</p>
                     <div class="drop-zone" id="dropArea" onclick="document.getElementById('fileSoInput').click()">
                         <input type="file" id="fileSoInput" accept="application/pdf" multiple>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                        <span class="title">Tarik & Lepas File Sales Order (PDF)</span>
-                        <span class="subtitle">Bisa pilih banyak file sekaligus untuk diproses bersamaan</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        <span class="title">Tarik & Lepas PDF Di Sini</span>
+                        <span class="subtitle">Atau klik untuk memilih file</span>
                         <div class="file-info" id="fileInfo"></div>
                     </div>
-
                     <button class="btn-process" id="btnProses" onclick="prosesBanyakPDF()" disabled>
-                        Ekstrak & Tampilkan Semua
+                        Mulai Proses Data
                     </button>
                     <div id="status-text"></div>
                 </div>
-
                 <div id="preview-section">
-                    <h2>Preview Surat Jalan</h2>
-                    <p class="preview-subtitle">Silakan periksa dan edit masing-masing surat jalan sebelum diunduh.</p>
-                    
+                    <h2 style="font-weight: 500; margin-bottom: 30px;">Preview Dokumen</h2>
                     <div id="all-papers-container"></div>
-
-                    <div style="margin-top: 20px; padding-top: 30px; border-top: 1px solid rgba(0,0,0,0.05);">
-                        <button class="btn-process btn-success" id="btnDownloadAll" onclick="unduhSemuaGabungan()" style="max-width: 400px; display: none; margin: 0 auto;">
-                            Unduh Semua Sekaligus (Gabung 1 PDF)
+                    <div style="margin-top: 20px;">
+                        <button class="btn-process btn-success" id="btnDownloadAll" onclick="unduhSemuaGabungan()" style="max-width: 350px; display: none; margin: 0 auto;">
+                            Unduh Semua (Gabung PDF)
                         </button>
                     </div>
                 </div>
@@ -662,35 +548,27 @@
 
             <!-- ================= VIEW: ADDRESS LABEL ================= -->
             <div id="view-alamat" class="view-section">
-                <div class="sub-header-bar">
-                    <button class="btn-back" onclick="switchTab('home')" style="margin-bottom: 0;">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                        Kembali ke Dashboard
-                    </button>
-                </div>
-                <!-- Mengambil file dari folder lokal /alamat/ -->
+                <button class="btn-back" onclick="switchTab('home')" style="margin-bottom: 20px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    Tutup Modul
+                </button>
                 <iframe src="./alamat/"></iframe>
             </div>
 
             <!-- ================= VIEW: TWIDY TOOLS ================= -->
             <div id="view-twidytools" class="view-section">
-                <div class="sub-header-bar">
-                    <button class="btn-back" onclick="switchTab('home')" style="margin-bottom: 0;">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                        Kembali ke Dashboard
-                    </button>
-                </div>
+                <button class="btn-back" onclick="switchTab('home')" style="margin-bottom: 20px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    Tutup Modul
+                </button>
                 <iframe src="https://twidytools.my.id"></iframe>
             </div>
 
         </main>
     </div>
 
-    <!-- ==========================================
-         SCRIPT LOGIKA SISTEM (LOGIN, UI, JAM, PDF)
-    =========================================== -->
+    <!-- SCRIPT LOGIKA -->
     <script>
-        // --- SCRIPT OTENTIKASI (LOGIN/LOGOUT) ---
         function checkLogin() {
             if (sessionStorage.getItem('isLoggedIn') === 'true') {
                 document.getElementById('login-screen').style.display = 'none';
@@ -705,270 +583,138 @@
             const user = document.getElementById('login-username').value;
             const pass = document.getElementById('login-password').value;
             const errorText = document.getElementById('login-error');
-
             if (user === 'adminpusat' && pass === 'andi3840') {
                 sessionStorage.setItem('isLoggedIn', 'true');
                 errorText.style.display = 'none';
                 document.getElementById('login-username').value = '';
                 document.getElementById('login-password').value = '';
                 checkLogin();
-            } else {
-                errorText.style.display = 'block';
-            }
+            } else { errorText.style.display = 'block'; }
         }
 
-        function handleLoginEnter(e) {
-            if (e.key === 'Enter') {
-                prosesLogin();
-            }
-        }
+        function handleLoginEnter(e) { if (e.key === 'Enter') prosesLogin(); }
 
         function prosesLogout() {
-            sessionStorage.removeItem('isLoggedIn');
-            checkLogin();
-            switchTab('home'); // Kembalikan ke beranda untuk sesi selanjutnya
+            sessionStorage.removeItem('isLoggedIn'); checkLogin(); switchTab('home');
         }
-
-        // Jalankan pengecekan login saat halaman pertama dimuat
         checkLogin();
 
-
-        // --- NAVIGASI DASHBOARD ---
         function switchTab(tabId) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            
             document.getElementById('view-' + tabId).classList.add('active');
-            
             let navItem = document.getElementById('nav-' + tabId);
             if(navItem) navItem.classList.add('active');
-
-            if(window.innerWidth <= 768) {
-                toggleMobileMenu(false);
-            }
+            const titles = { 'home': 'Workspace', 'surat-jalan': 'Modul: Surat Jalan', 'alamat': 'Modul: Address Label', 'twidytools': 'Modul: TwidyTools' };
+            document.getElementById('top-title').innerText = titles[tabId];
         }
 
-        function toggleMobileMenu(forceState) {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebar-overlay');
-            
-            if (forceState === false) {
-                sidebar.classList.remove('show');
-                overlay.classList.remove('show');
-            } else {
-                sidebar.classList.toggle('show');
-                overlay.classList.toggle('show');
-            }
-        }
-
-        // --- SCRIPT JAM & CUACA WIDGET ---
         function updateDateTime() {
             const now = new Date();
             const timeElement = document.getElementById('live-time');
             const dateElement = document.getElementById('live-date');
-            
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
             timeElement.innerText = `${hours}:${minutes}`;
-
-            const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            const days = ['Ming', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
             dateElement.innerText = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
         }
 
         async function updateWeather() {
             try {
-                // Fetch cuaca Yogyakarta via Open-Meteo API
                 const response = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-7.7971&longitude=110.3688&current_weather=true');
                 const data = await response.json();
-                const weather = data.current_weather;
-
-                document.getElementById('live-temp').innerText = `${Math.round(weather.temperature)}°C`;
-                
-                // Menerjemahkan WMO Weather Code
-                const wmoCodes = {
-                    0: { desc: 'Cerah', icon: '☀️' },
-                    1: { desc: 'Cerah Berawan', icon: '🌤️' },
-                    2: { desc: 'Berawan', icon: '⛅' },
-                    3: { desc: 'Mendung', icon: '☁️' },
-                    45: { desc: 'Berkabut', icon: '🌫️' },
-                    48: { desc: 'Kabut Embun', icon: '🌫️' },
-                    51: { desc: 'Gerimis Ringan', icon: '🌦️' },
-                    53: { desc: 'Gerimis Sedang', icon: '🌧️' },
-                    55: { desc: 'Gerimis Lebat', icon: '🌧️' },
-                    61: { desc: 'Hujan Ringan', icon: '🌧️' },
-                    63: { desc: 'Hujan Sedang', icon: '🌧️' },
-                    65: { desc: 'Hujan Lebat', icon: '⛈️' },
-                    80: { desc: 'Hujan Gerimis', icon: '🌦️' },
-                    95: { desc: 'Badai Petir', icon: '🌩️' }
-                };
-
-                const condition = wmoCodes[weather.weathercode] || { desc: 'Tidak Diketahui', icon: '🌡️' };
-                document.getElementById('live-condition').innerText = condition.desc;
-                document.getElementById('weather-icon').innerText = condition.icon;
-
-            } catch (error) {
-                console.error("Gagal mengambil cuaca:", error);
-                document.getElementById('live-condition').innerText = "Gagal memuat cuaca";
-            }
+                document.getElementById('live-temp').innerText = `${Math.round(data.current_weather.temperature)}°C`;
+                document.getElementById('live-condition').innerText = "Yogyakarta";
+            } catch (error) { document.getElementById('live-temp').innerText = "--°C"; }
         }
+        setInterval(updateDateTime, 1000); updateDateTime(); updateWeather();
 
-        setInterval(updateDateTime, 1000);
-        updateDateTime();
-        
-        updateWeather();
-        setInterval(updateWeather, 1800000); 
-
-        // --- SCRIPT GENERATOR PDF SURAT JALAN ---
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-
         const dropArea = document.getElementById('dropArea');
         const fileInput = document.getElementById('fileSoInput');
         const btnProses = document.getElementById('btnProses');
 
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            dropArea.addEventListener(eventName, preventDefaults, false);
-        });
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => { dropArea.addEventListener(eventName, preventDefaults, false); });
         function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
-
-        ['dragenter', 'dragover'].forEach(eventName => {
-            dropArea.addEventListener(eventName, () => dropArea.classList.add('dragover'), false);
-        });
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropArea.addEventListener(eventName, () => dropArea.classList.remove('dragover'), false);
-        });
+        ['dragenter', 'dragover'].forEach(eventName => { dropArea.addEventListener(eventName, () => dropArea.classList.add('dragover'), false); });
+        ['dragleave', 'drop'].forEach(eventName => { dropArea.addEventListener(eventName, () => dropArea.classList.remove('dragover'), false); });
 
         dropArea.addEventListener('drop', (e) => {
             let dt = e.dataTransfer;
-            if(dt.files.length > 0) {
-                fileInput.files = dt.files;
-                handleFileSelect(); 
-            }
+            if(dt.files.length > 0) { fileInput.files = dt.files; handleFileSelect(); }
         });
 
         fileInput.addEventListener('change', handleFileSelect);
-
         function handleFileSelect() {
             if (fileInput.files.length > 0) {
                 let fileNames = Array.from(fileInput.files).map(f => `- ${f.name}`).join('<br>');
                 document.getElementById('fileInfo').style.display = 'block';
-                document.getElementById('fileInfo').innerHTML = `📄 <strong>${fileInput.files.length} File siap diproses:</strong><br>${fileNames}`;
-                btnProses.disabled = false; 
-                document.getElementById('preview-section').style.display = 'none';
+                document.getElementById('fileInfo').innerHTML = `📄 <strong>${fileInput.files.length} File siap:</strong><br>${fileNames}`;
+                btnProses.disabled = false; document.getElementById('preview-section').style.display = 'none';
             }
         }
 
         async function extractDataFromPDF(file) {
             const arrayBuffer = await file.arrayBuffer();
             const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
-            
-            let noSO = "", keterangan = "", pelanggan = ""; 
-            let dataBarang = []; 
-
+            let noSO = "", keterangan = "", pelanggan = ""; let dataBarang = []; 
             for (let p = 1; p <= pdf.numPages; p++) {
                 const page = await pdf.getPage(p);
                 const textContent = await page.getTextContent();
-                
                 let itemsMap = {};
                 textContent.items.forEach(item => {
-                    let y = Math.round(item.transform[5]);
-                    let x = Math.round(item.transform[4]);
-                    let text = item.str.trim();
+                    let y = Math.round(item.transform[5]); let x = Math.round(item.transform[4]); let text = item.str.trim();
                     if (!text) return;
                     let yKey = Object.keys(itemsMap).find(k => Math.abs(k - y) <= 4);
                     if (!yKey) yKey = y;
                     if (!itemsMap[yKey]) itemsMap[yKey] = [];
                     itemsMap[yKey].push({x: x, text: text});
                 });
-
                 let rows = Object.keys(itemsMap).map(y => ({ y: parseInt(y), cols: itemsMap[y].sort((a,b) => a.x - b.x) })).sort((a,b) => b.y - a.y);
-                
                 if (p === 1) {
-                    let fullTextArray = rows.map(r => r.cols.map(c => c.text).join(" ")); 
-                    let fullText = fullTextArray.join(" ");
-
-                    let matchSO = fullText.match(/(SO\d{4}-\d{5})/);
-                    if (matchSO) noSO = matchSO[1];
-
+                    let fullTextArray = rows.map(r => r.cols.map(c => c.text).join(" ")); let fullText = fullTextArray.join(" ");
+                    let matchSO = fullText.match(/(SO\d{4}-\d{5})/); if (matchSO) noSO = matchSO[1];
                     let leftSideTextArray = rows.map(r => r.cols.filter(c => c.x < 350).map(c => c.text).join(" ")).filter(t => t.trim() !== "");
                     let leftFullText = leftSideTextArray.join(" ");
-                    let ketIndex = leftFullText.indexOf("Keterangan Nota");
-                    if (ketIndex === -1) ketIndex = leftFullText.indexOf("Keterangan");
+                    let ketIndex = leftFullText.indexOf("Keterangan Nota"); if (ketIndex === -1) ketIndex = leftFullText.indexOf("Keterangan");
                     if (ketIndex !== -1) {
                         let textAfterKet = leftFullText.substring(ketIndex).replace(/Keterangan(?:\s*Nota)?\s*:\s*/, "");
                         let endMatch = textAfterKet.match(/No\.\s|Kode\b/i); 
-                        if (endMatch) {
-                            keterangan = textAfterKet.substring(0, endMatch.index).trim();
-                        } else {
-                            keterangan = textAfterKet.trim();
-                        }
+                        if (endMatch) keterangan = textAfterKet.substring(0, endMatch.index).trim(); else keterangan = textAfterKet.trim();
                     }
-
-                    let isReadingPelanggan = false;
-                    let pelangganLines = [];
-                    let lastY = null;
-
+                    let isReadingPelanggan = false; let pelangganLines = []; let lastY = null;
                     for (let i = 0; i < rows.length; i++) {
-                        let row = rows[i];
-                        let rightCols = row.cols.filter(c => c.x >= 350);
+                        let row = rows[i]; let rightCols = row.cols.filter(c => c.x >= 350);
                         if (rightCols.length === 0) continue;
-
                         let rowText = rightCols.map(c => c.text).join(" ").trim();
                         if (!rowText) continue;
-
                         if (rowText.match(/Pelanggan\s*:/i)) {
-                            isReadingPelanggan = true;
-                            lastY = row.y;
+                            isReadingPelanggan = true; lastY = row.y;
                             let textAfter = rowText.replace(/Pelanggan\s*:/i, "").trim();
-                            if (textAfter && !textAfter.match(/^[\d\-\s]+$/)) {
-                                pelangganLines.push(textAfter);
-                            }
+                            if (textAfter && !textAfter.match(/^[\d\-\s]+$/)) pelangganLines.push(textAfter);
                             continue;
                         }
-
                         if (isReadingPelanggan) {
-                            if (lastY !== null) {
-                                let gap = lastY - row.y; 
-                                if (gap > 18) {
-                                    break; 
-                                }
-                            }
-
-                            if (rowText.match(/Tipe\s*:/i) || rowText.match(/Sales\s*:/i)) {
-                                break;
-                            }
-
-                            if (rowText.match(/^[\d\-\s]+$/)) {
-                                lastY = row.y; 
-                                continue;
-                            }
-
-                            pelangganLines.push(rowText);
-                            lastY = row.y;
+                            if (lastY !== null && (lastY - row.y > 18)) break; 
+                            if (rowText.match(/Tipe\s*:/i) || rowText.match(/Sales\s*:/i)) break;
+                            if (rowText.match(/^[\d\-\s]+$/)) { lastY = row.y; continue; }
+                            pelangganLines.push(rowText); lastY = row.y;
                         }
                     }
-
                     pelanggan = pelangganLines.join(" ");
                 }
-
-                let pageBarang = [];
-                let barangTemp = null;
-
+                let pageBarang = []; let barangTemp = null;
                 rows.forEach(row => {
                     let rowText = row.cols.map(c => c.text).join(" ");
                     let hasKode = row.cols.find(c => c.text.match(/^\d{2}-\d{2}-\d{2}-\d{2}-\d{6}/));
-
                     if (hasKode) {
                         if (barangTemp) pageBarang.push(barangTemp);
                         let judulCols = row.cols.filter(c => c.x > 80 && c.x < 250 && !c.text.match(/^\d{2}-\d{2}-\d{2}-\d{2}-\d{6}/));
                         let qtyCols = row.cols.filter(c => c.x > 450 && c.text.match(/^\d+$/));
-                        barangTemp = { 
-                            nama: judulCols.map(c => c.text).join(" "), 
-                            qty: qtyCols.length > 0 ? qtyCols[qtyCols.length - 1].text : "1", 
-                            startY: row.y 
-                        };
-                    }
-                    else if (barangTemp && row.y < barangTemp.startY && row.y > 60) {
+                        barangTemp = { nama: judulCols.map(c => c.text).join(" "), qty: qtyCols.length > 0 ? qtyCols[qtyCols.length - 1].text : "1", startY: row.y };
+                    } else if (barangTemp && row.y < barangTemp.startY && row.y > 60) {
                         if (rowText.includes("Page") || rowText.includes("Disiapkan") || rowText.includes("Qty Total") || rowText.match(/Tipe\s*:/)) {
                             pageBarang.push(barangTemp); barangTemp = null;
                         } else {
@@ -978,10 +724,8 @@
                     }
                 });
                 if (barangTemp) pageBarang.push(barangTemp);
-                pageBarang.reverse();
-                dataBarang = dataBarang.concat(pageBarang);
+                pageBarang.reverse(); dataBarang = dataBarang.concat(pageBarang);
             }
-
             return { noSO, keterangan, pelanggan, dataBarang };
         }
 
@@ -989,212 +733,88 @@
             const statusText = document.getElementById('status-text');
             const allPapersContainer = document.getElementById('all-papers-container');
             const btnDownloadAll = document.getElementById('btnDownloadAll');
-            
             if (fileInput.files.length === 0) return;
-
-            btnProses.disabled = true;
-            allPapersContainer.innerHTML = ''; 
+            btnProses.disabled = true; allPapersContainer.innerHTML = ''; 
             
             const d = new Date();
             const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
             const angkaRomawi = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
-            
             let tanggalStr = `Yogyakarta, ${d.getDate()} ${namaBulan[d.getMonth()]} ${d.getFullYear()}`;
-            let bulanStr = angkaRomawi[d.getMonth()];
-            let tahunStr = d.getFullYear();
+            let bulanStr = angkaRomawi[d.getMonth()]; let tahunStr = d.getFullYear();
 
             try {
                 for (let i = 0; i < fileInput.files.length; i++) {
-                    statusText.innerText = `Sedang memproses file ${i + 1} dari ${fileInput.files.length}...`;
-                    
+                    statusText.innerText = `Memproses file ${i + 1} / ${fileInput.files.length}...`;
                     let data = await extractDataFromPDF(fileInput.files[i]);
-                    
                     let barisBarang = "";
                     data.dataBarang.forEach((barang, index) => {
-                        barisBarang += `
-                            <tr>
-                                <td class="text-center" contenteditable="true">${index + 1}</td>
-                                <td contenteditable="true">${barang.nama}</td>
-                                <td class="text-center" contenteditable="true">${barang.qty}</td>
-                                <td contenteditable="true"></td>
-                            </tr>
-                        `;
+                        barisBarang += `<tr><td class="text-center" contenteditable="true">${index + 1}</td><td contenteditable="true">${barang.nama}</td><td class="text-center" contenteditable="true">${barang.qty}</td><td contenteditable="true"></td></tr>`;
                     });
-
                     let htmlSuratJalan = `
                     ${i > 0 ? '<div class="html2pdf__page-break"></div>' : ''}
                     <div class="paper-container">
                         <div id="paper-wrapper-${i}" class="paper-wrapper">
                             <div class="cetakan-surat-jalan">
-                                <div class="header-text">
-                                    <div class="title1">PENERBIT & PERCETAKAN</div>
-                                    <div class="title2">ANDI OFFSET</div>
-                                    <div class="address">Jl. BEO 38-40 TELP. (0274)561881 HUNTING. FAX.588282 YOGYAKARTA 55281 E-mail: pemasaran@andipublisher.net.id</div>
-                                </div>
-                                
+                                <div class="header-text"><div class="title1">PENERBIT & PERCETAKAN</div><div class="title2">ANDI OFFSET</div><div class="address">Jl. BEO 38-40 TELP. (0274)561881 HUNTING. FAX.588282 YOGYAKARTA 55281 E-mail: pemasaran@andipublisher.net.id</div></div>
                                 <table class="sub-header">
                                     <tr>
                                         <td style="width: 25%; vertical-align: top;"><div class="box-hijau">DIKIRIM KEMBALI</div></td>
-                                        <td style="width: 50%;">
-                                            <div class="sj-title">SURAT JALAN</div>
-                                            <div class="sj-no">
-                                                NO : AO / 
-                                                <span class="editable-field" contenteditable="true">${bulanStr}</span> / 
-                                                <span class="editable-field" contenteditable="true">${tahunStr}</span> / 
-                                                <span class="editable-field" contenteditable="true">${data.noSO}</span>
-                                            </div>
-                                        </td>
-                                        <td style="width: 25%; vertical-align: top; padding-top: 5px;">
-                                            <div class="date-right editable-field" contenteditable="true">${tanggalStr}</div>
-                                        </td>
+                                        <td style="width: 50%;"><div class="sj-title">SURAT JALAN</div><div class="sj-no">NO : AO / <span class="editable-field" contenteditable="true">${bulanStr}</span> / <span class="editable-field" contenteditable="true">${tahunStr}</span> / <span class="editable-field" contenteditable="true">${data.noSO}</span></div></td>
+                                        <td style="width: 25%; vertical-align: top; padding-top: 5px;"><div class="date-right editable-field" contenteditable="true">${tanggalStr}</div></td>
                                     </tr>
                                 </table>
-
-                                <table class="kepada-yth">
-                                    <tr>
-                                        <td style="width: 55%;"></td>
-                                        <td style="width: 45%;">
-                                            <span class="kepada-bold">Kepada Yth,</span><br><br>
-                                            <span class="kepada-bold editable-field" contenteditable="true">${data.pelanggan}</span>
-                                        </td>
-                                    </tr>
-                                </table>
+                                <table class="kepada-yth"><tr><td style="width: 55%;"></td><td style="width: 45%;"><span class="kepada-bold">Kepada Yth,</span><br><br><span class="kepada-bold editable-field" contenteditable="true">${data.pelanggan}</span></td></tr></table>
                                 <table class="keterangan-table">
-                                    <tr>
-                                        <td style="width: 11%;">Ekspedisi</td>
-                                        <td style="width: 2%;">:</td>
-                                        <td style="width: 87%;">
-                                            <span class="editable-field" style="width: 100%; display: inline-block; min-height: 15px;" contenteditable="true"></span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Keterangan</td>
-                                        <td>:</td>
-                                        <td>
-                                            <span class="editable-field" style="width: 100%; display: inline-block; min-height: 15px;" contenteditable="true">${data.keterangan}</span>
-                                        </td>
-                                    </tr>
+                                    <tr><td style="width: 11%;">Ekspedisi</td><td style="width: 2%;">:</td><td style="width: 87%;"><span class="editable-field" style="width: 100%; display: inline-block; min-height: 15px;" contenteditable="true"></span></td></tr>
+                                    <tr><td>Keterangan</td><td>:</td><td><span class="editable-field" style="width: 100%; display: inline-block; min-height: 15px;" contenteditable="true">${data.keterangan}</span></td></tr>
                                 </table>
                                 <table class="main-table">
-                                    <thead>
-                                        <tr>
-                                            <th style="width: 5%;">NO</th>
-                                            <th style="width: 65%;">NAMA BARANG</th>
-                                            <th style="width: 10%;">QTY</th>
-                                            <th style="width: 20%;">KOLI</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        ${barisBarang}
-                                    </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <td colspan="4" class="footer-note">
-                                                * 3 HARI SETELAH BARANG DITERIMA TIDAK ADA KOMPLAIN MAKA BARANG KAMI ANGGAP LENGKAP
-                                            </td>
-                                        </tr>
-                                    </tfoot>
+                                    <thead><tr><th style="width: 5%;">NO</th><th style="width: 65%;">NAMA BARANG</th><th style="width: 10%;">QTY</th><th style="width: 20%;">KOLI</th></tr></thead>
+                                    <tbody>${barisBarang}</tbody>
+                                    <tfoot><tr><td colspan="4" class="footer-note">* 3 HARI SETELAH BARANG DITERIMA TIDAK ADA KOMPLAIN MAKA BARANG KAMI ANGGAP LENGKAP</td></tr></tfoot>
                                 </table>
-                                <table class="ttd-table">
-                                    <tr>
-                                        <td style="width: 25%;">DITERIMA OLEH</td>
-                                        <td style="width: 25%;">EKSPEDISI</td>
-                                        <td style="width: 25%;">KEPALA GUDANG</td>
-                                        <td style="width: 25%;">MENGETAHUI</td>
-                                    </tr>
-                                </table>
+                                <table class="ttd-table"><tr><td style="width: 25%;">DITERIMA OLEH</td><td style="width: 25%;">EKSPEDISI</td><td style="width: 25%;">KEPALA GUDANG</td><td style="width: 25%;">MENGETAHUI</td></tr></table>
                             </div>
                         </div>
-                        <button class="btn-process btn-download-single" style="margin-top: 10px;" onclick="unduhSatuPDF(${i}, '${data.noSO}')">
-                            ⤓ Unduh Dokumen Ini Saja (${data.noSO || (i+1)})
-                        </button>
-                    </div>
-                    `;
-
+                        <button class="btn-process btn-download-single" style="margin-top: 10px; max-width: 300px; background: rgba(255,255,255,0.1); color: white;" onclick="unduhSatuPDF(${i}, '${data.noSO}')">⤓ Unduh Single PDF (${data.noSO || (i+1)})</button>
+                    </div>`;
                     allPapersContainer.insertAdjacentHTML('beforeend', htmlSuratJalan);
                 }
-
                 document.getElementById('preview-section').style.display = 'block';
-                statusText.innerText = "Semua data berhasil diekstrak!";
-                btnProses.disabled = false;
-                btnProses.innerText = "Ekstrak Ulang Berkas Baru";
-                
-                if(fileInput.files.length > 1) {
-                    btnDownloadAll.style.display = 'inline-block';
-                } else {
-                    btnDownloadAll.style.display = 'none';
-                }
-
+                statusText.innerText = "Data berhasil diekstrak."; btnProses.disabled = false; btnProses.innerText = "Ekstrak Berkas Lain";
+                btnDownloadAll.style.display = fileInput.files.length > 1 ? 'inline-block' : 'none';
                 setTimeout(() => document.getElementById('preview-section').scrollIntoView({ behavior: 'smooth' }), 100);
-
-            } catch (error) {
-                console.error(error);
-                statusText.style.color = "#E11D48";
-                statusText.innerText = "Gagal memproses salah satu file. Pastikan semuanya valid.";
-                btnProses.disabled = false;
-            }
+            } catch (error) { console.error(error); statusText.style.color = "#ef4444"; statusText.innerText = "Gagal memproses file."; btnProses.disabled = false; }
         }
 
         function getOpsiPDF(filename) {
             return {
-                margin:       [15, 15, 15, 10], 
-                filename:     filename,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, logging: false, scrollY: 0, scrollX: 0 }, 
-                jsPDF:        { unit: 'mm', format: 'letter', orientation: 'portrait' }, 
-                pagebreak:    { mode: ['css', 'legacy'], avoid: 'tr' } 
+                margin: [15, 15, 15, 10], filename: filename, image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, logging: false }, jsPDF: { unit: 'mm', format: 'letter', orientation: 'portrait' }, 
+                pagebreak: { mode: ['css', 'legacy'], avoid: 'tr' } 
             };
         }
 
         function unduhSatuPDF(index, noSO) {
-            window.scrollTo(0, 0);
             const wrapperCetak = document.getElementById(`paper-wrapper-${index}`);
             document.body.classList.add('exporting');
-            
-            const tombolUnduh = wrapperCetak.nextElementSibling; 
-            const teksAsli = tombolUnduh.innerText;
-            tombolUnduh.innerText = "Merender PDF...";
-            tombolUnduh.disabled = true;
-
-            const namaFilePDF = noSO ? `Surat_Jalan_${noSO}.pdf` : `Surat_Jalan_${index+1}.pdf`;
-
-            html2pdf().set(getOpsiPDF(namaFilePDF)).from(wrapperCetak).save().then(() => {
-                document.body.classList.remove('exporting');
-                tombolUnduh.innerText = teksAsli;
-                tombolUnduh.disabled = false;
-            }).catch(err => {
-                console.error(err);
-                document.body.classList.remove('exporting');
-                tombolUnduh.innerText = teksAsli;
-                tombolUnduh.disabled = false;
+            const btn = wrapperCetak.nextElementSibling; const teks = btn.innerText;
+            btn.innerText = "Proses PDF..."; btn.disabled = true;
+            html2pdf().set(getOpsiPDF(noSO ? `Surat_Jalan_${noSO}.pdf` : `Surat_Jalan_${index+1}.pdf`)).from(wrapperCetak).save().then(() => {
+                document.body.classList.remove('exporting'); btn.innerText = teks; btn.disabled = false;
             });
         }
 
         function unduhSemuaGabungan() {
-            window.scrollTo(0, 0);
             const wadahUtama = document.getElementById('all-papers-container');
             document.body.classList.add('exporting');
-            
-            const tombolGabungan = document.getElementById('btnDownloadAll');
-            tombolGabungan.innerText = "Menyusun PDF Gabungan (Mohon Tunggu)...";
-            tombolGabungan.disabled = true;
-
-            const tombolIndividuals = document.querySelectorAll('.btn-download-single');
-            tombolIndividuals.forEach(btn => btn.style.display = 'none');
-
-            html2pdf().set(getOpsiPDF('Kumpulan_Surat_Jalan_Batch.pdf')).from(wadahUtama).save().then(() => {
-                document.body.classList.remove('exporting');
-                tombolGabungan.innerText = "Unduh Semua Sekaligus (Gabung 1 PDF)";
-                tombolGabungan.disabled = false;
-                
-                tombolIndividuals.forEach(btn => btn.style.display = 'inline-block');
-                document.getElementById('status-text').innerText = "Selesai! PDF Gabungan berhasil diunduh.";
-            }).catch(err => {
-                console.error(err);
-                document.body.classList.remove('exporting');
-                tombolGabungan.innerText = "Unduh Semua Sekaligus (Gabung 1 PDF)";
-                tombolGabungan.disabled = false;
-                tombolIndividuals.forEach(btn => btn.style.display = 'inline-block');
+            const btnAll = document.getElementById('btnDownloadAll');
+            btnAll.innerText = "Menyusun PDF..."; btnAll.disabled = true;
+            const btnSingles = document.querySelectorAll('.btn-download-single');
+            btnSingles.forEach(btn => btn.style.display = 'none');
+            html2pdf().set(getOpsiPDF('Kumpulan_Surat_Jalan.pdf')).from(wadahUtama).save().then(() => {
+                document.body.classList.remove('exporting'); btnAll.innerText = "Unduh Semua (Gabung PDF)"; btnAll.disabled = false;
+                btnSingles.forEach(btn => btn.style.display = 'inline-block');
             });
         }
     </script>
