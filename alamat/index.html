@@ -373,7 +373,7 @@
         }
 
         function downloadTemplate() {
-            const ws_data = [['NAMA INSTANSI', 'ALAMAT LENGKAP', 'UP', 'NO TELP'], ['PAUD PELANGI', 'Kebondowo, Kec.Banyubiru', 'Ibu Yan', '085640840258']];
+            const ws_data = [['NAMA INSTANSI', 'ALAMAT LENGKAP', 'UP', 'NO TELP'], ['TWIDY SHOP', 'BANTUL', 'TRI WIDIYANTO', '08993023487']];
             const ws = XLSX.utils.aoa_to_sheet(ws_data);
             ws['!cols'] = [{wch: 30}, {wch: 60}, {wch: 20}, {wch: 20}];
             const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Database");
