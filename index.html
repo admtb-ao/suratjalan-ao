@@ -315,21 +315,40 @@
         }
 
         /* =========================================================
-           6. CSS CETAK (TETAP PUTIH)
+           6. CSS CETAK & EXPORT PDF (DIKEMBALIKAN KE VERSI STABIL AGAR TIDAK TERPOTONG)
         ========================================================= */
         .paper-container { margin-bottom: 40px; display: flex; flex-direction: column; align-items: center; }
         .paper-wrapper {
-            background: #FFFFFF !important; width: 215.9mm; margin: 0 auto 20px auto;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: left; padding: 10mm;
-            color: #000000 !important; border-radius: 4px;
+            background: white !important; width: 215.9mm; margin: 0 auto 20px auto;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: left;
+            overflow: visible; box-sizing: border-box; padding: 10mm;
+            border-radius: 4px;
         }
-        .editable-field { border-bottom: 1px dashed #cbd5e1; outline: none; padding: 1px 4px; display: inline-block; min-width: 20px; color: #000 !important; }
-        td[contenteditable="true"] { outline: none; transition: background-color 0.2s; color: #000 !important;}
-        .editable-field:focus, td[contenteditable="true"]:focus { background-color: rgba(74, 222, 128, 0.2); }
+
+        .editable-field { border-bottom: 1px dashed #94a3b8; outline: none; padding: 1px 4px; display: inline-block; min-width: 20px; color: #000 !important; }
+        td[contenteditable="true"] { outline: none; transition: background-color 0.2s; color: #000 !important; }
+        .editable-field:focus, .editable-field:hover, td[contenteditable="true"]:focus, td[contenteditable="true"]:hover {
+            background-color: rgba(74, 222, 128, 0.2);
+        }
+
         body.exporting .editable-field, .exporting .editable-field { border-bottom: none !important; background-color: transparent !important; padding: 1px 0 !important; }
         body.exporting td[contenteditable="true"], .exporting td[contenteditable="true"] { background-color: transparent !important; }
+        body.exporting, body.exporting .paper-container, .exporting .paper-container { margin: 0 !important; padding: 0 !important; box-shadow: none !important; }
+
+        /* BLOK PENTING UNTUK MENCEGAH KEPOTONG (Jangan Dihapus) */
+        body.exporting .paper-wrapper, .exporting .paper-wrapper {
+            width: 182mm !important; max-width: 182mm !important;
+            padding: 12mm 0 0 0 !important; margin: 0 auto !important;
+            box-shadow: none !important; border: none !important;
+        }
+
+        body.exporting tr, .exporting tr, 
+        body.exporting .footer-note, .exporting .footer-note, 
+        body.exporting .ttd-table, .exporting .ttd-table {
+            page-break-inside: avoid !important; break-inside: avoid !important;
+        }
         
-        .cetakan-surat-jalan { width: 100%; font-family: Arial, sans-serif !important; color: #000000 !important; background: #fff !important; }
+        .cetakan-surat-jalan { width: 100%; background: white !important; box-sizing: border-box; font-family: Arial, sans-serif !important; color: #000000 !important; }
         .header-text { text-align: center; color: #000000; }
         .header-text .title1 { font-size: 14pt; font-weight: bold; }
         .header-text .title2 { font-size: 22pt; font-weight: bold; margin: 2px 0; }
@@ -346,11 +365,11 @@
         .keterangan-table { width: 100%; font-size: 10pt; margin-top: 15px; border-collapse: collapse; }
         .keterangan-table td { padding: 3px 0; vertical-align: top; }
         .main-table { width: 100%; border-collapse: collapse; font-size: 10.5pt; margin-top: 10px; border: 2px solid #000000; table-layout: fixed; }
-        .main-table th { border: 1px solid #000000; padding: 5px; font-weight: bold; text-align: center; border-bottom: 2px solid #000000; color: #000;}
-        .main-table tbody td { border-left: 1px solid #000000; border-right: 1px solid #000000; padding: 5px; word-wrap: break-word; color: #000;} 
+        .main-table th { border: 1px solid #000000; padding: 5px; font-weight: bold; text-align: center; border-bottom: 2px solid #000000; color: #000; }
+        .main-table tbody td { border-left: 1px solid #000000; border-right: 1px solid #000000; border-top: none; border-bottom: none; padding: 5px; word-wrap: break-word; color: #000; } 
         .text-center { text-align: center; }
-        .footer-note { font-size: 9pt; font-weight: bold; padding: 6px 5px; border-top: 2px solid #000000; color: #000;}
-        .ttd-table { width: 100%; border-collapse: collapse; font-size: 10.5pt; text-align: center; font-weight: bold; margin-top: 25px; color: #000;}
+        .footer-note { font-size: 9pt; text-transform: uppercase; font-weight: bold; padding: 6px 5px; border-top: 2px solid #000000; color: #000; }
+        .ttd-table { width: 100%; border-collapse: collapse; font-size: 10.5pt; text-align: center; font-weight: bold; margin-top: 25px; color: #000; }
         .ttd-table td { border: none !important; height: 70px; vertical-align: bottom; padding-bottom: 5px; }
 
         @media (max-width: 900px) {
@@ -436,14 +455,14 @@
                     
                     <!-- 3D House Interaktif & Floating Widget -->
                     <div class="hero-section">
-                        <!-- Source gambar diarahkan ke image_619674.jpg yang kamu minta -->
+                        <!-- Sesuai dengan instruksi Anda untuk menggunakan image rumah yang telah di siapkan -->
                         <img src="image_619674.jpg" class="hero-bg-image" alt="3D Smart House with Garden">
                         
                         <div class="hero-overlay"></div>
                         
                         <div class="hero-content">
                             <h2 style="font-size: 28px; font-weight: 300; margin-bottom: 5px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">AO <strong>Dashboard</strong></h2>
-                            <p style="color: rgba(255,255,255,0.9); font-size: 13px; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">Sistem operasional terpadu terpusat.</p>
+                            <p style="color: rgba(255,255,255,0.9); font-size: 13px; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">Sistem operasional terpusat & terpadu.</p>
                         </div>
 
                         <!-- Floating Widget Suhu & Kelembaban -->
@@ -460,8 +479,6 @@
                                 </div>
                                 <div class="widget-val">22°C</div>
                             </div>
-                            
-                            <!-- Hapus HR, jadikan berjejer ke samping -->
                             
                             <div class="widget-row">
                                 <div class="widget-left">
@@ -567,8 +584,11 @@
         </main>
     </div>
 
-    <!-- SCRIPT LOGIKA -->
+    <!-- ==========================================
+         SCRIPT LOGIKA SISTEM
+    =========================================== -->
     <script>
+        // --- SCRIPT OTENTIKASI (LOGIN/LOGOUT) ---
         function checkLogin() {
             if (sessionStorage.getItem('isLoggedIn') === 'true') {
                 document.getElementById('login-screen').style.display = 'none';
@@ -583,39 +603,58 @@
             const user = document.getElementById('login-username').value;
             const pass = document.getElementById('login-password').value;
             const errorText = document.getElementById('login-error');
+            
             if (user === 'adminpusat' && pass === 'andi3840') {
                 sessionStorage.setItem('isLoggedIn', 'true');
                 errorText.style.display = 'none';
                 document.getElementById('login-username').value = '';
                 document.getElementById('login-password').value = '';
                 checkLogin();
-            } else { errorText.style.display = 'block'; }
+            } else { 
+                errorText.style.display = 'block'; 
+            }
         }
 
-        function handleLoginEnter(e) { if (e.key === 'Enter') prosesLogin(); }
+        function handleLoginEnter(e) { 
+            if (e.key === 'Enter') prosesLogin(); 
+        }
 
         function prosesLogout() {
-            sessionStorage.removeItem('isLoggedIn'); checkLogin(); switchTab('home');
+            sessionStorage.removeItem('isLoggedIn'); 
+            checkLogin(); 
+            switchTab('home');
         }
+        
         checkLogin();
 
+        // --- NAVIGASI DASHBOARD ---
         function switchTab(tabId) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            
             document.getElementById('view-' + tabId).classList.add('active');
             let navItem = document.getElementById('nav-' + tabId);
             if(navItem) navItem.classList.add('active');
-            const titles = { 'home': 'Workspace', 'surat-jalan': 'Modul: Surat Jalan', 'alamat': 'Modul: Address Label', 'twidytools': 'Modul: TwidyTools' };
+            
+            const titles = { 
+                'home': 'Workspace', 
+                'surat-jalan': 'Modul: Surat Jalan', 
+                'alamat': 'Modul: Address Label', 
+                'twidytools': 'Modul: TwidyTools' 
+            };
             document.getElementById('top-title').innerText = titles[tabId];
         }
 
+        // --- SCRIPT JAM & CUACA WIDGET ---
         function updateDateTime() {
             const now = new Date();
             const timeElement = document.getElementById('live-time');
             const dateElement = document.getElementById('live-date');
+            
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
             timeElement.innerText = `${hours}:${minutes}`;
+            
             const days = ['Ming', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
             const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
             dateElement.innerText = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
@@ -627,104 +666,181 @@
                 const data = await response.json();
                 document.getElementById('live-temp').innerText = `${Math.round(data.current_weather.temperature)}°C`;
                 document.getElementById('live-condition').innerText = "Yogyakarta";
-            } catch (error) { document.getElementById('live-temp').innerText = "--°C"; }
+            } catch (error) { 
+                document.getElementById('live-temp').innerText = "--°C"; 
+            }
         }
-        setInterval(updateDateTime, 1000); updateDateTime(); updateWeather();
+        
+        setInterval(updateDateTime, 1000); 
+        updateDateTime(); 
+        updateWeather();
 
+        // --- SCRIPT GENERATOR PDF SURAT JALAN (VERSI LAMA YANG STABIL & RAPI) ---
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+        
         const dropArea = document.getElementById('dropArea');
         const fileInput = document.getElementById('fileSoInput');
         const btnProses = document.getElementById('btnProses');
 
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => { dropArea.addEventListener(eventName, preventDefaults, false); });
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => { 
+            dropArea.addEventListener(eventName, preventDefaults, false); 
+        });
+        
         function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
-        ['dragenter', 'dragover'].forEach(eventName => { dropArea.addEventListener(eventName, () => dropArea.classList.add('dragover'), false); });
-        ['dragleave', 'drop'].forEach(eventName => { dropArea.addEventListener(eventName, () => dropArea.classList.remove('dragover'), false); });
+        
+        ['dragenter', 'dragover'].forEach(eventName => { 
+            dropArea.addEventListener(eventName, () => dropArea.classList.add('dragover'), false); 
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => { 
+            dropArea.addEventListener(eventName, () => dropArea.classList.remove('dragover'), false); 
+        });
 
         dropArea.addEventListener('drop', (e) => {
             let dt = e.dataTransfer;
-            if(dt.files.length > 0) { fileInput.files = dt.files; handleFileSelect(); }
+            if(dt.files.length > 0) { 
+                fileInput.files = dt.files; 
+                handleFileSelect(); 
+            }
         });
 
         fileInput.addEventListener('change', handleFileSelect);
+        
         function handleFileSelect() {
             if (fileInput.files.length > 0) {
                 let fileNames = Array.from(fileInput.files).map(f => `- ${f.name}`).join('<br>');
                 document.getElementById('fileInfo').style.display = 'block';
                 document.getElementById('fileInfo').innerHTML = `📄 <strong>${fileInput.files.length} File siap:</strong><br>${fileNames}`;
-                btnProses.disabled = false; document.getElementById('preview-section').style.display = 'none';
+                btnProses.disabled = false; 
+                document.getElementById('preview-section').style.display = 'none';
             }
         }
 
         async function extractDataFromPDF(file) {
             const arrayBuffer = await file.arrayBuffer();
             const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
-            let noSO = "", keterangan = "", pelanggan = ""; let dataBarang = []; 
+            
+            let noSO = "", keterangan = "", pelanggan = ""; 
+            let dataBarang = []; 
+
             for (let p = 1; p <= pdf.numPages; p++) {
                 const page = await pdf.getPage(p);
                 const textContent = await page.getTextContent();
+                
                 let itemsMap = {};
                 textContent.items.forEach(item => {
-                    let y = Math.round(item.transform[5]); let x = Math.round(item.transform[4]); let text = item.str.trim();
+                    let y = Math.round(item.transform[5]); 
+                    let x = Math.round(item.transform[4]); 
+                    let text = item.str.trim();
                     if (!text) return;
                     let yKey = Object.keys(itemsMap).find(k => Math.abs(k - y) <= 4);
                     if (!yKey) yKey = y;
                     if (!itemsMap[yKey]) itemsMap[yKey] = [];
                     itemsMap[yKey].push({x: x, text: text});
                 });
+
                 let rows = Object.keys(itemsMap).map(y => ({ y: parseInt(y), cols: itemsMap[y].sort((a,b) => a.x - b.x) })).sort((a,b) => b.y - a.y);
+                
                 if (p === 1) {
-                    let fullTextArray = rows.map(r => r.cols.map(c => c.text).join(" ")); let fullText = fullTextArray.join(" ");
-                    let matchSO = fullText.match(/(SO\d{4}-\d{5})/); if (matchSO) noSO = matchSO[1];
+                    let fullTextArray = rows.map(r => r.cols.map(c => c.text).join(" ")); 
+                    let fullText = fullTextArray.join(" ");
+
+                    let matchSO = fullText.match(/(SO\d{4}-\d{5})/); 
+                    if (matchSO) noSO = matchSO[1];
+
                     let leftSideTextArray = rows.map(r => r.cols.filter(c => c.x < 350).map(c => c.text).join(" ")).filter(t => t.trim() !== "");
                     let leftFullText = leftSideTextArray.join(" ");
-                    let ketIndex = leftFullText.indexOf("Keterangan Nota"); if (ketIndex === -1) ketIndex = leftFullText.indexOf("Keterangan");
+                    
+                    let ketIndex = leftFullText.indexOf("Keterangan Nota"); 
+                    if (ketIndex === -1) ketIndex = leftFullText.indexOf("Keterangan");
                     if (ketIndex !== -1) {
                         let textAfterKet = leftFullText.substring(ketIndex).replace(/Keterangan(?:\s*Nota)?\s*:\s*/, "");
                         let endMatch = textAfterKet.match(/No\.\s|Kode\b/i); 
-                        if (endMatch) keterangan = textAfterKet.substring(0, endMatch.index).trim(); else keterangan = textAfterKet.trim();
+                        if (endMatch) {
+                            keterangan = textAfterKet.substring(0, endMatch.index).trim();
+                        } else {
+                            keterangan = textAfterKet.trim();
+                        }
                     }
-                    let isReadingPelanggan = false; let pelangganLines = []; let lastY = null;
+
+                    let isReadingPelanggan = false; 
+                    let pelangganLines = []; 
+                    let lastY = null;
+
                     for (let i = 0; i < rows.length; i++) {
-                        let row = rows[i]; let rightCols = row.cols.filter(c => c.x >= 350);
+                        let row = rows[i]; 
+                        let rightCols = row.cols.filter(c => c.x >= 350);
                         if (rightCols.length === 0) continue;
+
                         let rowText = rightCols.map(c => c.text).join(" ").trim();
                         if (!rowText) continue;
+
                         if (rowText.match(/Pelanggan\s*:/i)) {
-                            isReadingPelanggan = true; lastY = row.y;
+                            isReadingPelanggan = true; 
+                            lastY = row.y;
                             let textAfter = rowText.replace(/Pelanggan\s*:/i, "").trim();
-                            if (textAfter && !textAfter.match(/^[\d\-\s]+$/)) pelangganLines.push(textAfter);
+                            if (textAfter && !textAfter.match(/^[\d\-\s]+$/)) {
+                                pelangganLines.push(textAfter);
+                            }
                             continue;
                         }
+
                         if (isReadingPelanggan) {
-                            if (lastY !== null && (lastY - row.y > 18)) break; 
-                            if (rowText.match(/Tipe\s*:/i) || rowText.match(/Sales\s*:/i)) break;
-                            if (rowText.match(/^[\d\-\s]+$/)) { lastY = row.y; continue; }
-                            pelangganLines.push(rowText); lastY = row.y;
+                            if (lastY !== null) {
+                                let gap = lastY - row.y; 
+                                if (gap > 18) {
+                                    break; 
+                                }
+                            }
+
+                            if (rowText.match(/Tipe\s*:/i) || rowText.match(/Sales\s*:/i)) {
+                                break;
+                            }
+
+                            if (rowText.match(/^[\d\-\s]+$/)) { 
+                                lastY = row.y; 
+                                continue; 
+                            }
+
+                            pelangganLines.push(rowText); 
+                            lastY = row.y;
                         }
                     }
                     pelanggan = pelangganLines.join(" ");
                 }
-                let pageBarang = []; let barangTemp = null;
+
+                let pageBarang = []; 
+                let barangTemp = null;
+
                 rows.forEach(row => {
                     let rowText = row.cols.map(c => c.text).join(" ");
                     let hasKode = row.cols.find(c => c.text.match(/^\d{2}-\d{2}-\d{2}-\d{2}-\d{6}/));
+                    
                     if (hasKode) {
                         if (barangTemp) pageBarang.push(barangTemp);
                         let judulCols = row.cols.filter(c => c.x > 80 && c.x < 250 && !c.text.match(/^\d{2}-\d{2}-\d{2}-\d{2}-\d{6}/));
                         let qtyCols = row.cols.filter(c => c.x > 450 && c.text.match(/^\d+$/));
-                        barangTemp = { nama: judulCols.map(c => c.text).join(" "), qty: qtyCols.length > 0 ? qtyCols[qtyCols.length - 1].text : "1", startY: row.y };
+                        barangTemp = { 
+                            nama: judulCols.map(c => c.text).join(" "), 
+                            qty: qtyCols.length > 0 ? qtyCols[qtyCols.length - 1].text : "1", 
+                            startY: row.y 
+                        };
                     } else if (barangTemp && row.y < barangTemp.startY && row.y > 60) {
                         if (rowText.includes("Page") || rowText.includes("Disiapkan") || rowText.includes("Qty Total") || rowText.match(/Tipe\s*:/)) {
-                            pageBarang.push(barangTemp); barangTemp = null;
+                            pageBarang.push(barangTemp); 
+                            barangTemp = null;
                         } else {
                             let judulCols = row.cols.filter(c => c.x > 80 && c.x < 250);
-                            if (judulCols.length > 0) barangTemp.nama += " " + judulCols.map(c => c.text).join(" ");
+                            if (judulCols.length > 0) {
+                                barangTemp.nama += " " + judulCols.map(c => c.text).join(" ");
+                            }
                         }
                     }
                 });
+                
                 if (barangTemp) pageBarang.push(barangTemp);
-                pageBarang.reverse(); dataBarang = dataBarang.concat(pageBarang);
+                pageBarang.reverse(); 
+                dataBarang = dataBarang.concat(pageBarang);
             }
             return { noSO, keterangan, pelanggan, dataBarang };
         }
@@ -733,88 +849,213 @@
             const statusText = document.getElementById('status-text');
             const allPapersContainer = document.getElementById('all-papers-container');
             const btnDownloadAll = document.getElementById('btnDownloadAll');
+            
             if (fileInput.files.length === 0) return;
-            btnProses.disabled = true; allPapersContainer.innerHTML = ''; 
+            
+            btnProses.disabled = true; 
+            allPapersContainer.innerHTML = ''; 
             
             const d = new Date();
             const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
             const angkaRomawi = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
+            
             let tanggalStr = `Yogyakarta, ${d.getDate()} ${namaBulan[d.getMonth()]} ${d.getFullYear()}`;
-            let bulanStr = angkaRomawi[d.getMonth()]; let tahunStr = d.getFullYear();
+            let bulanStr = angkaRomawi[d.getMonth()]; 
+            let tahunStr = d.getFullYear();
 
             try {
                 for (let i = 0; i < fileInput.files.length; i++) {
-                    statusText.innerText = `Memproses file ${i + 1} / ${fileInput.files.length}...`;
+                    statusText.innerText = `Sedang memproses file ${i + 1} dari ${fileInput.files.length}...`;
+                    
                     let data = await extractDataFromPDF(fileInput.files[i]);
+                    
                     let barisBarang = "";
                     data.dataBarang.forEach((barang, index) => {
-                        barisBarang += `<tr><td class="text-center" contenteditable="true">${index + 1}</td><td contenteditable="true">${barang.nama}</td><td class="text-center" contenteditable="true">${barang.qty}</td><td contenteditable="true"></td></tr>`;
+                        barisBarang += `
+                            <tr>
+                                <td class="text-center" contenteditable="true">${index + 1}</td>
+                                <td contenteditable="true">${barang.nama}</td>
+                                <td class="text-center" contenteditable="true">${barang.qty}</td>
+                                <td contenteditable="true"></td>
+                            </tr>
+                        `;
                     });
+
                     let htmlSuratJalan = `
                     ${i > 0 ? '<div class="html2pdf__page-break"></div>' : ''}
                     <div class="paper-container">
                         <div id="paper-wrapper-${i}" class="paper-wrapper">
                             <div class="cetakan-surat-jalan">
-                                <div class="header-text"><div class="title1">PENERBIT & PERCETAKAN</div><div class="title2">ANDI OFFSET</div><div class="address">Jl. BEO 38-40 TELP. (0274)561881 HUNTING. FAX.588282 YOGYAKARTA 55281 E-mail: pemasaran@andipublisher.net.id</div></div>
+                                <div class="header-text">
+                                    <div class="title1">PENERBIT & PERCETAKAN</div>
+                                    <div class="title2">ANDI OFFSET</div>
+                                    <div class="address">Jl. BEO 38-40 TELP. (0274)561881 HUNTING. FAX.588282 YOGYAKARTA 55281 E-mail: pemasaran@andipublisher.net.id</div>
+                                </div>
+                                
                                 <table class="sub-header">
                                     <tr>
                                         <td style="width: 25%; vertical-align: top;"><div class="box-hijau">DIKIRIM KEMBALI</div></td>
-                                        <td style="width: 50%;"><div class="sj-title">SURAT JALAN</div><div class="sj-no">NO : AO / <span class="editable-field" contenteditable="true">${bulanStr}</span> / <span class="editable-field" contenteditable="true">${tahunStr}</span> / <span class="editable-field" contenteditable="true">${data.noSO}</span></div></td>
-                                        <td style="width: 25%; vertical-align: top; padding-top: 5px;"><div class="date-right editable-field" contenteditable="true">${tanggalStr}</div></td>
+                                        <td style="width: 50%;">
+                                            <div class="sj-title">SURAT JALAN</div>
+                                            <div class="sj-no">
+                                                NO : AO / 
+                                                <span class="editable-field" contenteditable="true">${bulanStr}</span> / 
+                                                <span class="editable-field" contenteditable="true">${tahunStr}</span> / 
+                                                <span class="editable-field" contenteditable="true">${data.noSO}</span>
+                                            </div>
+                                        </td>
+                                        <td style="width: 25%; vertical-align: top; padding-top: 5px;">
+                                            <div class="date-right editable-field" contenteditable="true">${tanggalStr}</div>
+                                        </td>
                                     </tr>
                                 </table>
-                                <table class="kepada-yth"><tr><td style="width: 55%;"></td><td style="width: 45%;"><span class="kepada-bold">Kepada Yth,</span><br><br><span class="kepada-bold editable-field" contenteditable="true">${data.pelanggan}</span></td></tr></table>
+
+                                <table class="kepada-yth">
+                                    <tr>
+                                        <td style="width: 55%;"></td>
+                                        <td style="width: 45%;">
+                                            <span class="kepada-bold">Kepada Yth,</span><br><br>
+                                            <span class="kepada-bold editable-field" contenteditable="true">${data.pelanggan}</span>
+                                        </td>
+                                    </tr>
+                                </table>
                                 <table class="keterangan-table">
-                                    <tr><td style="width: 11%;">Ekspedisi</td><td style="width: 2%;">:</td><td style="width: 87%;"><span class="editable-field" style="width: 100%; display: inline-block; min-height: 15px;" contenteditable="true"></span></td></tr>
-                                    <tr><td>Keterangan</td><td>:</td><td><span class="editable-field" style="width: 100%; display: inline-block; min-height: 15px;" contenteditable="true">${data.keterangan}</span></td></tr>
+                                    <tr>
+                                        <td style="width: 11%;">Ekspedisi</td>
+                                        <td style="width: 2%;">:</td>
+                                        <td style="width: 87%;">
+                                            <span class="editable-field" style="width: 100%; display: inline-block; min-height: 15px;" contenteditable="true"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Keterangan</td>
+                                        <td>:</td>
+                                        <td>
+                                            <span class="editable-field" style="width: 100%; display: inline-block; min-height: 15px;" contenteditable="true">${data.keterangan}</span>
+                                        </td>
+                                    </tr>
                                 </table>
                                 <table class="main-table">
-                                    <thead><tr><th style="width: 5%;">NO</th><th style="width: 65%;">NAMA BARANG</th><th style="width: 10%;">QTY</th><th style="width: 20%;">KOLI</th></tr></thead>
-                                    <tbody>${barisBarang}</tbody>
-                                    <tfoot><tr><td colspan="4" class="footer-note">* 3 HARI SETELAH BARANG DITERIMA TIDAK ADA KOMPLAIN MAKA BARANG KAMI ANGGAP LENGKAP</td></tr></tfoot>
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 5%;">NO</th>
+                                            <th style="width: 65%;">NAMA BARANG</th>
+                                            <th style="width: 10%;">QTY</th>
+                                            <th style="width: 20%;">KOLI</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${barisBarang}
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="4" class="footer-note">
+                                                * 3 HARI SETELAH BARANG DITERIMA TIDAK ADA KOMPLAIN MAKA BARANG KAMI ANGGAP LENGKAP
+                                            </td>
+                                        </tr>
+                                    </tfoot>
                                 </table>
-                                <table class="ttd-table"><tr><td style="width: 25%;">DITERIMA OLEH</td><td style="width: 25%;">EKSPEDISI</td><td style="width: 25%;">KEPALA GUDANG</td><td style="width: 25%;">MENGETAHUI</td></tr></table>
+                                <table class="ttd-table">
+                                    <tr>
+                                        <td style="width: 25%;">DITERIMA OLEH</td>
+                                        <td style="width: 25%;">EKSPEDISI</td>
+                                        <td style="width: 25%;">KEPALA GUDANG</td>
+                                        <td style="width: 25%;">MENGETAHUI</td>
+                                    </tr>
+                                </table>
                             </div>
                         </div>
-                        <button class="btn-process btn-download-single" style="margin-top: 10px; max-width: 300px; background: rgba(255,255,255,0.1); color: white;" onclick="unduhSatuPDF(${i}, '${data.noSO}')">⤓ Unduh Single PDF (${data.noSO || (i+1)})</button>
-                    </div>`;
+                        <button class="btn-process btn-download-single" style="margin-top: 10px; max-width: 300px; background: rgba(255,255,255,0.1); color: white;" onclick="unduhSatuPDF(${i}, '${data.noSO}')">
+                            ⤓ Unduh Single PDF (${data.noSO || (i+1)})
+                        </button>
+                    </div>
+                    `;
+
                     allPapersContainer.insertAdjacentHTML('beforeend', htmlSuratJalan);
                 }
+
                 document.getElementById('preview-section').style.display = 'block';
-                statusText.innerText = "Data berhasil diekstrak."; btnProses.disabled = false; btnProses.innerText = "Ekstrak Berkas Lain";
-                btnDownloadAll.style.display = fileInput.files.length > 1 ? 'inline-block' : 'none';
+                statusText.innerText = "Semua data berhasil diekstrak!";
+                btnProses.disabled = false;
+                btnProses.innerText = "Ekstrak Ulang Berkas Baru";
+                
+                if(fileInput.files.length > 1) {
+                    btnDownloadAll.style.display = 'inline-block';
+                } else {
+                    btnDownloadAll.style.display = 'none';
+                }
+
                 setTimeout(() => document.getElementById('preview-section').scrollIntoView({ behavior: 'smooth' }), 100);
-            } catch (error) { console.error(error); statusText.style.color = "#ef4444"; statusText.innerText = "Gagal memproses file."; btnProses.disabled = false; }
+
+            } catch (error) {
+                console.error(error);
+                statusText.style.color = "#E11D48";
+                statusText.innerText = "Gagal memproses salah satu file. Pastikan semuanya valid.";
+                btnProses.disabled = false;
+            }
         }
 
+        // PENTING: scrollY dan scrollX diset 0 untuk mencegah PDF terpotong 
         function getOpsiPDF(filename) {
             return {
-                margin: [15, 15, 15, 10], filename: filename, image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, logging: false }, jsPDF: { unit: 'mm', format: 'letter', orientation: 'portrait' }, 
-                pagebreak: { mode: ['css', 'legacy'], avoid: 'tr' } 
+                margin:       [15, 15, 15, 10], 
+                filename:     filename,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, logging: false, scrollY: 0, scrollX: 0 }, 
+                jsPDF:        { unit: 'mm', format: 'letter', orientation: 'portrait' }, 
+                pagebreak:    { mode: ['css', 'legacy'], avoid: 'tr' } 
             };
         }
 
         function unduhSatuPDF(index, noSO) {
+            window.scrollTo(0, 0); // Reset scroll ke atas sebelum render agar tidak potong
             const wrapperCetak = document.getElementById(`paper-wrapper-${index}`);
             document.body.classList.add('exporting');
-            const btn = wrapperCetak.nextElementSibling; const teks = btn.innerText;
-            btn.innerText = "Proses PDF..."; btn.disabled = true;
-            html2pdf().set(getOpsiPDF(noSO ? `Surat_Jalan_${noSO}.pdf` : `Surat_Jalan_${index+1}.pdf`)).from(wrapperCetak).save().then(() => {
-                document.body.classList.remove('exporting'); btn.innerText = teks; btn.disabled = false;
+            
+            const tombolUnduh = wrapperCetak.nextElementSibling; 
+            const teksAsli = tombolUnduh.innerText;
+            tombolUnduh.innerText = "Merender PDF...";
+            tombolUnduh.disabled = true;
+
+            const namaFilePDF = noSO ? `Surat_Jalan_${noSO}.pdf` : `Surat_Jalan_${index+1}.pdf`;
+
+            html2pdf().set(getOpsiPDF(namaFilePDF)).from(wrapperCetak).save().then(() => {
+                document.body.classList.remove('exporting');
+                tombolUnduh.innerText = teksAsli;
+                tombolUnduh.disabled = false;
+            }).catch(err => {
+                console.error(err);
+                document.body.classList.remove('exporting');
+                tombolUnduh.innerText = teksAsli;
+                tombolUnduh.disabled = false;
             });
         }
 
         function unduhSemuaGabungan() {
+            window.scrollTo(0, 0); // Reset scroll
             const wadahUtama = document.getElementById('all-papers-container');
             document.body.classList.add('exporting');
-            const btnAll = document.getElementById('btnDownloadAll');
-            btnAll.innerText = "Menyusun PDF..."; btnAll.disabled = true;
-            const btnSingles = document.querySelectorAll('.btn-download-single');
-            btnSingles.forEach(btn => btn.style.display = 'none');
-            html2pdf().set(getOpsiPDF('Kumpulan_Surat_Jalan.pdf')).from(wadahUtama).save().then(() => {
-                document.body.classList.remove('exporting'); btnAll.innerText = "Unduh Semua (Gabung PDF)"; btnAll.disabled = false;
-                btnSingles.forEach(btn => btn.style.display = 'inline-block');
+            
+            const tombolGabungan = document.getElementById('btnDownloadAll');
+            tombolGabungan.innerText = "Menyusun PDF Gabungan (Mohon Tunggu)...";
+            tombolGabungan.disabled = true;
+
+            const tombolIndividuals = document.querySelectorAll('.btn-download-single');
+            tombolIndividuals.forEach(btn => btn.style.display = 'none');
+
+            html2pdf().set(getOpsiPDF('Kumpulan_Surat_Jalan_Batch.pdf')).from(wadahUtama).save().then(() => {
+                document.body.classList.remove('exporting');
+                tombolGabungan.innerText = "Unduh Semua Sekaligus (Gabung 1 PDF)";
+                tombolGabungan.disabled = false;
+                
+                tombolIndividuals.forEach(btn => btn.style.display = 'inline-block');
+                document.getElementById('status-text').innerText = "Selesai! PDF Gabungan berhasil diunduh.";
+            }).catch(err => {
+                console.error(err);
+                document.body.classList.remove('exporting');
+                tombolGabungan.innerText = "Unduh Semua Sekaligus (Gabung 1 PDF)";
+                tombolGabungan.disabled = false;
+                tombolIndividuals.forEach(btn => btn.style.display = 'inline-block');
             });
         }
     </script>
