@@ -230,8 +230,8 @@
         .widget-text { display: flex; flex-direction: column; }
         .widget-title { font-size: 15px; font-weight: 500; color: #fff; margin-bottom: 2px;}
         .widget-sub { font-size: 11px; color: var(--text-muted); }
-        .widget-val { font-size: 18px; font-weight: 600; color: #facc15; }
-        .widget-val.humidity { color: var(--primary); }
+        .widget-val { font-size: 15px; font-weight: 600; color: #facc15; }
+        .widget-val.memory { color: #60A5FA; } /* Warna biru untuk RAM */
 
         /* Panel Kontrol Kanan */
         .control-panel { display: flex; flex-direction: column; gap: 16px; padding-right: 10px; }
@@ -462,35 +462,52 @@
                         
                         <div class="hero-content">
                             <h2 style="font-size: 28px; font-weight: 300; margin-bottom: 5px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">AO <strong>Dashboard</strong></h2>
-                            <p style="color: rgba(255,255,255,0.9); font-size: 13px; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">Sistem operasional terpusat & terpadu.</p>
+                            <p style="color: rgba(255,255,255,0.9); font-size: 13px; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">Sistem operasional terpadu terpusat.</p>
                         </div>
 
-                        <!-- Floating Widget Suhu & Kelembaban -->
+                        <!-- Floating Widget Health Monitor (Fungsional) -->
                         <div class="floating-widget">
                             <div class="widget-row">
                                 <div class="widget-left">
                                     <div class="widget-icon">
-                                        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"></path></svg>
+                                        <!-- Ikon Sinyal/Internet -->
+                                        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                            <path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"></path>
+                                        </svg>
                                     </div>
                                     <div class="widget-text">
-                                        <span class="widget-title">Temperature</span>
-                                        <span class="widget-sub">Optimally: 20-24 °C</span>
+                                        <span class="widget-title">System Status</span>
+                                        <span class="widget-sub">Network Connection</span>
                                     </div>
                                 </div>
-                                <div class="widget-val">22°C</div>
+                                <div class="widget-val" id="network-status-val">
+                                    <span style="color: #4ADE80;">Online 🟢</span>
+                                </div>
                             </div>
                             
                             <div class="widget-row">
                                 <div class="widget-left">
                                     <div class="widget-icon">
-                                        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+                                        <!-- Ikon Memori/Prosesor -->
+                                        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                            <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
+                                            <rect x="9" y="9" width="6" height="6"></rect>
+                                            <line x1="9" y1="1" x2="9" y2="4"></line>
+                                            <line x1="15" y1="1" x2="15" y2="4"></line>
+                                            <line x1="9" y1="20" x2="9" y2="23"></line>
+                                            <line x1="15" y1="20" x2="15" y2="23"></line>
+                                            <line x1="20" y1="9" x2="23" y2="9"></line>
+                                            <line x1="20" y1="14" x2="23" y2="14"></line>
+                                            <line x1="1" y1="9" x2="4" y2="9"></line>
+                                            <line x1="1" y1="14" x2="4" y2="14"></line>
+                                        </svg>
                                     </div>
                                     <div class="widget-text">
-                                        <span class="widget-title">Humidity</span>
-                                        <span class="widget-sub">Optimally: 40-60 %</span>
+                                        <span class="widget-title">Local Memory</span>
+                                        <span class="widget-sub">Browser RAM Usage</span>
                                     </div>
                                 </div>
-                                <div class="widget-val humidity">55%</div>
+                                <div class="widget-val memory" id="memory-status-val">...</div>
                             </div>
                         </div>
                     </div>
@@ -644,6 +661,36 @@
             };
             document.getElementById('top-title').innerText = titles[tabId];
         }
+
+        // --- SCRIPT WIDGET KESEHATAN SISTEM (NETWORK & MEMORY) ---
+        function updateSystemHealth() {
+            // 1. Status Jaringan
+            const statusEl = document.getElementById('network-status-val');
+            if (navigator.onLine) {
+                statusEl.innerHTML = '<span style="color: #4ADE80;">Online 🟢</span>';
+            } else {
+                statusEl.innerHTML = '<span style="color: #ef4444;">Offline 🔴</span>';
+            }
+
+            // 2. Pemantau Memori (Fitur yang sangat cocok untuk Browser Chromium)
+            const memoryEl = document.getElementById('memory-status-val');
+            if (window.performance && window.performance.memory) {
+                // Menghitung JS Heap Size dan mengubah Byte menjadi Megabyte (MB)
+                const usedHeap = Math.round(performance.memory.usedJSHeapSize / (1024 * 1024));
+                memoryEl.innerText = `${usedHeap} MB`;
+            } else {
+                // Fallback jika browser tidak mendukung performance.memory (contoh: Firefox)
+                memoryEl.innerText = "Stabil ⚡";
+            }
+        }
+        
+        // Pasang event listener ketika koneksi mati/hidup
+        window.addEventListener('online', updateSystemHealth);
+        window.addEventListener('offline', updateSystemHealth);
+        // Refresh pembacaan memori setiap 2 detik
+        setInterval(updateSystemHealth, 2000);
+        updateSystemHealth(); // Jalankan sekali saat load
+
 
         // --- SCRIPT JAM & CUACA WIDGET ---
         function updateDateTime() {
