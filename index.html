@@ -14,7 +14,7 @@
     
     <style>
         /* =========================================================
-           1. MODERN DARK DASHBOARD VARIABLES & RESET
+           1. MODERN DASHBOARD VARIABLES (DARK MODE - DEFAULT)
         ========================================================= */
         :root {
             --bg-outer: #2a3439;
@@ -31,6 +31,21 @@
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        /* =========================================================
+           1.A. LIGHT MODE VARIABLES
+        ========================================================= */
+        body.light-mode {
+            --bg-outer: #E2E8F0;
+            --bg-app: #F8FAFC;
+            --bg-app-gradient: linear-gradient(135deg, #F8FAFC 0%, #E2E8F0 100%);
+            --glass-bg: rgba(255, 255, 255, 0.6);
+            --glass-border: rgba(0, 0, 0, 0.08);
+            --glass-bg-hover: rgba(0, 0, 0, 0.05);
+            --primary: #10B981; /* Sedikit lebih gelap agar kontras di latar putih */
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
@@ -43,49 +58,50 @@
             align-items: center;
             min-height: 100vh;
             padding: 20px;
+            transition: var(--transition);
         }
 
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
+        ::-webkit-scrollbar-thumb { background: rgba(150,150,150,0.3); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(150,150,150,0.5); }
 
         /* =========================================================
-           1.B. LOGIN SCREEN CSS (GLASSMORPHISM)
+           1.B. LOGIN SCREEN CSS
         ========================================================= */
         #login-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
             background: var(--bg-outer);
             display: flex; justify-content: center; align-items: center;
             z-index: 9999;
+            transition: var(--transition);
         }
         .login-card {
-            background: rgba(20, 20, 20, 0.6);
+            background: var(--glass-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             padding: 40px; border-radius: 30px;
             border: 1px solid var(--glass-border);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2);
             width: 100%; max-width: 380px; text-align: center;
         }
         .login-card h2 { font-size: 24px; font-weight: 600; color: var(--text-main); margin-bottom: 8px; }
         .login-card p { font-size: 13px; color: var(--text-muted); margin-bottom: 30px; }
         .login-input {
             width: 100%; padding: 14px 16px; margin-bottom: 16px;
-            background: rgba(0,0,0,0.2);
+            background: rgba(128,128,128,0.1);
             border: 1px solid var(--glass-border); border-radius: 16px;
-            color: white;
+            color: var(--text-main);
             font-size: 14px; font-family: inherit; outline: none; transition: var(--transition);
         }
-        .login-input::placeholder { color: rgba(255,255,255,0.3); }
+        .login-input::placeholder { color: var(--text-muted); }
         .login-input:focus { border-color: var(--primary); box-shadow: 0 0 0 1px var(--primary); }
         .btn-login {
             width: 100%; padding: 14px; background: var(--primary);
-            color: #000; border: none; border-radius: 16px; font-weight: 600; font-size: 15px;
-            cursor: pointer; transition: var(--transition);
-            margin-top: 10px;
+            color: #fff; border: none; border-radius: 16px; font-weight: 600; font-size: 15px;
+            cursor: pointer; transition: var(--transition); margin-top: 10px;
         }
-        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 8px 20px -5px rgba(74, 222, 128, 0.4); }
+        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 8px 20px -5px rgba(16, 185, 129, 0.4); }
         #login-error { color: #ef4444; font-size: 13px; font-weight: 500; margin-top: 16px; display: none; }
         
         #app-container { display: none; } 
@@ -98,8 +114,8 @@
             height: calc(100vh - 40px);
             background: var(--bg-app-gradient);
             border-radius: 30px;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
-            border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.2);
+            border: 1px solid var(--glass-border);
             display: flex;
             overflow: hidden;
             position: relative;
@@ -107,14 +123,15 @@
 
         .sidebar {
             width: var(--sidebar-width);
-            background: rgba(0, 0, 0, 0.2);
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
             border-right: 1px solid var(--glass-border);
             display: flex; flex-direction: column; align-items: center;
             padding: 30px 0; z-index: 100;
         }
 
         .sidebar-brand {
-            width: 50px; height: 50px; background: var(--glass-bg);
+            width: 50px; height: 50px; background: rgba(128,128,128,0.1);
             border-radius: 16px; display: flex; justify-content: center; align-items: center;
             margin-bottom: 40px; cursor: pointer; border: 1px solid var(--glass-border);
         }
@@ -130,7 +147,7 @@
         }
 
         .nav-item:hover { color: var(--text-main); background: var(--glass-bg-hover); }
-        .nav-item.active { background: var(--primary); color: #000; box-shadow: 0 0 15px rgba(74, 222, 128, 0.3); }
+        .nav-item.active { background: var(--primary); color: #fff; box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); }
         .nav-item svg { width: 22px; height: 22px; }
         
         .nav-item::after {
@@ -141,8 +158,9 @@
         }
         .nav-item:hover::after { opacity: 1; transform: translateX(5px); }
 
-        .btn-logout { margin-top: auto; }
-        .btn-logout:hover { background: #ef4444; color: white; }
+        .btn-theme { margin-top: auto; margin-bottom: 10px; }
+        .btn-logout { margin-top: 0; }
+        .btn-logout:hover { background: #ef4444 !important; color: white !important; }
 
         /* =========================================================
            3. MAIN CONTENT AREA & HEADER
@@ -157,14 +175,15 @@
             padding: 30px 40px;
         }
 
-        .header-title-group h1 { font-size: 20px; font-weight: 500; letter-spacing: 0.5px; }
+        .header-title-group h1 { font-size: 20px; font-weight: 600; letter-spacing: 0.5px; }
         .header-title-group p { font-size: 13px; color: var(--text-muted); }
 
         .header-status-group {
             display: flex; align-items: center; gap: 24px;
-            background: rgba(0,0,0,0.3); padding: 10px 20px; border-radius: 20px;
+            background: var(--glass-bg); padding: 10px 20px; border-radius: 20px;
             border: 1px solid var(--glass-border);
-            font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.8);
+            font-size: 13px; font-weight: 500; color: var(--text-main);
+            backdrop-filter: blur(10px);
         }
         .header-status-group span { display: flex; align-items: center; gap: 8px; }
         .header-status-group svg { width: 16px; height: 16px; opacity: 0.7; }
@@ -186,7 +205,7 @@
         .hero-section {
             display: flex; flex-direction: column; justify-content: flex-start;
             position: relative; border-radius: 30px; padding: 30px;
-            overflow: hidden; box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
+            overflow: hidden; box-shadow: inset 0 0 50px rgba(0,0,0,0.1);
         }
 
         .hero-bg-image {
@@ -195,26 +214,31 @@
         }
         .hero-section:hover .hero-bg-image { transform: scale(1.05); }
 
+        /* Hero overlay disesuaikan supaya teks tetap terbaca meski gambar terang */
         .hero-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.6) 100%);
-            z-index: 1;
+            background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.7) 100%);
+            z-index: 1; transition: var(--transition);
+        }
+        
+        body.light-mode .hero-overlay {
+            background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.6) 100%);
         }
 
-        .hero-content { position: relative; z-index: 2; }
+        .hero-content { position: relative; z-index: 2; color: white; }
         
         .floating-widget {
             position: absolute; 
             bottom: 30px; 
             left: 30px; 
             z-index: 3; 
-            background: rgba(20, 20, 20, 0.4);
+            background: var(--glass-bg);
             backdrop-filter: blur(20px); 
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.1); 
+            border: 1px solid var(--glass-border); 
             border-radius: 24px;
             padding: 20px 30px; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
             transition: var(--transition); 
             cursor: default;
             display: flex; 
@@ -222,28 +246,26 @@
             align-items: center; 
             width: max-content;
         }
-        .floating-widget:hover { background: rgba(30, 30, 30, 0.5); border-color: rgba(255,255,255,0.2); }
 
         .widget-row { display: flex; align-items: center; gap: 20px; justify-content: space-between; }
-        .widget-left { display: flex; align-items: center; gap: 16px; }
+        .widget-left { display: flex; align-items: center; gap: 16px; color: var(--text-main); }
         .widget-icon { font-size: 24px; opacity: 0.8; }
         .widget-text { display: flex; flex-direction: column; }
-        .widget-title { font-size: 15px; font-weight: 500; color: #fff; margin-bottom: 2px;}
+        .widget-title { font-size: 15px; font-weight: 600; margin-bottom: 2px;}
         .widget-sub { font-size: 11px; color: var(--text-muted); }
-        .widget-val { font-size: 15px; font-weight: 600; color: #facc15; }
-        .widget-val.memory { color: #60A5FA; } /* Warna biru untuk RAM */
+        .widget-val { font-size: 15px; font-weight: 600; color: var(--primary); }
 
         /* Panel Kontrol Kanan */
         .control-panel { display: flex; flex-direction: column; gap: 16px; padding-right: 10px; }
         .glass-card {
-            background: rgba(20, 20, 20, 0.4); backdrop-filter: blur(15px);
+            background: var(--glass-bg); backdrop-filter: blur(15px);
             border: 1px solid var(--glass-border); border-radius: 24px; padding: 20px;
             display: flex; align-items: center; gap: 16px; cursor: pointer; transition: var(--transition);
         }
-        .glass-card:hover { background: rgba(30, 30, 30, 0.6); border-color: rgba(255,255,255,0.15); }
+        .glass-card:hover { border-color: var(--primary); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
 
         .toggle-switch {
-            width: 44px; height: 24px; background: rgba(255,255,255,0.1); border-radius: 12px;
+            width: 44px; height: 24px; background: rgba(128,128,128,0.2); border-radius: 12px;
             position: relative; transition: var(--transition);
         }
         .toggle-switch::after {
@@ -251,76 +273,76 @@
             width: 18px; height: 18px; background: #9CA3AF; border-radius: 50%; transition: var(--transition);
         }
         .glass-card:hover .toggle-switch { background: var(--primary); }
-        .glass-card:hover .toggle-switch::after { background: #000; transform: translateX(20px); }
+        .glass-card:hover .toggle-switch::after { background: #fff; transform: translateX(20px); }
 
         .feature-card-lg { flex-direction: column; align-items: stretch; padding: 24px; }
         .feature-card-lg .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .feature-card-lg .header .title-area { display: flex; align-items: center; gap: 12px; }
-        .feature-card-lg .icon { width: 36px; height: 36px; background: var(--primary); color: #000; border-radius: 10px; display: flex; justify-content: center; align-items: center;}
+        .feature-card-lg .icon { width: 36px; height: 36px; background: var(--primary); color: #fff; border-radius: 10px; display: flex; justify-content: center; align-items: center;}
 
         /* =========================================================
            5. HALAMAN LAIN (SURAT JALAN, DLL)
         ========================================================= */
         .app-wrapper {
-            background: rgba(20, 20, 20, 0.5); backdrop-filter: blur(20px);
+            background: var(--glass-bg); backdrop-filter: blur(20px);
             padding: 40px; border-radius: 30px; border: 1px solid var(--glass-border);
             width: 100%; max-width: 700px; text-align: center; margin: 0 auto;
         }
 
-        .app-wrapper h2 { font-size: 24px; font-weight: 500; margin-bottom: 8px; }
+        .app-wrapper h2 { font-size: 24px; font-weight: 600; margin-bottom: 8px; }
         .app-wrapper p.desc { font-size: 13px; color: var(--text-muted); margin-bottom: 32px; }
 
         .drop-zone {
-            border: 2px dashed rgba(255,255,255,0.2); border-radius: 24px; padding: 50px 20px;
-            background-color: rgba(0,0,0,0.2); transition: var(--transition); cursor: pointer; margin-bottom: 24px;
+            border: 2px dashed rgba(128,128,128,0.3); border-radius: 24px; padding: 50px 20px;
+            background-color: rgba(128,128,128,0.05); transition: var(--transition); cursor: pointer; margin-bottom: 24px;
         }
-        .drop-zone:hover, .drop-zone.dragover { border-color: var(--primary); background-color: rgba(74, 222, 128, 0.05); }
-        .drop-zone svg { width: 50px; height: 50px; color: var(--primary); margin-bottom: 15px; opacity: 0.8; }
-        .drop-zone .title { font-size: 15px; font-weight: 500; margin-bottom: 8px; display: block; }
+        .drop-zone:hover, .drop-zone.dragover { border-color: var(--primary); background-color: rgba(16, 185, 129, 0.05); }
+        .drop-zone svg { width: 50px; height: 50px; color: var(--primary); margin-bottom: 15px; opacity: 0.9; }
+        .drop-zone .title { font-size: 15px; font-weight: 600; margin-bottom: 8px; display: block; }
         .drop-zone .subtitle { font-size: 12px; color: var(--text-muted); display: block; }
         .drop-zone input[type="file"] { display: none; }
         
         .file-info {
-            display: none; margin-top: 20px; padding: 16px; background: rgba(255,255,255,0.05);
+            display: none; margin-top: 20px; padding: 16px; background: rgba(128,128,128,0.05);
             border-radius: 16px; font-size: 12px; color: var(--primary); max-height: 120px; overflow-y: auto; text-align: left;
         }
 
         .btn-process {
-            background: var(--primary); color: #000; border: none; padding: 16px 28px; width: 100%;
+            background: var(--primary); color: #fff; border: none; padding: 16px 28px; width: 100%;
             border-radius: 16px; font-size: 14px; font-weight: 600; cursor: pointer; transition: var(--transition);
         }
-        .btn-process:hover:not(:disabled) { box-shadow: 0 10px 25px -5px rgba(74, 222, 128, 0.3); }
-        .btn-process:disabled { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.3); cursor: not-allowed; }
-        .btn-success { background: #34d399; margin-top: 15px; }
+        .btn-process:hover:not(:disabled) { box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.4); }
+        .btn-process:disabled { background: rgba(128,128,128,0.2); color: rgba(128,128,128,0.5); cursor: not-allowed; box-shadow:none;}
+        .btn-success { background: #3b82f6; }
 
         #preview-section {
             display: none; width: 100%; max-width: 950px; margin: 40px auto 0;
-            background: rgba(20, 20, 20, 0.5); padding: 40px; border-radius: 30px; text-align: center;
+            background: var(--glass-bg); padding: 40px; border-radius: 30px; text-align: center;
             border: 1px solid var(--glass-border); backdrop-filter: blur(20px);
         }
 
-        #status-text { margin-top: 16px; font-size: 13px; color: var(--primary); min-height: 20px; }
+        #status-text { margin-top: 16px; font-size: 13px; font-weight:500; color: var(--primary); min-height: 20px; }
 
         .btn-back {
-            display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.05);
-            border: 1px solid var(--glass-border); color: white; padding: 10px 16px; border-radius: 12px;
-            font-size: 13px; cursor: pointer; transition: var(--transition); margin-bottom: 24px; width: fit-content;
+            display: inline-flex; align-items: center; gap: 8px; background: rgba(128,128,128,0.1);
+            border: 1px solid var(--glass-border); color: var(--text-main); padding: 10px 16px; border-radius: 12px;
+            font-size: 13px; font-weight:500; cursor: pointer; transition: var(--transition); margin-bottom: 24px; width: fit-content;
         }
-        .btn-back:hover { background: rgba(255,255,255,0.1); }
+        .btn-back:hover { background: rgba(128,128,128,0.2); }
 
         #view-twidytools, #view-alamat { padding-top: 0; }
         iframe {
             flex: 1; width: 100%; border: 1px solid var(--glass-border); border-radius: 20px;
-            min-height: calc(100vh - 150px); background: rgba(255,255,255,0.95);
+            min-height: calc(100vh - 150px); background: #fff;
         }
 
         /* =========================================================
-           6. CSS CETAK & EXPORT PDF (DIKEMBALIKAN KE VERSI STABIL AGAR TIDAK TERPOTONG)
+           6. CSS CETAK & EXPORT PDF (TETAP STABIL / PUTIH)
         ========================================================= */
         .paper-container { margin-bottom: 40px; display: flex; flex-direction: column; align-items: center; }
         .paper-wrapper {
             background: white !important; width: 215.9mm; margin: 0 auto 20px auto;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: left;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15); text-align: left;
             overflow: visible; box-sizing: border-box; padding: 10mm;
             border-radius: 4px;
         }
@@ -328,14 +350,13 @@
         .editable-field { border-bottom: 1px dashed #94a3b8; outline: none; padding: 1px 4px; display: inline-block; min-width: 20px; color: #000 !important; }
         td[contenteditable="true"] { outline: none; transition: background-color 0.2s; color: #000 !important; }
         .editable-field:focus, .editable-field:hover, td[contenteditable="true"]:focus, td[contenteditable="true"]:hover {
-            background-color: rgba(74, 222, 128, 0.2);
+            background-color: rgba(16, 185, 129, 0.2);
         }
 
         body.exporting .editable-field, .exporting .editable-field { border-bottom: none !important; background-color: transparent !important; padding: 1px 0 !important; }
         body.exporting td[contenteditable="true"], .exporting td[contenteditable="true"] { background-color: transparent !important; }
         body.exporting, body.exporting .paper-container, .exporting .paper-container { margin: 0 !important; padding: 0 !important; box-shadow: none !important; }
 
-        /* BLOK PENTING UNTUK MENCEGAH KEPOTONG (Jangan Dihapus) */
         body.exporting .paper-wrapper, .exporting .paper-wrapper {
             width: 182mm !important; max-width: 182mm !important;
             padding: 12mm 0 0 0 !important; margin: 0 auto !important;
@@ -379,6 +400,7 @@
             .nav-menu { flex-direction: row; justify-content: flex-end; gap: 10px; }
             .nav-item { width: 40px; height: 40px; }
             .nav-item::after { display: none; }
+            .btn-theme { margin: 0; }
             .home-layout { grid-template-columns: 1fr; }
             .smart-header { flex-direction: column; align-items: flex-start; gap: 15px; padding: 20px; }
             .view-section { padding: 20px; }
@@ -392,7 +414,7 @@
     <div id="login-screen">
         <div class="login-card">
             <div style="display:flex; justify-content:center; margin-bottom: 20px;">
-                <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);">
+                <div style="background: rgba(128,128,128,0.1); padding: 15px; border-radius: 20px; border: 1px solid var(--glass-border);">
                     <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" width="36" height="36" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                 </div>
             </div>
@@ -424,6 +446,19 @@
                 <div class="nav-item" id="nav-twidytools" onclick="switchTab('twidytools')" data-tooltip="TwidyTools">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
                 </div>
+                
+                <!-- TOMBOL GANTI TEMA -->
+                <div class="nav-item btn-theme" onclick="toggleTheme()" data-tooltip="Ubah Tema">
+                    <!-- Matahari tampil di Mode Gelap -->
+                    <svg id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <!-- Bulan tampil di Mode Terang -->
+                    <svg id="icon-moon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </div>
+
                 <div class="nav-item btn-logout" onclick="prosesLogout()" data-tooltip="Logout">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
                 </div>
@@ -455,8 +490,7 @@
                     
                     <!-- 3D House Interaktif & Floating Widget -->
                     <div class="hero-section">
-                        <!-- Sesuai dengan instruksi Anda untuk menggunakan image rumah yang telah di siapkan -->
-                        <img src="image_619674.jpg" class="hero-bg-image" alt="3D Smart House with Garden">
+                        <img src="image_619674.jpg" class="hero-bg-image" id="hero-image" alt="3D Smart House">
                         
                         <div class="hero-overlay"></div>
                         
@@ -507,7 +541,7 @@
                                         <span class="widget-sub">Browser RAM Usage</span>
                                     </div>
                                 </div>
-                                <div class="widget-val memory" id="memory-status-val">...</div>
+                                <div class="widget-val" id="memory-status-val">...</div>
                             </div>
                         </div>
                     </div>
@@ -569,14 +603,18 @@
                     </button>
                     <div id="status-text"></div>
                 </div>
+                
                 <div id="preview-section">
-                    <h2 style="font-weight: 500; margin-bottom: 30px;">Preview Dokumen</h2>
-                    <div id="all-papers-container"></div>
-                    <div style="margin-top: 20px;">
+                    <h2 style="font-weight: 500; margin-bottom: 15px;">Preview Dokumen</h2>
+                    
+                    <!-- TOMBOL UNDUH SEMUA DIPINDAH KE ATAS SINI -->
+                    <div style="margin-bottom: 30px;">
                         <button class="btn-process btn-success" id="btnDownloadAll" onclick="unduhSemuaGabungan()" style="max-width: 350px; display: none; margin: 0 auto;">
                             Unduh Semua (Gabung PDF)
                         </button>
                     </div>
+
+                    <div id="all-papers-container"></div>
                 </div>
             </div>
 
@@ -644,6 +682,48 @@
         
         checkLogin();
 
+        // --- SCRIPT PENGATURAN TEMA (LIGHT / DARK MODE) ---
+        function initTheme() {
+            const savedTheme = localStorage.getItem('app-theme');
+            const heroImage = document.getElementById('hero-image');
+            
+            // Secara default adalah Dark Mode, ubah hanya jika Light Mode tersimpan
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+                heroImage.src = 'image_619675.jpg'; // Gambar Terang
+                document.getElementById('icon-sun').style.display = 'none';
+                document.getElementById('icon-moon').style.display = 'block';
+            } else {
+                document.body.classList.remove('light-mode');
+                heroImage.src = 'image_619674.jpg'; // Gambar Gelap
+                document.getElementById('icon-sun').style.display = 'block';
+                document.getElementById('icon-moon').style.display = 'none';
+            }
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            body.classList.toggle('light-mode');
+            const isLight = body.classList.contains('light-mode');
+            
+            const heroImage = document.getElementById('hero-image');
+            
+            if (isLight) {
+                localStorage.setItem('app-theme', 'light');
+                heroImage.src = 'image_619675.jpg';
+                document.getElementById('icon-sun').style.display = 'none';
+                document.getElementById('icon-moon').style.display = 'block';
+            } else {
+                localStorage.setItem('app-theme', 'dark');
+                heroImage.src = 'image_619674.jpg';
+                document.getElementById('icon-sun').style.display = 'block';
+                document.getElementById('icon-moon').style.display = 'none';
+            }
+        }
+
+        // Jalankan saat web pertama di-load
+        document.addEventListener('DOMContentLoaded', initTheme);
+
         // --- NAVIGASI DASHBOARD ---
         function switchTab(tabId) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
@@ -667,30 +747,25 @@
             // 1. Status Jaringan
             const statusEl = document.getElementById('network-status-val');
             if (navigator.onLine) {
-                statusEl.innerHTML = '<span style="color: #4ADE80;">Online 🟢</span>';
+                statusEl.innerHTML = '<span style="color: #10B981;">Online 🟢</span>';
             } else {
                 statusEl.innerHTML = '<span style="color: #ef4444;">Offline 🔴</span>';
             }
 
-            // 2. Pemantau Memori (Fitur yang sangat cocok untuk Browser Chromium)
+            // 2. Pemantau Memori
             const memoryEl = document.getElementById('memory-status-val');
             if (window.performance && window.performance.memory) {
-                // Menghitung JS Heap Size dan mengubah Byte menjadi Megabyte (MB)
                 const usedHeap = Math.round(performance.memory.usedJSHeapSize / (1024 * 1024));
                 memoryEl.innerText = `${usedHeap} MB`;
             } else {
-                // Fallback jika browser tidak mendukung performance.memory (contoh: Firefox)
                 memoryEl.innerText = "Stabil ⚡";
             }
         }
         
-        // Pasang event listener ketika koneksi mati/hidup
         window.addEventListener('online', updateSystemHealth);
         window.addEventListener('offline', updateSystemHealth);
-        // Refresh pembacaan memori setiap 2 detik
         setInterval(updateSystemHealth, 2000);
-        updateSystemHealth(); // Jalankan sekali saat load
-
+        updateSystemHealth();
 
         // --- SCRIPT JAM & CUACA WIDGET ---
         function updateDateTime() {
@@ -722,7 +797,7 @@
         updateDateTime(); 
         updateWeather();
 
-        // --- SCRIPT GENERATOR PDF SURAT JALAN (VERSI LAMA YANG STABIL & RAPI) ---
+        // --- SCRIPT GENERATOR PDF SURAT JALAN (STABIL & RAPI) ---
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
         
         const dropArea = document.getElementById('dropArea');
@@ -1012,7 +1087,7 @@
                                 </table>
                             </div>
                         </div>
-                        <button class="btn-process btn-download-single" style="margin-top: 10px; max-width: 300px; background: rgba(255,255,255,0.1); color: white;" onclick="unduhSatuPDF(${i}, '${data.noSO}')">
+                        <button class="btn-process btn-download-single" style="margin-top: 10px; max-width: 300px; background: rgba(128,128,128,0.2); color: var(--text-main);" onclick="unduhSatuPDF(${i}, '${data.noSO}')">
                             ⤓ Unduh Single PDF (${data.noSO || (i+1)})
                         </button>
                     </div>
