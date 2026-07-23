@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Twidy Console - Smart UI</title>
+    <title>Twidy Dashboard - Smart UI</title>
     
     <!-- Font Poppins -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -213,27 +213,23 @@
             object-fit: cover; transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
-        /* Z-INDEX LAYER PENTING AGAR HUJAN TERLIHAT */
         #hero-image { z-index: 0; }
         .hero-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.7) 100%);
-            z-index: 1; transition: var(--transition); /* Overlay ada di lapis 1 */
+            z-index: 1; transition: var(--transition);
         }
         body.light-mode .hero-overlay {
             background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.6) 100%);
         }
 
-        /* Hujan ada di lapis 2 (DI ATAS overlay, sehingga terang/jelas) */
         #rain-canvas { z-index: 2; pointer-events: none; display: block; }
 
-        /* Konten/Teks ada di lapis 3 (Paling Atas) */
         .hero-content { position: relative; z-index: 3; color: white; }
         
         .floating-widget {
             position: absolute; bottom: 30px; left: 30px; 
-            z-index: 4; /* Paling atas agar bisa diklik/jelas */
-            background: var(--glass-bg); backdrop-filter: blur(20px); 
+            z-index: 4; background: var(--glass-bg); backdrop-filter: blur(20px); 
             -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border); 
             border-radius: 24px; padding: 20px 30px; 
             box-shadow: 0 20px 50px rgba(0,0,0,0.2);
@@ -251,7 +247,6 @@
         .widget-sub { font-size: 11px; color: var(--text-muted); }
         .widget-val { font-size: 15px; font-weight: 600; color: var(--primary); }
 
-        /* Panel Kontrol Kanan */
         .control-panel { display: flex; flex-direction: column; gap: 16px; padding-right: 10px; }
         .glass-card {
             background: var(--glass-bg); backdrop-filter: blur(15px);
@@ -389,6 +384,51 @@
         .ttd-table { width: 100%; border-collapse: collapse; font-size: 10.5pt; text-align: center; font-weight: bold; margin-top: 25px; color: #000; }
         .ttd-table td { border: none !important; height: 70px; vertical-align: bottom; padding-bottom: 5px; }
 
+        /* =========================================================
+           7. MODAL INPUT MANUAL SURAT JALAN
+        ========================================================= */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 9999; display: none; justify-content: center; align-items: center;
+        }
+        .modal-card {
+            background: var(--bg-app); border: 1px solid var(--glass-border);
+            border-radius: 24px; padding: 30px; width: 100%; max-width: 600px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto;
+        }
+        .modal-card h3 { margin-bottom: 20px; font-size: 20px; font-weight: 600; }
+        .form-group { margin-bottom: 15px; text-align: left; }
+        .form-group label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 5px; }
+        .form-input {
+            width: 100%; padding: 10px 15px; background: rgba(128,128,128,0.1);
+            border: 1px solid var(--glass-border); border-radius: 12px;
+            color: var(--text-main); font-family: inherit; font-size: 14px;
+        }
+        .form-input:focus { outline: none; border-color: var(--primary); }
+        .item-table-modal { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        .item-table-modal th { font-size: 12px; color: var(--text-muted); text-align: left; padding-bottom: 8px; border-bottom: 1px solid var(--glass-border); }
+        .item-table-modal td { padding: 8px 0; }
+        .item-table-modal input { width: 95%; }
+        .btn-add-item { 
+            background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px dashed #3b82f6; 
+            padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 12px; 
+            font-weight: 600; margin-bottom: 20px; width: 100%; transition: var(--transition);
+        }
+        .btn-add-item:hover { background: rgba(59, 130, 246, 0.2); }
+        .btn-delete-item { 
+            background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); 
+            width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: var(--transition);
+        }
+        .btn-delete-item:hover { background: rgba(239, 68, 68, 0.3); }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; border-top: 1px solid var(--glass-border); padding-top: 20px;}
+        .btn-cancel { 
+            background: rgba(128,128,128,0.1); color: var(--text-main); border: 1px solid var(--glass-border); 
+            padding: 10px 20px; border-radius: 12px; cursor: pointer; font-weight: 600; transition: var(--transition);
+        }
+        .btn-cancel:hover { background: rgba(128,128,128,0.2); }
+
         @media (max-width: 900px) {
             .dashboard-layout { height: 100vh; max-width: 100%; border-radius: 0; border: none; flex-direction: column;}
             .sidebar { width: 100%; height: 60px; flex-direction: row; padding: 0 20px; justify-content: space-between; border-right: none; border-bottom: 1px solid var(--glass-border); }
@@ -401,6 +441,7 @@
             .smart-header { flex-direction: column; align-items: flex-start; gap: 15px; padding: 20px; }
             .view-section { padding: 20px; }
             .floating-widget { flex-direction: column; bottom: 20px; left: 20px; gap: 20px; }
+            .action-buttons-group { flex-direction: column; }
         }
     </style>
 </head>
@@ -595,9 +636,17 @@
                         <span class="subtitle">Atau klik untuk memilih file</span>
                         <div class="file-info" id="fileInfo"></div>
                     </div>
-                    <button class="btn-process" id="btnProses" onclick="prosesBanyakPDF()" disabled>
-                        Mulai Proses Data
-                    </button>
+                    
+                    <!-- TOMBOL AKSI DIBUAT SEJAJAR -->
+                    <div class="action-buttons-group" style="display: flex; gap: 12px; justify-content: center; width: 100%;">
+                        <button class="btn-process" id="btnProses" onclick="prosesBanyakPDF()" disabled style="flex: 1;">
+                            Mulai Proses Data
+                        </button>
+                        <button class="btn-process" style="flex: 1; background: rgba(128,128,128,0.1); border: 1px solid var(--glass-border); color: var(--text-main);" onclick="openManualModal()">
+                            ✍️ Buat Manual
+                        </button>
+                    </div>
+
                     <div id="status-text"></div>
                 </div>
                 
@@ -630,6 +679,46 @@
                 <iframe src="https://twidytools.my.id"></iframe>
             </div>
         </main>
+    </div>
+
+    <!-- ================= MODAL INPUT MANUAL ================= -->
+    <div id="modal-manual" class="modal-overlay">
+        <div class="modal-card">
+            <h3>Buat Surat Jalan Manual</h3>
+            
+            <div class="form-group">
+                <label>No. SO / Referensi</label>
+                <input type="text" id="manual-noso" class="form-input" placeholder="Opsional (Otomatis jika kosong)">
+            </div>
+            <div class="form-group">
+                <label>Nama Pelanggan / Kepada Yth.</label>
+                <textarea id="manual-pelanggan" class="form-input" rows="2" placeholder="Masukkan nama dan alamat pelanggan"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Keterangan Tambahan</label>
+                <input type="text" id="manual-keterangan" class="form-input" placeholder="Contoh: Titip ke Ekspedisi A">
+            </div>
+            
+            <label style="display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 5px; margin-top: 20px;">Daftar Barang</label>
+            <table class="item-table-modal" id="manual-items-table">
+                <thead>
+                    <tr><th style="width: 70%;">Nama Barang</th><th style="width: 20%;">Qty</th><th style="width: 10%;"></th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" class="form-input item-nama" placeholder="Nama Barang"></td>
+                        <td><input type="number" class="form-input item-qty" value="1" min="1"></td>
+                        <td><button class="btn-delete-item" onclick="hapusBarisManual(this)">X</button></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button class="btn-add-item" onclick="tambahBarisManual()">+ Tambah Baris Barang</button>
+
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeManualModal()">Batal</button>
+                <button class="btn-process" style="width: auto;" onclick="generateManualSuratJalan()">Generate Kertas</button>
+            </div>
+        </div>
     </div>
 
     <!-- ==========================================
@@ -849,7 +938,168 @@
         updateDateTime(); 
         updateWeather();
 
-        // --- SCRIPT GENERATOR PDF SURAT JALAN ---
+        // --- SCRIPT MODAL INPUT MANUAL SURAT JALAN ---
+        function openManualModal() {
+            document.getElementById('modal-manual').style.display = 'flex';
+        }
+        
+        function closeManualModal() {
+            document.getElementById('modal-manual').style.display = 'none';
+        }
+        
+        function tambahBarisManual() {
+            const tbody = document.querySelector('#manual-items-table tbody');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><input type="text" class="form-input item-nama" placeholder="Nama Barang"></td>
+                <td><input type="number" class="form-input item-qty" value="1" min="1"></td>
+                <td><button class="btn-delete-item" onclick="hapusBarisManual(this)">X</button></td>
+            `;
+            tbody.appendChild(tr);
+        }
+        
+        function hapusBarisManual(btn) {
+            btn.closest('tr').remove();
+        }
+
+        function generateManualSuratJalan() {
+            // Ambil data dari form pop-up
+            let noSO = document.getElementById('manual-noso').value.trim();
+            if(!noSO) noSO = "MANUAL-" + Math.floor(Math.random() * 10000); // Jika kosong, auto-generate kode
+            
+            const pelanggan = document.getElementById('manual-pelanggan').value.trim();
+            const keterangan = document.getElementById('manual-keterangan').value.trim();
+            
+            let dataBarang = [];
+            document.querySelectorAll('#manual-items-table tbody tr').forEach(tr => {
+                const nama = tr.querySelector('.item-nama').value.trim();
+                const qty = tr.querySelector('.item-qty').value.trim();
+                if(nama) dataBarang.push({ nama, qty });
+            });
+            
+            if(dataBarang.length === 0) {
+                alert("Masukkan minimal 1 nama barang!");
+                return;
+            }
+
+            // Mulai proses generate layout ke canvas PDF
+            const allPapersContainer = document.getElementById('all-papers-container');
+            const d = new Date();
+            const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            const angkaRomawi = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
+            
+            let tanggalStr = `Yogyakarta, ${d.getDate()} ${namaBulan[d.getMonth()]} ${d.getFullYear()}`;
+            let bulanStr = angkaRomawi[d.getMonth()]; let tahunStr = d.getFullYear();
+
+            let barisBarang = "";
+            dataBarang.forEach((barang, index) => {
+                barisBarang += `
+                    <tr>
+                        <td class="text-center" contenteditable="true">${index + 1}</td>
+                        <td contenteditable="true">${barang.nama}</td>
+                        <td class="text-center" contenteditable="true">${barang.qty}</td>
+                        <td contenteditable="true"></td>
+                    </tr>`;
+            });
+
+            // ID unik untuk render kertas PDF
+            const uniqueId = Date.now();
+            const hasExisting = allPapersContainer.children.length > 0;
+
+            let htmlSuratJalan = `
+            ${hasExisting ? '<div class="html2pdf__page-break"></div>' : ''}
+            <div class="paper-container">
+                <div id="paper-wrapper-m${uniqueId}" class="paper-wrapper">
+                    <div class="cetakan-surat-jalan">
+                        <div class="header-text">
+                            <div class="title1">PENERBIT & PERCETAKAN</div>
+                            <div class="title2">ANDI OFFSET</div>
+                            <div class="address">Jl. BEO 38-40 TELP. (0274)561881 HUNTING. FAX.588282 YOGYAKARTA 55281 E-mail: pemasaran@andipublisher.net.id</div>
+                        </div>
+                        <table class="sub-header">
+                            <tr>
+                                <td style="width: 25%; vertical-align: top;"><div class="box-hijau">DIKIRIM KEMBALI</div></td>
+                                <td style="width: 50%;">
+                                    <div class="sj-title">SURAT JALAN</div>
+                                    <div class="sj-no">
+                                        NO : AO / 
+                                        <span class="editable-field" contenteditable="true">${bulanStr}</span> / 
+                                        <span class="editable-field" contenteditable="true">${tahunStr}</span> / 
+                                        <span class="editable-field" contenteditable="true">${noSO}</span>
+                                    </div>
+                                </td>
+                                <td style="width: 25%; vertical-align: top; padding-top: 5px;">
+                                    <div class="date-right editable-field" contenteditable="true">${tanggalStr}</div>
+                                </td>
+                            </tr>
+                        </table>
+                        <table class="kepada-yth">
+                            <tr>
+                                <td style="width: 55%;"></td>
+                                <td style="width: 45%;">
+                                    <span class="kepada-bold">Kepada Yth,</span><br><br>
+                                    <span class="kepada-bold editable-field" contenteditable="true">${pelanggan.replace(/\n/g, '<br>')}</span>
+                                </td>
+                            </tr>
+                        </table>
+                        <table class="keterangan-table">
+                            <tr>
+                                <td style="width: 11%;">Ekspedisi</td><td style="width: 2%;">:</td>
+                                <td style="width: 87%;"><span class="editable-field" style="width: 100%; display: inline-block; min-height: 15px;" contenteditable="true"></span></td>
+                            </tr>
+                            <tr>
+                                <td>Keterangan</td><td>:</td>
+                                <td><span class="editable-field" style="width: 100%; display: inline-block; min-height: 15px;" contenteditable="true">${keterangan}</span></td>
+                            </tr>
+                        </table>
+                        <table class="main-table">
+                            <thead>
+                                <tr><th style="width: 5%;">NO</th><th style="width: 65%;">NAMA BARANG</th><th style="width: 10%;">QTY</th><th style="width: 20%;">KOLI</th></tr>
+                            </thead>
+                            <tbody>${barisBarang}</tbody>
+                            <tfoot>
+                                <tr><td colspan="4" class="footer-note">* 3 HARI SETELAH BARANG DITERIMA TIDAK ADA KOMPLAIN MAKA BARANG KAMI ANGGAP LENGKAP</td></tr>
+                            </tfoot>
+                        </table>
+                        <table class="ttd-table">
+                            <tr><td style="width: 25%;">DITERIMA OLEH</td><td style="width: 25%;">EKSPEDISI</td><td style="width: 25%;">KEPALA GUDANG</td><td style="width: 25%;">MENGETAHUI</td></tr>
+                        </table>
+                    </div>
+                </div>
+                <button class="btn-process btn-download-single" style="margin-top: 10px; max-width: 300px; background: rgba(128,128,128,0.2); color: var(--text-main);" onclick="unduhSatuPDF('m${uniqueId}', '${noSO}')">
+                    ⤓ Unduh Single PDF (${noSO})
+                </button>
+            </div>
+            `;
+            allPapersContainer.insertAdjacentHTML('beforeend', htmlSuratJalan);
+            
+            // Tampilkan UI Preview
+            document.getElementById('preview-section').style.display = 'block';
+            document.getElementById('status-text').innerText = "Surat Jalan Manual berhasil ditambahkan!";
+            
+            // Tampilkan tombol "Unduh Semua" jika ada lebih dari 1 kertas
+            const btnDownloadAll = document.getElementById('btnDownloadAll');
+            if(document.querySelectorAll('.paper-container').length > 1) {
+                btnDownloadAll.style.display = 'inline-block';
+            }
+            
+            // Tutup modal, scroll ke kertas baru, dan reset form
+            closeManualModal();
+            setTimeout(() => document.getElementById(`paper-wrapper-m${uniqueId}`).scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+            
+            document.getElementById('manual-noso').value = '';
+            document.getElementById('manual-pelanggan').value = '';
+            document.getElementById('manual-keterangan').value = '';
+            document.querySelector('#manual-items-table tbody').innerHTML = `
+                <tr>
+                    <td><input type="text" class="form-input item-nama" placeholder="Nama Barang"></td>
+                    <td><input type="number" class="form-input item-qty" value="1" min="1"></td>
+                    <td><button class="btn-delete-item" onclick="hapusBarisManual(this)">X</button></td>
+                </tr>
+            `;
+        }
+
+        // --- SCRIPT GENERATOR PDF SURAT JALAN (DARI FILE PDF BATCH) ---
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
         
         const dropArea = document.getElementById('dropArea');
@@ -1067,7 +1317,7 @@
                                 </table>
                             </div>
                         </div>
-                        <button class="btn-process btn-download-single" style="margin-top: 10px; max-width: 300px; background: rgba(128,128,128,0.2); color: var(--text-main);" onclick="unduhSatuPDF(${i}, '${data.noSO}')">
+                        <button class="btn-process btn-download-single" style="margin-top: 10px; max-width: 300px; background: rgba(128,128,128,0.2); color: var(--text-main);" onclick="unduhSatuPDF('${i}', '${data.noSO}')">
                             ⤓ Unduh Single PDF (${data.noSO || (i+1)})
                         </button>
                     </div>
@@ -1090,6 +1340,7 @@
             }
         }
 
+        // --- SISTEM UNDUH PDF (HTML2PDF) ---
         function getOpsiPDF(filename) {
             return {
                 margin:       [15, 15, 15, 10], 
@@ -1101,15 +1352,15 @@
             };
         }
 
-        function unduhSatuPDF(index, noSO) {
+        function unduhSatuPDF(id, noSO) {
             window.scrollTo(0, 0); 
-            const wrapperCetak = document.getElementById(`paper-wrapper-${index}`);
+            const wrapperCetak = document.getElementById(`paper-wrapper-${id}`);
             document.body.classList.add('exporting');
             const tombolUnduh = wrapperCetak.nextElementSibling; 
             const teksAsli = tombolUnduh.innerText;
             tombolUnduh.innerText = "Merender PDF..."; tombolUnduh.disabled = true;
 
-            const namaFilePDF = noSO ? `Surat_Jalan_${noSO}.pdf` : `Surat_Jalan_${index+1}.pdf`;
+            const namaFilePDF = noSO ? `Surat_Jalan_${noSO}.pdf` : `Surat_Jalan_${id}.pdf`;
             html2pdf().set(getOpsiPDF(namaFilePDF)).from(wrapperCetak).save().then(() => {
                 document.body.classList.remove('exporting');
                 tombolUnduh.innerText = teksAsli; tombolUnduh.disabled = false;
