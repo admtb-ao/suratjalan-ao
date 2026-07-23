@@ -115,7 +115,11 @@
                             <p class="text-sm text-gray-500">Siap dieksekusi: <span id="selected-count" class="font-bold text-red-600">0</span></p>
                         </div>
                         
+                        <!-- PANEL TOMBOL (DITAMBAH TOMBOL REFRESH) -->
                         <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                            <button id="btn-refresh" onclick="refreshData()" class="flex-1 sm:flex-none bg-gray-100 border border-gray-300 text-gray-800 px-5 py-2.5 rounded hover:bg-gray-200 shadow font-bold flex items-center justify-center gap-2 transition">
+                                🔄 Refresh Data
+                            </button>
                             <button onclick="cetakPrinter()" class="flex-1 sm:flex-none bg-blue-600 text-white px-5 py-2.5 rounded hover:bg-blue-700 shadow font-bold flex items-center justify-center gap-2 transition">
                                 🖨️ Print Fisik
                             </button>
@@ -147,10 +151,17 @@
         let dataAlamat = [];
         const LOGO_URL = "https://raw.githubusercontent.com/tlibrary-shop/tlibrary/main/Logo%20Penerbit%20Andi%20tok.png";
 
-        // MENGAMBIL DATA DARI DATABASE SAAT HALAMAN DIBUKA
-        window.onload = async function() {
+        // FUNGSI UTAMA UNTUK MENGAMBIL DATA (DIPAKAI SAAT HALAMAN DIBUKA & SAAT REFRESH)
+        async function fetchDatabaseData(isRefresh = false) {
             const printArea = document.getElementById('print-area');
-            printArea.innerHTML = '<div class="w-full p-10 text-center font-bold text-blue-600">⏳ Sedang mengambil data dari Google Sheets...</div>';
+            const btnRefresh = document.getElementById('btn-refresh');
+
+            if (isRefresh) {
+                btnRefresh.innerHTML = '⏳ Sedang Refresh...';
+                btnRefresh.disabled = true;
+            } else {
+                printArea.innerHTML = '<div class="w-full p-10 text-center font-bold text-blue-600">⏳ Sedang mengambil data dari Google Sheets...</div>';
+            }
             
             try {
                 const response = await fetch(SCRIPT_URL);
@@ -168,14 +179,33 @@
                 }));
                 updatePreview();
             } catch (err) {
-                printArea.innerHTML = `
-                    <div class="w-full p-10 text-center">
-                        <p class="font-bold text-red-500 text-xl mb-2">❌ Gagal terhubung ke Database Google Sheets.</p>
-                        <p class="text-gray-600">Pastikan Script di-deploy ke "Anyone" (Semua Orang) dan nama Sheet Anda benar-benar "Database".</p>
-                    </div>`;
+                if (!isRefresh) {
+                    printArea.innerHTML = `
+                        <div class="w-full p-10 text-center">
+                            <p class="font-bold text-red-500 text-xl mb-2">❌ Gagal terhubung ke Database Google Sheets.</p>
+                            <p class="text-gray-600">Pastikan Script di-deploy ke "Anyone" (Semua Orang) dan nama Sheet Anda benar-benar "Database".</p>
+                        </div>`;
+                } else {
+                    alert("Gagal me-refresh data. Periksa koneksi internet.");
+                }
                 console.error("Fetch Error Detail:", err);
+            } finally {
+                if (isRefresh) {
+                    btnRefresh.innerHTML = '🔄 Refresh Data';
+                    btnRefresh.disabled = false;
+                }
             }
+        }
+
+        // MENGAMBIL DATA DARI DATABASE SAAT HALAMAN DIBUKA
+        window.onload = function() {
+            fetchDatabaseData(false);
         };
+
+        // FUNGSI SAAT TOMBOL REFRESH DIKLIK
+        function refreshData() {
+            fetchDatabaseData(true);
+        }
 
         function renderLabel(data, index) {
             const isSelected = data.selected ? 'checked' : '';
