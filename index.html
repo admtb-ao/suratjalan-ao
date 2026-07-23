@@ -41,7 +41,7 @@
             --glass-bg: rgba(255, 255, 255, 0.6);
             --glass-border: rgba(0, 0, 0, 0.08);
             --glass-bg-hover: rgba(0, 0, 0, 0.05);
-            --primary: #10B981; /* Sedikit lebih gelap agar kontras di latar putih */
+            --primary: #10B981; 
             --text-main: #0F172A;
             --text-muted: #64748B;
         }
@@ -196,7 +196,7 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         /* =========================================================
-           4. HALAMAN HOME (3D HOUSE INTERAKTIF)
+           4. HALAMAN HOME & MEDIA
         ========================================================= */
         .home-layout {
             display: grid; grid-template-columns: 1fr 380px; gap: 40px; height: 100%;
@@ -208,44 +208,40 @@
             overflow: hidden; box-shadow: inset 0 0 50px rgba(0,0,0,0.1);
         }
 
-        .hero-bg-image {
+        .hero-bg-media {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            object-fit: cover; z-index: 0; transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            object-fit: cover; transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .hero-section:hover .hero-bg-image { transform: scale(1.05); }
-
-        /* Hero overlay disesuaikan supaya teks tetap terbaca meski gambar terang */
+        
+        /* Z-INDEX LAYER PENTING AGAR HUJAN TERLIHAT */
+        #hero-image { z-index: 0; }
         .hero-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.7) 100%);
-            z-index: 1; transition: var(--transition);
+            z-index: 1; transition: var(--transition); /* Overlay ada di lapis 1 */
         }
-        
         body.light-mode .hero-overlay {
             background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.6) 100%);
         }
 
-        .hero-content { position: relative; z-index: 2; color: white; }
+        /* Hujan ada di lapis 2 (DI ATAS overlay, sehingga terang/jelas) */
+        #rain-canvas { z-index: 2; pointer-events: none; display: block; }
+
+        /* Konten/Teks ada di lapis 3 (Paling Atas) */
+        .hero-content { position: relative; z-index: 3; color: white; }
         
         .floating-widget {
-            position: absolute; 
-            bottom: 30px; 
-            left: 30px; 
-            z-index: 3; 
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px); 
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border); 
-            border-radius: 24px;
-            padding: 20px 30px; 
+            position: absolute; bottom: 30px; left: 30px; 
+            z-index: 4; /* Paling atas agar bisa diklik/jelas */
+            background: var(--glass-bg); backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border); 
+            border-radius: 24px; padding: 20px 30px; 
             box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-            transition: var(--transition); 
-            cursor: default;
-            display: flex; 
-            gap: 40px; 
-            align-items: center; 
-            width: max-content;
+            transition: var(--transition); cursor: default;
+            display: flex; gap: 40px; align-items: center; width: max-content;
         }
+
+        .hero-section:hover .hero-bg-media#hero-image { transform: scale(1.03); }
 
         .widget-row { display: flex; align-items: center; gap: 20px; justify-content: space-between; }
         .widget-left { display: flex; align-items: center; gap: 16px; color: var(--text-main); }
@@ -337,7 +333,7 @@
         }
 
         /* =========================================================
-           6. CSS CETAK & EXPORT PDF (TETAP STABIL / PUTIH)
+           6. CSS CETAK & EXPORT PDF
         ========================================================= */
         .paper-container { margin-bottom: 40px; display: flex; flex-direction: column; align-items: center; }
         .paper-wrapper {
@@ -449,11 +445,9 @@
                 
                 <!-- TOMBOL GANTI TEMA -->
                 <div class="nav-item btn-theme" onclick="toggleTheme()" data-tooltip="Ubah Tema">
-                    <!-- Matahari tampil di Mode Gelap -->
                     <svg id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
                     </svg>
-                    <!-- Bulan tampil di Mode Terang -->
                     <svg id="icon-moon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                     </svg>
@@ -490,21 +484,25 @@
                     
                     <!-- 3D House Interaktif & Floating Widget -->
                     <div class="hero-section">
-                        <img src="image_619674.jpg" class="hero-bg-image" id="hero-image" alt="3D Smart House">
+                        <!-- Gambar Background -->
+                        <img src="image_619674.jpg" class="hero-bg-media" id="hero-image" alt="3D Smart House">
                         
+                        <!-- Overlay Transparan -->
                         <div class="hero-overlay"></div>
+                        
+                        <!-- Canvas untuk Efek Hujan (Sekarang di atas Overlay) -->
+                        <canvas id="rain-canvas" class="hero-bg-media"></canvas>
                         
                         <div class="hero-content">
                             <h2 style="font-size: 28px; font-weight: 300; margin-bottom: 5px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">AO <strong>Dashboard</strong></h2>
                             <p style="color: rgba(255,255,255,0.9); font-size: 13px; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">Manage your daily operations efficiently.</p>
                         </div>
 
-                        <!-- Floating Widget Health Monitor (Fungsional) -->
+                        <!-- Floating Widget Health Monitor -->
                         <div class="floating-widget">
                             <div class="widget-row">
                                 <div class="widget-left">
                                     <div class="widget-icon">
-                                        <!-- Ikon Sinyal/Internet -->
                                         <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5">
                                             <path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"></path>
                                         </svg>
@@ -522,7 +520,6 @@
                             <div class="widget-row">
                                 <div class="widget-left">
                                     <div class="widget-icon">
-                                        <!-- Ikon Memori/Prosesor -->
                                         <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5">
                                             <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
                                             <rect x="9" y="9" width="6" height="6"></rect>
@@ -546,7 +543,7 @@
                         </div>
                     </div>
 
-                    <!-- Panel Kanan (Kontrol Modul) -->
+                    <!-- Panel Kanan -->
                     <div class="control-panel">
                         <div class="glass-card feature-card-lg" onclick="switchTab('surat-jalan')">
                             <div class="header">
@@ -606,14 +603,11 @@
                 
                 <div id="preview-section">
                     <h2 style="font-weight: 500; margin-bottom: 15px;">Preview Dokumen</h2>
-                    
-                    <!-- TOMBOL UNDUH SEMUA DIPINDAH KE ATAS SINI -->
                     <div style="margin-bottom: 30px;">
                         <button class="btn-process btn-success" id="btnDownloadAll" onclick="unduhSemuaGabungan()" style="max-width: 350px; display: none; margin: 0 auto;">
                             Unduh Semua (Gabung PDF)
                         </button>
                     </div>
-
                     <div id="all-papers-container"></div>
                 </div>
             </div>
@@ -635,7 +629,6 @@
                 </button>
                 <iframe src="https://twidytools.my.id"></iframe>
             </div>
-
         </main>
     </div>
 
@@ -643,51 +636,114 @@
          SCRIPT LOGIKA SISTEM
     =========================================== -->
     <script>
-        // --- SCRIPT OTENTIKASI (LOGIN/LOGOUT) ---
+        // --- SCRIPT OTENTIKASI & TRIGGER EFEK HUJAN ---
         function checkLogin() {
             if (sessionStorage.getItem('isLoggedIn') === 'true') {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('app-container').style.display = 'flex';
+                // Trigger hujan setelah layout berhasil dimuat (agar canvas mendapatkan ukuran yang benar)
+                setTimeout(startRain, 150); 
             } else {
                 document.getElementById('login-screen').style.display = 'flex';
                 document.getElementById('app-container').style.display = 'none';
             }
         }
-
         function prosesLogin() {
             const user = document.getElementById('login-username').value;
             const pass = document.getElementById('login-password').value;
-            const errorText = document.getElementById('login-error');
-            
             if (user === 'adminpusat' && pass === 'andi3840') {
                 sessionStorage.setItem('isLoggedIn', 'true');
-                errorText.style.display = 'none';
-                document.getElementById('login-username').value = '';
-                document.getElementById('login-password').value = '';
+                document.getElementById('login-error').style.display = 'none';
                 checkLogin();
             } else { 
-                errorText.style.display = 'block'; 
+                document.getElementById('login-error').style.display = 'block'; 
             }
         }
-
-        function handleLoginEnter(e) { 
-            if (e.key === 'Enter') prosesLogin(); 
-        }
-
+        function handleLoginEnter(e) { if (e.key === 'Enter') prosesLogin(); }
         function prosesLogout() {
             sessionStorage.removeItem('isLoggedIn'); 
             checkLogin(); 
             switchTab('home');
         }
         
-        checkLogin();
+        // --- SCRIPT EFEK HUJAN (CANVAS) ---
+        const canvas = document.getElementById('rain-canvas');
+        const ctx = canvas.getContext('2d');
+        let rainDrops = [];
+        let rainAnimationId;
+        let isRainStarted = false;
+        
+        function initRain() {
+            if (canvas.offsetWidth === 0) return; 
+
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            rainDrops = [];
+            
+            // JUMLAH TETESAN DIKURANGI AGAR TIDAK TERLALU RAMAI (Dari 150 jadi 100)
+            for (let i = 0; i < 100; i++) { 
+                rainDrops.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    length: Math.random() * 15 + 10, // Sedikit lebih pendek
+                    speed: Math.random() * 7 + 5, // KECEPATAN DIPERLAMBAT (Gerimis santai)
+                    opacity: Math.random() * 0.4 + 0.2, // OPACITY DITURUNKAN (Sangat transparan/samar)
+                    wind: Math.random() * 2 - 1
+                });
+            }
+        }
+        
+        function drawRain() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < rainDrops.length; i++) {
+                let drop = rainDrops[i];
+                ctx.beginPath();
+                ctx.strokeStyle = `rgba(255, 255, 255, ${drop.opacity})`;
+                ctx.lineWidth = 1; // KETEBALAN DIKEMBALIKAN KE 1 (Biar halus)
+                ctx.lineCap = 'round';
+                ctx.moveTo(drop.x, drop.y);
+                ctx.lineTo(drop.x + drop.wind, drop.y + drop.length);
+                ctx.stroke();
+            }
+        }
+        
+        function updateRain() {
+            for (let i = 0; i < rainDrops.length; i++) {
+                let drop = rainDrops[i];
+                drop.x += drop.wind;
+                drop.y += drop.speed;
+                if (drop.y > canvas.height) {
+                    drop.y = -drop.length;
+                    drop.x = Math.random() * canvas.width;
+                }
+            }
+        }
+        
+        function animateRain() {
+            drawRain();
+            updateRain();
+            rainAnimationId = requestAnimationFrame(animateRain);
+        }
+        
+        function startRain() {
+            if (!isRainStarted) {
+                initRain();
+                animateRain();
+                isRainStarted = true;
+            } else {
+                initRain(); 
+            }
+        }
+
+        window.addEventListener('resize', () => {
+            initRain();
+        });
 
         // --- SCRIPT PENGATURAN TEMA (LIGHT / DARK MODE) ---
         function initTheme() {
             const savedTheme = localStorage.getItem('app-theme');
             const heroImage = document.getElementById('hero-image');
             
-            // Secara default adalah Dark Mode, ubah hanya jika Light Mode tersimpan
             if (savedTheme === 'light') {
                 document.body.classList.add('light-mode');
                 heroImage.src = 'image_619675.jpg'; // Gambar Terang
@@ -705,24 +761,25 @@
             const body = document.body;
             body.classList.toggle('light-mode');
             const isLight = body.classList.contains('light-mode');
-            
             const heroImage = document.getElementById('hero-image');
             
             if (isLight) {
                 localStorage.setItem('app-theme', 'light');
-                heroImage.src = 'image_619675.jpg';
+                heroImage.src = 'image_619675.jpg'; 
                 document.getElementById('icon-sun').style.display = 'none';
                 document.getElementById('icon-moon').style.display = 'block';
             } else {
                 localStorage.setItem('app-theme', 'dark');
-                heroImage.src = 'image_619674.jpg';
+                heroImage.src = 'image_619674.jpg'; 
                 document.getElementById('icon-sun').style.display = 'block';
                 document.getElementById('icon-moon').style.display = 'none';
             }
         }
 
-        // Jalankan saat web pertama di-load
-        document.addEventListener('DOMContentLoaded', initTheme);
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            checkLogin(); 
+        });
 
         // --- NAVIGASI DASHBOARD ---
         function switchTab(tabId) {
@@ -742,9 +799,8 @@
             document.getElementById('top-title').innerText = titles[tabId];
         }
 
-        // --- SCRIPT WIDGET KESEHATAN SISTEM (NETWORK & MEMORY) ---
+        // --- SCRIPT WIDGET KESEHATAN SISTEM ---
         function updateSystemHealth() {
-            // 1. Status Jaringan
             const statusEl = document.getElementById('network-status-val');
             if (navigator.onLine) {
                 statusEl.innerHTML = '<span style="color: #10B981;">Online 🟢</span>';
@@ -752,7 +808,6 @@
                 statusEl.innerHTML = '<span style="color: #ef4444;">Offline 🔴</span>';
             }
 
-            // 2. Pemantau Memori
             const memoryEl = document.getElementById('memory-status-val');
             if (window.performance && window.performance.memory) {
                 const usedHeap = Math.round(performance.memory.usedJSHeapSize / (1024 * 1024));
@@ -761,7 +816,6 @@
                 memoryEl.innerText = "Stabil ⚡";
             }
         }
-        
         window.addEventListener('online', updateSystemHealth);
         window.addEventListener('offline', updateSystemHealth);
         setInterval(updateSystemHealth, 2000);
@@ -781,7 +835,6 @@
             const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
             dateElement.innerText = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
         }
-
         async function updateWeather() {
             try {
                 const response = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-7.7971&longitude=110.3688&current_weather=true');
@@ -792,12 +845,11 @@
                 document.getElementById('live-temp').innerText = "--°C"; 
             }
         }
-        
         setInterval(updateDateTime, 1000); 
         updateDateTime(); 
         updateWeather();
 
-        // --- SCRIPT GENERATOR PDF SURAT JALAN (STABIL & RAPI) ---
+        // --- SCRIPT GENERATOR PDF SURAT JALAN ---
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
         
         const dropArea = document.getElementById('dropArea');
@@ -807,25 +859,19 @@
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => { 
             dropArea.addEventListener(eventName, preventDefaults, false); 
         });
-        
         function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
         
         ['dragenter', 'dragover'].forEach(eventName => { 
             dropArea.addEventListener(eventName, () => dropArea.classList.add('dragover'), false); 
         });
-        
         ['dragleave', 'drop'].forEach(eventName => { 
             dropArea.addEventListener(eventName, () => dropArea.classList.remove('dragover'), false); 
         });
 
         dropArea.addEventListener('drop', (e) => {
             let dt = e.dataTransfer;
-            if(dt.files.length > 0) { 
-                fileInput.files = dt.files; 
-                handleFileSelect(); 
-            }
+            if(dt.files.length > 0) { fileInput.files = dt.files; handleFileSelect(); }
         });
-
         fileInput.addEventListener('change', handleFileSelect);
         
         function handleFileSelect() {
@@ -841,9 +887,7 @@
         async function extractDataFromPDF(file) {
             const arrayBuffer = await file.arrayBuffer();
             const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
-            
-            let noSO = "", keterangan = "", pelanggan = ""; 
-            let dataBarang = []; 
+            let noSO = "", keterangan = "", pelanggan = ""; let dataBarang = []; 
 
             for (let p = 1; p <= pdf.numPages; p++) {
                 const page = await pdf.getPage(p);
@@ -866,7 +910,6 @@
                 if (p === 1) {
                     let fullTextArray = rows.map(r => r.cols.map(c => c.text).join(" ")); 
                     let fullText = fullTextArray.join(" ");
-
                     let matchSO = fullText.match(/(SO\d{4}-\d{5})/); 
                     if (matchSO) noSO = matchSO[1];
 
@@ -878,62 +921,34 @@
                     if (ketIndex !== -1) {
                         let textAfterKet = leftFullText.substring(ketIndex).replace(/Keterangan(?:\s*Nota)?\s*:\s*/, "");
                         let endMatch = textAfterKet.match(/No\.\s|Kode\b/i); 
-                        if (endMatch) {
-                            keterangan = textAfterKet.substring(0, endMatch.index).trim();
-                        } else {
-                            keterangan = textAfterKet.trim();
-                        }
+                        if (endMatch) keterangan = textAfterKet.substring(0, endMatch.index).trim();
+                        else keterangan = textAfterKet.trim();
                     }
 
-                    let isReadingPelanggan = false; 
-                    let pelangganLines = []; 
-                    let lastY = null;
-
+                    let isReadingPelanggan = false; let pelangganLines = []; let lastY = null;
                     for (let i = 0; i < rows.length; i++) {
-                        let row = rows[i]; 
-                        let rightCols = row.cols.filter(c => c.x >= 350);
+                        let row = rows[i]; let rightCols = row.cols.filter(c => c.x >= 350);
                         if (rightCols.length === 0) continue;
-
                         let rowText = rightCols.map(c => c.text).join(" ").trim();
                         if (!rowText) continue;
 
                         if (rowText.match(/Pelanggan\s*:/i)) {
-                            isReadingPelanggan = true; 
-                            lastY = row.y;
+                            isReadingPelanggan = true; lastY = row.y;
                             let textAfter = rowText.replace(/Pelanggan\s*:/i, "").trim();
-                            if (textAfter && !textAfter.match(/^[\d\-\s]+$/)) {
-                                pelangganLines.push(textAfter);
-                            }
+                            if (textAfter && !textAfter.match(/^[\d\-\s]+$/)) pelangganLines.push(textAfter);
                             continue;
                         }
-
                         if (isReadingPelanggan) {
-                            if (lastY !== null) {
-                                let gap = lastY - row.y; 
-                                if (gap > 18) {
-                                    break; 
-                                }
-                            }
-
-                            if (rowText.match(/Tipe\s*:/i) || rowText.match(/Sales\s*:/i)) {
-                                break;
-                            }
-
-                            if (rowText.match(/^[\d\-\s]+$/)) { 
-                                lastY = row.y; 
-                                continue; 
-                            }
-
-                            pelangganLines.push(rowText); 
-                            lastY = row.y;
+                            if (lastY !== null && (lastY - row.y) > 18) break; 
+                            if (rowText.match(/Tipe\s*:/i) || rowText.match(/Sales\s*:/i)) break;
+                            if (rowText.match(/^[\d\-\s]+$/)) { lastY = row.y; continue; }
+                            pelangganLines.push(rowText); lastY = row.y;
                         }
                     }
                     pelanggan = pelangganLines.join(" ");
                 }
 
-                let pageBarang = []; 
-                let barangTemp = null;
-
+                let pageBarang = []; let barangTemp = null;
                 rows.forEach(row => {
                     let rowText = row.cols.map(c => c.text).join(" ");
                     let hasKode = row.cols.find(c => c.text.match(/^\d{2}-\d{2}-\d{2}-\d{2}-\d{6}/));
@@ -949,20 +964,15 @@
                         };
                     } else if (barangTemp && row.y < barangTemp.startY && row.y > 60) {
                         if (rowText.includes("Page") || rowText.includes("Disiapkan") || rowText.includes("Qty Total") || rowText.match(/Tipe\s*:/)) {
-                            pageBarang.push(barangTemp); 
-                            barangTemp = null;
+                            pageBarang.push(barangTemp); barangTemp = null;
                         } else {
                             let judulCols = row.cols.filter(c => c.x > 80 && c.x < 250);
-                            if (judulCols.length > 0) {
-                                barangTemp.nama += " " + judulCols.map(c => c.text).join(" ");
-                            }
+                            if (judulCols.length > 0) barangTemp.nama += " " + judulCols.map(c => c.text).join(" ");
                         }
                     }
                 });
-                
                 if (barangTemp) pageBarang.push(barangTemp);
-                pageBarang.reverse(); 
-                dataBarang = dataBarang.concat(pageBarang);
+                pageBarang.reverse(); dataBarang = dataBarang.concat(pageBarang);
             }
             return { noSO, keterangan, pelanggan, dataBarang };
         }
@@ -973,24 +983,19 @@
             const btnDownloadAll = document.getElementById('btnDownloadAll');
             
             if (fileInput.files.length === 0) return;
-            
-            btnProses.disabled = true; 
-            allPapersContainer.innerHTML = ''; 
+            btnProses.disabled = true; allPapersContainer.innerHTML = ''; 
             
             const d = new Date();
             const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
             const angkaRomawi = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
             
             let tanggalStr = `Yogyakarta, ${d.getDate()} ${namaBulan[d.getMonth()]} ${d.getFullYear()}`;
-            let bulanStr = angkaRomawi[d.getMonth()]; 
-            let tahunStr = d.getFullYear();
+            let bulanStr = angkaRomawi[d.getMonth()]; let tahunStr = d.getFullYear();
 
             try {
                 for (let i = 0; i < fileInput.files.length; i++) {
                     statusText.innerText = `Sedang memproses file ${i + 1} dari ${fileInput.files.length}...`;
-                    
                     let data = await extractDataFromPDF(fileInput.files[i]);
-                    
                     let barisBarang = "";
                     data.dataBarang.forEach((barang, index) => {
                         barisBarang += `
@@ -999,8 +1004,7 @@
                                 <td contenteditable="true">${barang.nama}</td>
                                 <td class="text-center" contenteditable="true">${barang.qty}</td>
                                 <td contenteditable="true"></td>
-                            </tr>
-                        `;
+                            </tr>`;
                     });
 
                     let htmlSuratJalan = `
@@ -1013,7 +1017,6 @@
                                     <div class="title2">ANDI OFFSET</div>
                                     <div class="address">Jl. BEO 38-40 TELP. (0274)561881 HUNTING. FAX.588282 YOGYAKARTA 55281 E-mail: pemasaran@andipublisher.net.id</div>
                                 </div>
-                                
                                 <table class="sub-header">
                                     <tr>
                                         <td style="width: 25%; vertical-align: top;"><div class="box-hijau">DIKIRIM KEMBALI</div></td>
@@ -1031,7 +1034,6 @@
                                         </td>
                                     </tr>
                                 </table>
-
                                 <table class="kepada-yth">
                                     <tr>
                                         <td style="width: 55%;"></td>
@@ -1043,47 +1045,25 @@
                                 </table>
                                 <table class="keterangan-table">
                                     <tr>
-                                        <td style="width: 11%;">Ekspedisi</td>
-                                        <td style="width: 2%;">:</td>
-                                        <td style="width: 87%;">
-                                            <span class="editable-field" style="width: 100%; display: inline-block; min-height: 15px;" contenteditable="true"></span>
-                                        </td>
+                                        <td style="width: 11%;">Ekspedisi</td><td style="width: 2%;">:</td>
+                                        <td style="width: 87%;"><span class="editable-field" style="width: 100%; display: inline-block; min-height: 15px;" contenteditable="true"></span></td>
                                     </tr>
                                     <tr>
-                                        <td>Keterangan</td>
-                                        <td>:</td>
-                                        <td>
-                                            <span class="editable-field" style="width: 100%; display: inline-block; min-height: 15px;" contenteditable="true">${data.keterangan}</span>
-                                        </td>
+                                        <td>Keterangan</td><td>:</td>
+                                        <td><span class="editable-field" style="width: 100%; display: inline-block; min-height: 15px;" contenteditable="true">${data.keterangan}</span></td>
                                     </tr>
                                 </table>
                                 <table class="main-table">
                                     <thead>
-                                        <tr>
-                                            <th style="width: 5%;">NO</th>
-                                            <th style="width: 65%;">NAMA BARANG</th>
-                                            <th style="width: 10%;">QTY</th>
-                                            <th style="width: 20%;">KOLI</th>
-                                        </tr>
+                                        <tr><th style="width: 5%;">NO</th><th style="width: 65%;">NAMA BARANG</th><th style="width: 10%;">QTY</th><th style="width: 20%;">KOLI</th></tr>
                                     </thead>
-                                    <tbody>
-                                        ${barisBarang}
-                                    </tbody>
+                                    <tbody>${barisBarang}</tbody>
                                     <tfoot>
-                                        <tr>
-                                            <td colspan="4" class="footer-note">
-                                                * 3 HARI SETELAH BARANG DITERIMA TIDAK ADA KOMPLAIN MAKA BARANG KAMI ANGGAP LENGKAP
-                                            </td>
-                                        </tr>
+                                        <tr><td colspan="4" class="footer-note">* 3 HARI SETELAH BARANG DITERIMA TIDAK ADA KOMPLAIN MAKA BARANG KAMI ANGGAP LENGKAP</td></tr>
                                     </tfoot>
                                 </table>
                                 <table class="ttd-table">
-                                    <tr>
-                                        <td style="width: 25%;">DITERIMA OLEH</td>
-                                        <td style="width: 25%;">EKSPEDISI</td>
-                                        <td style="width: 25%;">KEPALA GUDANG</td>
-                                        <td style="width: 25%;">MENGETAHUI</td>
-                                    </tr>
+                                    <tr><td style="width: 25%;">DITERIMA OLEH</td><td style="width: 25%;">EKSPEDISI</td><td style="width: 25%;">KEPALA GUDANG</td><td style="width: 25%;">MENGETAHUI</td></tr>
                                 </table>
                             </div>
                         </div>
@@ -1092,32 +1072,24 @@
                         </button>
                     </div>
                     `;
-
                     allPapersContainer.insertAdjacentHTML('beforeend', htmlSuratJalan);
                 }
 
                 document.getElementById('preview-section').style.display = 'block';
                 statusText.innerText = "Semua data berhasil diekstrak!";
-                btnProses.disabled = false;
-                btnProses.innerText = "Ekstrak Ulang Berkas Baru";
+                btnProses.disabled = false; btnProses.innerText = "Ekstrak Ulang Berkas Baru";
                 
-                if(fileInput.files.length > 1) {
-                    btnDownloadAll.style.display = 'inline-block';
-                } else {
-                    btnDownloadAll.style.display = 'none';
-                }
+                if(fileInput.files.length > 1) btnDownloadAll.style.display = 'inline-block';
+                else btnDownloadAll.style.display = 'none';
 
                 setTimeout(() => document.getElementById('preview-section').scrollIntoView({ behavior: 'smooth' }), 100);
-
             } catch (error) {
                 console.error(error);
-                statusText.style.color = "#E11D48";
-                statusText.innerText = "Gagal memproses salah satu file. Pastikan semuanya valid.";
+                statusText.style.color = "#E11D48"; statusText.innerText = "Gagal memproses salah satu file. Pastikan semuanya valid.";
                 btnProses.disabled = false;
             }
         }
 
-        // PENTING: scrollY dan scrollX diset 0 untuk mencegah PDF terpotong 
         function getOpsiPDF(filename) {
             return {
                 margin:       [15, 15, 15, 10], 
@@ -1130,53 +1102,41 @@
         }
 
         function unduhSatuPDF(index, noSO) {
-            window.scrollTo(0, 0); // Reset scroll ke atas sebelum render agar tidak potong
+            window.scrollTo(0, 0); 
             const wrapperCetak = document.getElementById(`paper-wrapper-${index}`);
             document.body.classList.add('exporting');
-            
             const tombolUnduh = wrapperCetak.nextElementSibling; 
             const teksAsli = tombolUnduh.innerText;
-            tombolUnduh.innerText = "Merender PDF...";
-            tombolUnduh.disabled = true;
+            tombolUnduh.innerText = "Merender PDF..."; tombolUnduh.disabled = true;
 
             const namaFilePDF = noSO ? `Surat_Jalan_${noSO}.pdf` : `Surat_Jalan_${index+1}.pdf`;
-
             html2pdf().set(getOpsiPDF(namaFilePDF)).from(wrapperCetak).save().then(() => {
                 document.body.classList.remove('exporting');
-                tombolUnduh.innerText = teksAsli;
-                tombolUnduh.disabled = false;
+                tombolUnduh.innerText = teksAsli; tombolUnduh.disabled = false;
             }).catch(err => {
-                console.error(err);
-                document.body.classList.remove('exporting');
-                tombolUnduh.innerText = teksAsli;
-                tombolUnduh.disabled = false;
+                console.error(err); document.body.classList.remove('exporting');
+                tombolUnduh.innerText = teksAsli; tombolUnduh.disabled = false;
             });
         }
 
         function unduhSemuaGabungan() {
-            window.scrollTo(0, 0); // Reset scroll
+            window.scrollTo(0, 0); 
             const wadahUtama = document.getElementById('all-papers-container');
             document.body.classList.add('exporting');
-            
             const tombolGabungan = document.getElementById('btnDownloadAll');
-            tombolGabungan.innerText = "Menyusun PDF Gabungan (Mohon Tunggu)...";
-            tombolGabungan.disabled = true;
+            tombolGabungan.innerText = "Menyusun PDF Gabungan (Mohon Tunggu)..."; tombolGabungan.disabled = true;
 
             const tombolIndividuals = document.querySelectorAll('.btn-download-single');
             tombolIndividuals.forEach(btn => btn.style.display = 'none');
 
             html2pdf().set(getOpsiPDF('Kumpulan_Surat_Jalan_Batch.pdf')).from(wadahUtama).save().then(() => {
                 document.body.classList.remove('exporting');
-                tombolGabungan.innerText = "Unduh Semua Sekaligus (Gabung 1 PDF)";
-                tombolGabungan.disabled = false;
-                
+                tombolGabungan.innerText = "Unduh Semua Sekaligus (Gabung 1 PDF)"; tombolGabungan.disabled = false;
                 tombolIndividuals.forEach(btn => btn.style.display = 'inline-block');
                 document.getElementById('status-text').innerText = "Selesai! PDF Gabungan berhasil diunduh.";
             }).catch(err => {
-                console.error(err);
-                document.body.classList.remove('exporting');
-                tombolGabungan.innerText = "Unduh Semua Sekaligus (Gabung 1 PDF)";
-                tombolGabungan.disabled = false;
+                console.error(err); document.body.classList.remove('exporting');
+                tombolGabungan.innerText = "Unduh Semua Sekaligus (Gabung 1 PDF)"; tombolGabungan.disabled = false;
                 tombolIndividuals.forEach(btn => btn.style.display = 'inline-block');
             });
         }
