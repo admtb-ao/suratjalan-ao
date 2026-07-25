@@ -476,12 +476,33 @@
                     </div>`;
             });
 
-            const opt = { margin: [10, 15], filename: namaFile, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
-            const btn = document.getElementById('btn-download'); const originalText = btn.innerHTML;
-            btn.innerHTML = '⏳ Memproses PDF...'; btn.classList.add('opacity-50', 'cursor-not-allowed');
+            // SCROLL Y = 0 SUDAH DITERAPKAN DI SINI
+            const opt = { 
+                margin: [10, 15], 
+                filename: namaFile, 
+                image: { type: 'jpeg', quality: 0.98 }, 
+                html2canvas: { 
+                    scale: 2, 
+                    useCORS: true,
+                    scrollY: 0, 
+                    windowY: 0  
+                }, 
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
+            };
             
-            html2pdf().set(opt).from(tempContainer).save().then(() => { btn.innerHTML = originalText; btn.classList.remove('opacity-50', 'cursor-not-allowed'); })
-            .catch(() => { alert("Gagal membuat PDF."); btn.innerHTML = originalText; btn.classList.remove('opacity-50', 'cursor-not-allowed'); });
+            const btn = document.getElementById('btn-download'); 
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '⏳ Memproses PDF...'; 
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+            
+            html2pdf().set(opt).from(tempContainer).save().then(() => { 
+                btn.innerHTML = originalText; 
+                btn.classList.remove('opacity-50', 'cursor-not-allowed'); 
+            }).catch(() => { 
+                alert("Gagal membuat PDF."); 
+                btn.innerHTML = originalText; 
+                btn.classList.remove('opacity-50', 'cursor-not-allowed'); 
+            });
         }
 
         function downloadTemplate() {
