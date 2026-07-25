@@ -115,7 +115,7 @@
                             <p class="text-sm text-gray-500">Siap dieksekusi: <span id="selected-count" class="font-bold text-red-600">0</span></p>
                         </div>
                         
-                        <!-- PANEL TOMBOL (DITAMBAH TOMBOL REFRESH) -->
+                        <!-- PANEL TOMBOL (TERMASUK REFRESH) -->
                         <div class="flex flex-wrap gap-2 w-full sm:w-auto">
                             <button id="btn-refresh" onclick="refreshData()" class="flex-1 sm:flex-none bg-gray-100 border border-gray-300 text-gray-800 px-5 py-2.5 rounded hover:bg-gray-200 shadow font-bold flex items-center justify-center gap-2 transition">
                                 🔄 Refresh Data
@@ -151,7 +151,7 @@
         let dataAlamat = [];
         const LOGO_URL = "https://raw.githubusercontent.com/tlibrary-shop/tlibrary/main/Logo%20Penerbit%20Andi%20tok.png";
 
-        // FUNGSI UTAMA UNTUK MENGAMBIL DATA (DIPAKAI SAAT HALAMAN DIBUKA & SAAT REFRESH)
+        // FUNGSI UTAMA UNTUK MENGAMBIL DATA 
         async function fetchDatabaseData(isRefresh = false) {
             const printArea = document.getElementById('print-area');
             const btnRefresh = document.getElementById('btn-refresh');
@@ -169,7 +169,6 @@
                 
                 const result = await response.json();
                 
-                // Load ke variabel
                 dataAlamat = result.map(item => ({
                     nama: item.nama || '',
                     alamat: item.alamat || '',
@@ -197,12 +196,10 @@
             }
         }
 
-        // MENGAMBIL DATA DARI DATABASE SAAT HALAMAN DIBUKA
         window.onload = function() {
             fetchDatabaseData(false);
         };
 
-        // FUNGSI SAAT TOMBOL REFRESH DIKLIK
         function refreshData() {
             fetchDatabaseData(true);
         }
@@ -245,20 +242,105 @@
             </div>`;
         }
 
+        // FUNGSI PERHITUNGAN BARU
+        function hitungTotalPilih() {
+            const total = dataAlamat.filter(item => item.selected).length;
+            document.getElementById('selected-count').innerText = total;
+        }
+
         function updatePreview() {
             const container = document.getElementById('print-area');
             container.innerHTML = '';
-            let selectedCount = 0;
             
             [...dataAlamat].reverse().forEach((item, originalReverseIndex) => {
                 const index = dataAlamat.length - 1 - originalReverseIndex; 
                 container.innerHTML += renderLabel(item, index);
-                if(item.selected) selectedCount++;
             });
             
             document.getElementById('count').innerText = dataAlamat.length;
-            document.getElementById('selected-count').innerText = selectedCount;
+            
+            hitungTotalPilih(); // Gunakan fungsi hitung baru
             searchLabel(); 
+        }
+
+        // FUNGSI CENTANG INSTAN (TANPA RE-RENDER)
+        function toggleSelect(index) { 
+            dataAlamat[index].selected = !dataAlamat[index].selected; 
+            
+            const el = document.getElementById(`label-el-${index}`);
+            if (el) {
+                if (dataAlamat[index].selected) {
+                    el.classList.remove('opacity-40', 'grayscale', 'unselected-print');
+                    el.classList.add('opacity-100');
+                } else {
+                    el.classList.add('opacity-40', 'grayscale', 'unselected-print');
+                    el.classList.remove('opacity-100');
+                }
+            }
+            hitungTotalPilih(); 
+        }
+
+        // FUNGSI PILIH SEMUA INSTAN
+        function selectAll(status) { 
+            dataAlamat.forEach((item, index) => {
+                item.selected = status;
+                const el = document.getElementById(`label-el-${index}`);
+                if (el) {
+                    const checkbox = el.querySelector('input[type="checkbox"]');
+                    if (checkbox) checkbox.checked = status; 
+                    
+                    if (status) {
+                        el.classList.remove('opacity-40', 'grayscale', 'unselected-print');
+                        el.classList.add('opacity-100');
+                    } else {
+                        el.classList.add('opacity-40', 'grayscale', 'unselected-print');
+                        el.classList.remove('opacity-100');
+                    }
+                }
+            }); 
+            hitungTotalPilih(); 
+        }
+
+        // FUNGSI PILIH RANGE INSTAN
+        function applyCustomSelect() {
+            const input = document.getElementById('custom-select').value;
+            if(!input) return alert("Masukkan nomor (contoh: 1, 3, 5-8)");
+            
+            selectAll(false);
+
+            input.split(',').forEach(part => {
+                part = part.trim();
+                if(part.includes('-')) {
+                    const [start, end] = part.split('-');
+                    for(let i = parseInt(start); i <= parseInt(end); i++) {
+                        const index = i - 1;
+                        if(dataAlamat[index]) {
+                            dataAlamat[index].selected = true; 
+                            const el = document.getElementById(`label-el-${index}`);
+                            if(el) {
+                                const checkbox = el.querySelector('input[type="checkbox"]');
+                                if (checkbox) checkbox.checked = true; 
+                                el.classList.remove('opacity-40', 'grayscale', 'unselected-print');
+                                el.classList.add('opacity-100');
+                            }
+                        }
+                    }
+                } else {
+                    const num = parseInt(part);
+                    const index = num - 1;
+                    if(dataAlamat[index]) {
+                        dataAlamat[index].selected = true; 
+                        const el = document.getElementById(`label-el-${index}`);
+                        if(el) {
+                            const checkbox = el.querySelector('input[type="checkbox"]');
+                            if (checkbox) checkbox.checked = true; 
+                            el.classList.remove('opacity-40', 'grayscale', 'unselected-print');
+                            el.classList.add('opacity-100');
+                        }
+                    }
+                }
+            });
+            hitungTotalPilih();
         }
 
         // TAMBAH DATA MANUAL + AUTO SAVE API
@@ -421,25 +503,6 @@
             });
         }
 
-        function applyCustomSelect() {
-            const input = document.getElementById('custom-select').value;
-            if(!input) return alert("Masukkan nomor (contoh: 1, 3, 5-8)");
-            dataAlamat.forEach(item => item.selected = false);
-            input.split(',').forEach(part => {
-                part = part.trim();
-                if(part.includes('-')) {
-                    const [start, end] = part.split('-');
-                    for(let i = parseInt(start); i <= parseInt(end); i++) if(dataAlamat[i - 1]) dataAlamat[i - 1].selected = true;
-                } else {
-                    const num = parseInt(part);
-                    if(dataAlamat[num - 1]) dataAlamat[num - 1].selected = true;
-                }
-            });
-            updatePreview();
-        }
-
-        function toggleSelect(index) { dataAlamat[index].selected = !dataAlamat[index].selected; updatePreview(); }
-        function selectAll(status) { dataAlamat.forEach(item => item.selected = status); updatePreview(); }
         function clearData() { if(confirm("Bersihkan layar preview (Tidak akan menghapus data di Google Sheets)?")) { dataAlamat = []; updatePreview(); } }
     </script>
 </body>
