@@ -308,12 +308,21 @@
         .btn-process {
             background: var(--primary); color: #fff; border: none; padding: 14px 20px; width: 100%;
             border-radius: 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: var(--transition);
-            text-align: center;
+            text-align: center; display: inline-flex; justify-content: center; align-items: center; gap: 6px;
         }
         .btn-process:hover:not(:disabled) { box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.4); filter: brightness(1.1); transform: translateY(-1px);}
         .btn-process:disabled { background: rgba(128,128,128,0.2) !important; color: rgba(128,128,128,0.5) !important; cursor: not-allowed; box-shadow:none !important; transform: none !important; filter: none !important;}
-        .btn-success { background: #3b82f6; }
+        
+        .btn-success { background: #10B981; }
+        .btn-blue { background: #3b82f6; }
+        .btn-yellow { background: #eab308; }
+        .btn-outline { background: rgba(128,128,128,0.1); border: 1px solid var(--glass-border); color: var(--text-main); }
         .btn-sm { padding: 8px 12px; font-size: 12px; }
+
+        /* Container Tombol Batch */
+        .batch-actions-container {
+            display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; width: 100%; display: none; flex-wrap: wrap;
+        }
 
         /* Kartu Riwayat di Sidebar */
         .history-item-card {
@@ -408,7 +417,8 @@
             
             #print-area { 
                 display: flex !important; 
-                justify-content: center; /* Memastikan kertas berada tepat di tengah */
+                flex-direction: column;
+                align-items: center;
                 position: absolute; 
                 top: 0; left: 0; 
                 width: 100%; 
@@ -419,23 +429,25 @@
             #print-area .paper-wrapper { 
                 box-shadow: none !important; 
                 border: none !important; 
-                
-                /* Mengunci dimensi persis seperti format PDF Export agar tidak mepet tepi printer */
                 width: 182mm !important; 
                 max-width: 182mm !important; 
                 margin: 0 auto !important; 
-                padding: 10mm 0 0 0 !important; /* Memberi sedikit nafas ruang di bagian atas kertas */
+                padding: 10mm 0 0 0 !important; 
+                page-break-after: always; /* Pastikan antar kertas batch ada pemisah halaman */
+            }
+            
+            #print-area .paper-wrapper:last-child {
+                page-break-after: auto;
             }
             
             @page { 
                 size: letter portrait; 
-                /* Mengatur margin printer fisik agar identik dengan margin hasil PDF (15mm sisi, 10mm bawah) */
                 margin: 15mm 15mm 10mm 15mm; 
             }
         }
 
         /* =========================================================
-           7. MODAL INPUT MANUAL SURAT JALAN
+           7. MODAL INPUT MANUAL SURAT JALAN & TOAST
         ========================================================= */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -479,6 +491,17 @@
         }
         .btn-cancel:hover { background: rgba(128,128,128,0.2); }
 
+        /* Toast Notifikasi */
+        .toast-notification {
+            position: fixed; bottom: 30px; right: 30px; background: var(--glass-bg); backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border); border-left: 4px solid var(--primary); border-radius: 12px;
+            padding: 16px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 10000;
+            display: flex; flex-direction: column; gap: 4px; transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .toast-notification.show { transform: translateX(0); }
+        .toast-title { font-size: 14px; font-weight: 600; }
+        .toast-msg { font-size: 12px; color: var(--text-muted); }
+
         @media (max-width: 900px) {
             .dashboard-layout { height: 100vh; max-width: 100%; border-radius: 0; border: none; flex-direction: column;}
             .sidebar { width: 100%; height: 60px; flex-direction: row; padding: 0 20px; justify-content: space-between; border-right: none; border-bottom: 1px solid var(--glass-border); }
@@ -499,6 +522,12 @@
     
     <!-- Tempat Tersembunyi untuk Print -->
     <div id="print-area"></div>
+    
+    <!-- Elemen Toast Notifikasi -->
+    <div id="toast" class="toast-notification">
+        <span class="toast-title" id="toast-title">Pesan</span>
+        <span class="toast-msg" id="toast-msg">Detail</span>
+    </div>
 
     <!-- ================= VIEW: LOGIN ================= -->
     <div id="login-screen">
@@ -687,7 +716,7 @@
                         <div class="file-info" id="fileInfo"></div>
                         
                         <button class="btn-process" id="btnProses" onclick="prosesBanyakPDF()" disabled>Mulai Proses File PDF</button>
-                        <button class="btn-process" style="background: rgba(128,128,128,0.1); border: 1px solid var(--glass-border); color: var(--text-main);" onclick="openManualModal()">✍️ Buat Manual</button>
+                        <button class="btn-process btn-outline" style="background: rgba(128,128,128,0.1); border: 1px solid var(--glass-border); color: var(--text-main);" onclick="openManualModal()">✍️ Buat Manual</button>
 
                         <hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 5px 0;">
 
@@ -695,25 +724,28 @@
                         <div style="display: flex; flex-direction: column; gap: 10px;">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <label style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Cari Riwayat Database</label>
-                                <button onclick="loadRiwayatData()" style="background: none; border: none; color: var(--primary); font-size: 11px; cursor: pointer; font-weight: 500;">🔄 Refresh</button>
+                                <button onclick="loadRiwayatData()" style="background: none; border: none; color: var(--primary); font-size: 11px; cursor: pointer; font-weight: 500;">🔄 Refresh DB</button>
                             </div>
                             <input type="text" id="input-search-riwayat" class="form-input" placeholder="🔍 Cari No. SO atau Pelanggan..." oninput="filterRiwayatList()">
                         </div>
 
                         <!-- LIST HASIL PENCARIAN RIWAYAT -->
                         <div id="sidebar-riwayat-container" style="display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto; padding-right: 2px;">
-                            <span style="font-size: 11px; color: var(--text-muted); text-align: center; padding: 15px;">Klik Refresh untuk memuat riwayat...</span>
+                            <span style="font-size: 11px; color: var(--text-muted); text-align: center; padding: 15px;">Klik Refresh DB untuk memuat data...</span>
                         </div>
                     </div>
 
                     <!-- PANEL KANAN: WORKSPACE PREVIEW KERTAS -->
                     <div class="sj-main-panel">
                         <div id="status-text"></div>
-                        <div style="margin-bottom: 20px; width: 100%; text-align: center;">
-                            <button class="btn-process btn-success" id="btnDownloadAll" onclick="unduhSemuaGabungan()" style="max-width: 350px; display: none; margin: 0 auto;">
-                                Unduh Semua (Gabung PDF)
-                            </button>
+                        
+                        <!-- TOMBOL BATCH AKSI (Print Semua / Simpan Semua) -->
+                        <div class="batch-actions-container" id="batch-actions-container">
+                            <button class="btn-process btn-blue" style="max-width: 180px;" onclick="printSemuaKertas()">🖨️ Print Semua</button>
+                            <button class="btn-process btn-success" style="max-width: 180px;" onclick="simpanSemuaKertas()">☁️ Simpan Semua DB</button>
+                            <button class="btn-process btn-yellow" style="max-width: 180px;" onclick="unduhSemuaGabungan()">⤓ Unduh Gabung PDF</button>
                         </div>
+
                         <div id="all-papers-container" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
                             <div style="margin: auto; color: var(--text-muted); text-align: center; padding: 60px 20px;">
                                 <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.4; margin-bottom: 12px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
@@ -779,13 +811,13 @@
 
             <div class="modal-actions">
                 <button class="btn-cancel" onclick="closeManualModal()">Batal</button>
-                <button class="btn-process" style="width: auto;" onclick="generateManualSuratJalan()">Generate</button>
+                <button class="btn-process btn-success" style="width: auto;" onclick="generateManualSuratJalan()">Generate</button>
             </div>
         </div>
     </div>
 
     <!-- ==========================================
-         SCRIPT LOGIKA SISTEM
+         SCRIPT LOGIKA SISTEM UTAMA
     =========================================== -->
     <script>
         // API URL Google Sheets Anda
@@ -860,6 +892,16 @@
         function startRain() { if (!isRainStarted) { initRain(); animateRain(); isRainStarted = true; } else { initRain(); } }
         window.addEventListener('resize', () => { initRain(); });
 
+        // --- SCRIPT TOAST NOTIFICATION ---
+        function showToast(title, message, isError = false) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-msg').innerText = message;
+            toast.style.borderLeftColor = isError ? '#ef4444' : '#10B981';
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 4000);
+        }
+
         // --- SCRIPT PENGATURAN TEMA ---
         function initTheme() {
             const savedTheme = localStorage.getItem('app-theme');
@@ -907,7 +949,7 @@
             document.getElementById('top-title').innerText = titles[tabId];
 
             if(tabId === 'surat-jalan' && window.allDatabaseData.length === 0) {
-                loadRiwayatData(); // Otomatis tarik data database saat membuka modul surat jalan
+                loadRiwayatData(); 
             }
         }
 
@@ -943,64 +985,7 @@
         }
         setInterval(updateDateTime, 1000); updateDateTime(); updateWeather();
 
-        // --- SISTEM PRINT KERTAS TERISOLASI ---
-        function printKertas(wrapperId) {
-            const wrapper = document.getElementById(wrapperId);
-            const printArea = document.getElementById('print-area');
-            printArea.innerHTML = ''; 
-            // Kloning dokumen ke area tersembunyi khusus untuk diprint
-            printArea.appendChild(wrapper.cloneNode(true));
-            window.print();
-            printArea.innerHTML = ''; // Bersihkan kembali setelah print
-        }
-
-        // --- SISTEM SIMPAN KE DATABASE (DOM SCRAPING) ---
-        async function simpanKertas(wrapperId) {
-            const btn = document.querySelector(`.btn-simpan-${wrapperId}`);
-            if(!btn) return;
-            const originalText = btn.innerHTML;
-            btn.innerHTML = "⏳ Menyimpan..."; btn.disabled = true;
-
-            const wrapper = document.getElementById(wrapperId);
-            const dataToSave = {
-                noSO: wrapper.querySelector('.val-noso').innerText.trim(),
-                tanggal: wrapper.querySelector('.val-tanggal').innerText.trim(),
-                bulan: wrapper.querySelector('.val-bulan').innerText.trim(),
-                tahun: wrapper.querySelector('.val-tahun').innerText.trim(),
-                pelanggan: wrapper.querySelector('.val-pelanggan').innerText.trim(),
-                ekspedisi: wrapper.querySelector('.val-ekspedisi').innerText.trim(),
-                keterangan: wrapper.querySelector('.val-keterangan').innerText.trim(),
-                dataBarang: []
-            };
-            
-            const rows = wrapper.querySelectorAll('.main-table tbody tr');
-            rows.forEach(tr => {
-                const cols = tr.querySelectorAll('td');
-                if(cols.length >= 3) {
-                    const nama = cols[1].innerText.trim();
-                    const qty = cols[2].innerText.trim();
-                    if(nama) dataToSave.dataBarang.push({nama, qty});
-                }
-            });
-
-            try {
-                const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(dataToSave) });
-                const result = await res.json();
-                if(result.status === 'success') {
-                    btn.innerHTML = "✔️ Tersimpan di DB";
-                    btn.style.background = "#6B7280";
-                    loadRiwayatData(); // Refresh sidebar otomatis
-                } else {
-                    throw new Error(result.message);
-                }
-            } catch(e) {
-                console.error(e);
-                alert("Gagal menyimpan ke database! Periksa koneksi.");
-                btn.innerHTML = originalText; btn.disabled = false;
-            }
-        }
-
-        // --- MANAJEMEN DATABASE & PENCARIAN REALTIME DI SIDEBAR ---
+        // ================= MANAJEMEN DATABASE & RIWAYAT (SIDEBAR KIRI) =================
         window.allDatabaseData = [];
         
         async function loadRiwayatData() {
@@ -1030,13 +1015,13 @@
                 return;
             }
 
-            dataList.forEach((item, index) => {
+            dataList.forEach((item) => {
                 const dateObj = new Date(item.timestamp);
                 const tsStr = `${dateObj.getDate()}/${dateObj.getMonth()+1} ${String(dateObj.getHours()).padStart(2,'0')}:${String(dateObj.getMinutes()).padStart(2,'0')}`;
                 
                 const card = document.createElement('div');
                 card.className = 'history-item-card';
-                card.onclick = () => renderDokumenDariDatabase(item);
+                card.onclick = () => renderDokumen(item, true); // true = mode Re-Print
                 card.innerHTML = `
                     <div class="history-item-header">
                         <span>${item.noSO || 'Tanpa No'}</span>
@@ -1048,7 +1033,6 @@
             });
         }
 
-        // Fungsi Filter Live Search Riwayat
         function filterRiwayatList() {
             const keyword = document.getElementById('input-search-riwayat').value.toLowerCase();
             const filtered = window.allDatabaseData.filter(item => {
@@ -1059,27 +1043,39 @@
             renderSidebarRiwayat(filtered);
         }
 
-        // Render Ulang Kertas Surat Jalan di Panel Kanan dari Database (Re-Print Instant)
-        function renderDokumenDariDatabase(item) {
+        // ================= ENGINE RENDER DOKUMEN & UI =================
+        function renderDokumen(data, isReprint = false) {
             const container = document.getElementById('all-papers-container');
+            if(isReprint) {
+                container.innerHTML = ''; 
+                document.getElementById('batch-actions-container').style.display = 'none';
+                document.getElementById('status-text').innerText = `Mode Re-Print: SO ${data.noSO} dimuat dari Database.`;
+            } else {
+                if(container.innerHTML.includes('Belum ada dokumen')) container.innerHTML = '';
+            }
             
+            const uniqueId = `paper-wrapper-${Date.now()}-${Math.floor(Math.random()*100)}`;
             let barisBarang = "";
-            (item.dataBarang || []).forEach((barang, i) => {
-                barisBarang += `
-                    <tr>
-                        <td class="text-center" contenteditable="true">${i + 1}</td>
-                        <td contenteditable="true">${barang.nama}</td>
-                        <td class="text-center" contenteditable="true">${barang.qty}</td>
-                        <td contenteditable="true"></td>
-                    </tr>`;
-            });
+            (data.dataBarang || []).forEach((b, i) => { barisBarang += `<tr><td class="text-center" contenteditable="true">${i + 1}</td><td contenteditable="true">${b.nama}</td><td class="text-center" contenteditable="true">${b.qty||'1'}</td><td contenteditable="true"></td></tr>`; });
 
-            const uniqueId = 'db-' + Date.now();
-            const wrapperId = 'paper-wrapper-' + uniqueId;
+            // Pengaturan Tombol Berdasarkan Mode
+            let actionButtonsHTML = '';
+            if(isReprint) {
+                actionButtonsHTML = `
+                    <button class="btn-process btn-sm btn-blue btn-print-${uniqueId}" style="max-width: 130px;" onclick="printKertasIndividu('${uniqueId}')">🖨️ Re-Print Fisik</button>
+                    <button class="btn-process btn-sm btn-yellow" style="max-width: 110px;" onclick="unduhSatuPDF('${uniqueId}', '${data.noSO}')">⤓ Unduh PDF</button>
+                `;
+            } else {
+                actionButtonsHTML = `
+                    <button class="btn-process btn-sm btn-blue btn-print-${uniqueId}" style="max-width: 150px;" onclick="printDanSimpan('${uniqueId}')">🖨️ Print & Simpan</button>
+                    <button class="btn-process btn-sm btn-success btn-simpan-${uniqueId}" style="max-width: 130px;" onclick="simpanKertasIndividual('${uniqueId}')">☁️ Simpan DB</button>
+                    <button class="btn-process btn-sm btn-outline" style="max-width: 110px;" onclick="unduhSatuPDF('${uniqueId}', '${data.noSO}')">⤓ Unduh</button>
+                `;
+            }
 
-            let htmlSuratJalan = `
+            const htmlSuratJalan = `
             <div class="paper-container">
-                <div id="${wrapperId}" class="paper-wrapper">
+                <div id="${uniqueId}" class="paper-wrapper">
                     <div class="cetakan-surat-jalan">
                         <div class="header-text">
                             <div class="title1">PENERBIT & PERCETAKAN</div>
@@ -1093,13 +1089,13 @@
                                     <div class="sj-title">SURAT JALAN</div>
                                     <div class="sj-no">
                                         NO : AO / 
-                                        <span class="editable-field val-bulan" contenteditable="true">${item.bulan || 'I'}</span> / 
-                                        <span class="editable-field val-tahun" contenteditable="true">${item.tahun || '2026'}</span> / 
-                                        <span class="editable-field val-noso" contenteditable="true">${item.noSO || ''}</span>
+                                        <span class="editable-field val-bulan" contenteditable="true">${data.bulan || 'I'}</span> / 
+                                        <span class="editable-field val-tahun" contenteditable="true">${data.tahun || '2026'}</span> / 
+                                        <span class="editable-field val-noso" contenteditable="true">${data.noSO || ''}</span>
                                     </div>
                                 </td>
                                 <td style="width: 25%; vertical-align: top; padding-top: 5px;">
-                                    <div class="date-right editable-field val-tanggal" contenteditable="true">${item.tanggal || ''}</div>
+                                    <div class="date-right editable-field val-tanggal" contenteditable="true">${data.tanggal || ''}</div>
                                 </td>
                             </tr>
                         </table>
@@ -1108,143 +1104,18 @@
                                 <td style="width: 55%;"></td>
                                 <td style="width: 45%;">
                                     <span class="kepada-bold">Kepada Yth,</span><br><br>
-                                    <span class="kepada-bold editable-field val-pelanggan" contenteditable="true">${(item.pelanggan || '').replace(/\n/g, '<br>')}</span>
+                                    <span class="kepada-bold editable-field val-pelanggan" contenteditable="true">${(data.pelanggan || '').replace(/\n/g, '<br>')}</span>
                                 </td>
                             </tr>
                         </table>
                         <table class="keterangan-table">
                             <tr>
                                 <td style="width: 11%;">Ekspedisi</td><td style="width: 2%;">:</td>
-                                <td style="width: 87%;"><span class="editable-field val-ekspedisi" style="width: 100%; display: inline-block; min-height: 15px;" contenteditable="true">${item.ekspedisi || ''}</span></td>
+                                <td style="width: 87%;"><span class="editable-field val-ekspedisi" style="width: 100%; display: inline-block; min-height: 15px;" contenteditable="true">${data.ekspedisi || ''}</span></td>
                             </tr>
                             <tr>
                                 <td>Keterangan</td><td>:</td>
-                                <td><span class="editable-field val-keterangan" style="width: 100%; display: inline-block; min-height: 15px;" contenteditable="true">${item.keterangan || ''}</span></td>
-                            </tr>
-                        </table>
-                        <table class="main-table">
-                            <thead>
-                                <tr><th style="width: 5%;">NO</th><th style="width: 65%;">NAMA BARANG</th><th style="width: 10%;">QTY</th><th style="width: 20%;">KOLI</th></tr>
-                            </thead>
-                            <tbody>${barisBarang}</tbody>
-                            <tfoot>
-                                <tr><td colspan="4" class="footer-note">* 3 HARI SETELAH BARANG DITERIMA TIDAK ADA KOMPLAIN MAKA BARANG KAMI ANGGAP LENGKAP</td></tr>
-                            </tfoot>
-                        </table>
-                        <table class="ttd-table">
-                            <tr><td style="width: 25%;">DITERIMA OLEH</td><td style="width: 25%;">EKSPEDISI</td><td style="width: 25%;">KEPALA GUDANG</td><td style="width: 25%;">MENGETAHUI</td></tr>
-                        </table>
-                    </div>
-                </div>
-                
-                <!-- 3 TOMBOL AKSI CEPAT -->
-                <div style="display:flex; gap:10px; justify-content:center; margin-top:10px; width: 100%;">
-                    <button class="btn-process btn-sm" style="background: #3b82f6; max-width: 120px;" onclick="printKertas('${wrapperId}')">🖨️ Print</button>
-                    <button class="btn-process btn-sm" style="background: #eab308; max-width: 120px;" onclick="unduhSatuPDF('${wrapperId}', '${item.noSO}')">⤓ Unduh</button>
-                    <button class="btn-process btn-sm btn-simpan-${wrapperId}" style="background: #10B981; max-width: 140px;" onclick="simpanKertas('${wrapperId}')">☁️ Simpan</button>
-                </div>
-            </div>
-            `;
-            
-            container.innerHTML = htmlSuratJalan;
-            document.getElementById('status-text').innerText = `Dokumen ${item.noSO} dimuat dari Database untuk Re-Print.`;
-            document.getElementById('btnDownloadAll').style.display = 'none';
-        }
-
-        // --- SCRIPT MODAL INPUT MANUAL SURAT JALAN ---
-        function openManualModal() { document.getElementById('modal-manual').style.display = 'flex'; }
-        function closeManualModal() { document.getElementById('modal-manual').style.display = 'none'; }
-        
-        function tambahBarisManual() {
-            const tbody = document.querySelector('#manual-items-table tbody');
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td><input type="text" class="form-input item-nama" placeholder="Nama Barang"></td><td><input type="number" class="form-input item-qty" value="1" min="1"></td><td><button class="btn-delete-item" onclick="hapusBarisManual(this)">X</button></td>`;
-            tbody.appendChild(tr);
-        }
-        function hapusBarisManual(btn) { btn.closest('tr').remove(); }
-
-        function generateManualSuratJalan() {
-            let noSO = document.getElementById('manual-noso').value.trim();
-            if(!noSO) noSO = "MANUAL-" + Math.floor(Math.random() * 10000); 
-            
-            const pelanggan = document.getElementById('manual-pelanggan').value.trim();
-            const keterangan = document.getElementById('manual-keterangan').value.trim();
-            
-            let dataBarang = [];
-            document.querySelectorAll('#manual-items-table tbody tr').forEach(tr => {
-                const nama = tr.querySelector('.item-nama').value.trim();
-                const qty = tr.querySelector('.item-qty').value.trim();
-                if(nama) dataBarang.push({ nama, qty });
-            });
-            if(dataBarang.length === 0) { alert("Masukkan minimal 1 nama barang!"); return; }
-
-            const allPapersContainer = document.getElementById('all-papers-container');
-            const d = new Date();
-            const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-            const angkaRomawi = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
-            
-            let tanggalStr = `Yogyakarta, ${d.getDate()} ${namaBulan[d.getMonth()]} ${d.getFullYear()}`;
-            let bulanStr = angkaRomawi[d.getMonth()]; let tahunStr = d.getFullYear();
-
-            let barisBarang = "";
-            dataBarang.forEach((barang, index) => {
-                barisBarang += `
-                    <tr>
-                        <td class="text-center" contenteditable="true">${index + 1}</td>
-                        <td contenteditable="true">${barang.nama}</td>
-                        <td class="text-center" contenteditable="true">${barang.qty}</td>
-                        <td contenteditable="true"></td>
-                    </tr>`;
-            });
-
-            const uniqueId = Date.now();
-            const wrapperId = `paper-wrapper-m${uniqueId}`;
-            const hasExisting = allPapersContainer.children.length > 0 && !allPapersContainer.innerHTML.includes('Belum ada dokumen');
-
-            let htmlSuratJalan = `
-            ${hasExisting ? '<div class="html2pdf__page-break"></div>' : ''}
-            <div class="paper-container">
-                <div id="${wrapperId}" class="paper-wrapper">
-                    <div class="cetakan-surat-jalan">
-                        <div class="header-text">
-                            <div class="title1">PENERBIT & PERCETAKAN</div>
-                            <div class="title2">ANDI OFFSET</div>
-                            <div class="address">Jl. BEO 38-40 TELP. (0274)561881 HUNTING. FAX.588282 YOGYAKARTA 55281 E-mail: pemasaran@andipublisher.net.id</div>
-                        </div>
-                        <table class="sub-header">
-                            <tr>
-                                <td style="width: 25%; vertical-align: top;"><div class="box-hijau">DIKIRIM KEMBALI</div></td>
-                                <td style="width: 50%;">
-                                    <div class="sj-title">SURAT JALAN</div>
-                                    <div class="sj-no">
-                                        NO : AO / 
-                                        <span class="editable-field val-bulan" contenteditable="true">${bulanStr}</span> / 
-                                        <span class="editable-field val-tahun" contenteditable="true">${tahunStr}</span> / 
-                                        <span class="editable-field val-noso" contenteditable="true">${noSO}</span>
-                                    </div>
-                                </td>
-                                <td style="width: 25%; vertical-align: top; padding-top: 5px;">
-                                    <div class="date-right editable-field val-tanggal" contenteditable="true">${tanggalStr}</div>
-                                </td>
-                            </tr>
-                        </table>
-                        <table class="kepada-yth">
-                            <tr>
-                                <td style="width: 55%;"></td>
-                                <td style="width: 45%;">
-                                    <span class="kepada-bold">Kepada Yth,</span><br><br>
-                                    <span class="kepada-bold editable-field val-pelanggan" contenteditable="true">${pelanggan.replace(/\n/g, '<br>')}</span>
-                                </td>
-                            </tr>
-                        </table>
-                        <table class="keterangan-table">
-                            <tr>
-                                <td style="width: 11%;">Ekspedisi</td><td style="width: 2%;">:</td>
-                                <td style="width: 87%;"><span class="editable-field val-ekspedisi" style="width: 100%; display: inline-block; min-height: 15px;" contenteditable="true"></span></td>
-                            </tr>
-                            <tr>
-                                <td>Keterangan</td><td>:</td>
-                                <td><span class="editable-field val-keterangan" style="width: 100%; display: inline-block; min-height: 15px;" contenteditable="true">${keterangan}</span></td>
+                                <td><span class="editable-field val-keterangan" style="width: 100%; display: inline-block; min-height: 15px;" contenteditable="true">${data.keterangan || ''}</span></td>
                             </tr>
                         </table>
                         <table class="main-table">
@@ -1263,28 +1134,175 @@
                 </div>
                 
                 <div style="display:flex; gap:10px; justify-content:center; margin-top:10px; width: 100%;">
-                    <button class="btn-process btn-sm" style="background: #3b82f6; max-width: 120px;" onclick="printKertas('${wrapperId}')">🖨️ Print</button>
-                    <button class="btn-process btn-sm" style="background: #eab308; max-width: 120px;" onclick="unduhSatuPDF('${wrapperId}', '${noSO}')">⤓ Unduh</button>
-                    <button class="btn-process btn-sm btn-simpan-${wrapperId}" style="background: #10B981; max-width: 140px;" onclick="simpanKertas('${wrapperId}')">☁️ Simpan</button>
+                    ${actionButtonsHTML}
                 </div>
             </div>
             `;
             
-            if(!hasExisting) allPapersContainer.innerHTML = htmlSuratJalan;
-            else allPapersContainer.insertAdjacentHTML('beforeend', htmlSuratJalan);
-            
-            document.getElementById('status-text').innerText = "Surat Jalan Manual berhasil digenerate!";
-            closeManualModal();
-            setTimeout(() => document.getElementById(wrapperId).scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
-            
-            document.getElementById('manual-noso').value = ''; document.getElementById('manual-pelanggan').value = ''; document.getElementById('manual-keterangan').value = '';
-            document.querySelector('#manual-items-table tbody').innerHTML = `<tr><td><input type="text" class="form-input item-nama" placeholder="Nama Barang"></td><td><input type="number" class="form-input item-qty" value="1" min="1"></td><td><button class="btn-delete-item" onclick="hapusBarisManual(this)">X</button></td></tr>`;
+            container.insertAdjacentHTML('beforeend', htmlSuratJalan);
         }
 
-        // --- SCRIPT GENERATOR PDF SURAT JALAN BATCH ---
+        // ================= LOGIKA DATABASE (ANTI DUPLIKAT & OVERWRITE) =================
+        function ekstrakDataDariUI(wrapperId) {
+            const w = document.getElementById(wrapperId);
+            const data = {
+                noSO: w.querySelector('.val-noso').innerText.trim(),
+                tanggal: w.querySelector('.val-tanggal').innerText.trim(),
+                bulan: w.querySelector('.val-bulan').innerText.trim(),
+                tahun: w.querySelector('.val-tahun').innerText.trim(),
+                pelanggan: w.querySelector('.val-pelanggan').innerText.trim(),
+                ekspedisi: w.querySelector('.val-ekspedisi').innerText.trim(),
+                keterangan: w.querySelector('.val-keterangan').innerText.trim(),
+                dataBarang: []
+            };
+            w.querySelectorAll('.main-table tbody tr').forEach(tr => {
+                const cols = tr.querySelectorAll('td');
+                if(cols.length >= 3 && cols[1].innerText.trim()) {
+                    data.dataBarang.push({nama: cols[1].innerText.trim(), qty: cols[2].innerText.trim()});
+                }
+            });
+            return data;
+        }
+
+        function validasiDataSebelumSimpan(dataToSave) {
+            const existingData = window.allDatabaseData.find(d => d.noSO === dataToSave.noSO);
+            
+            if (existingData) {
+                const isPelangganSama = (existingData.pelanggan || "").trim() === (dataToSave.pelanggan || "").trim();
+                const isKetSama = (existingData.keterangan || "").trim() === (dataToSave.keterangan || "").trim();
+                
+                // Deep Equality: Jika nomor, pelanggan, dan keterangan sama = DUPLIKAT. Jika ada yang beda = REVISI.
+                if (isPelangganSama && isKetSama) {
+                    return { status: 'DUPLICATE', message: `SO ${dataToSave.noSO} sudah ada tanpa perubahan.` };
+                } else {
+                    return { status: 'REVISION', message: `Revisi terdeteksi untuk SO ${dataToSave.noSO}.` };
+                }
+            }
+            return { status: 'NEW', message: 'Data Baru' };
+        }
+
+        async function eksekusiSimpanAPI(dataToSave, btnElement) {
+            const validasi = validasiDataSebelumSimpan(dataToSave);
+            
+            if (validasi.status === 'DUPLICATE') {
+                if(btnElement) { btnElement.innerHTML = "⚠️ Duplikat"; btnElement.disabled = true; }
+                showToast("Dibatalkan", validasi.message, true);
+                return false; 
+            }
+            
+            // Flag untuk backend script Google Apps Script agar mengerti ini adalah perintah overwrite
+            if (validasi.status === 'REVISION') {
+                dataToSave.isUpdate = true; 
+            }
+
+            try {
+                const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(dataToSave) });
+                const result = await res.json();
+                if (result.status === 'success') {
+                    if(btnElement) { btnElement.innerHTML = "✔️ Tersimpan"; btnElement.disabled = true; btnElement.style.background = "#6B7280"; }
+                    
+                    // Update cache lokal langsung agar validasi di aksi selanjutnya akurat
+                    if(validasi.status === 'NEW') window.allDatabaseData.push(dataToSave);
+                    else {
+                        const idx = window.allDatabaseData.findIndex(d => d.noSO === dataToSave.noSO);
+                        if(idx > -1) window.allDatabaseData[idx] = dataToSave;
+                    }
+                    return true; 
+                }
+                throw new Error("Gagal direspon server");
+            } catch(e) {
+                if(btnElement) { btnElement.innerHTML = "☁️ Coba Lagi"; btnElement.disabled = false; }
+                showToast("Error Network", "Gagal menghubungi database.", true);
+                return false;
+            }
+        }
+
+        async function simpanKertasIndividual(wrapperId) {
+            const btn = document.querySelector(`.btn-simpan-${wrapperId}`);
+            if(btn) { btn.innerHTML = "⏳..."; btn.disabled = true; }
+            const data = ekstrakDataDariUI(wrapperId);
+            const isSuccess = await eksekusiSimpanAPI(data, btn);
+            if(isSuccess) loadRiwayatData(); // Refresh sidebar DB
+        }
+
+        // ================= INDIVIDUAL & BATCH ACTIONS (PRINT & SAVE) =================
+        function printKertasIndividu(id) {
+            const printArea = document.getElementById('print-area');
+            printArea.innerHTML = ''; printArea.appendChild(document.getElementById(id).cloneNode(true));
+            window.print(); printArea.innerHTML = '';
+        }
+
+        async function printDanSimpan(wrapperId) {
+            const wrapper = document.getElementById(wrapperId);
+            const btnPrint = document.querySelector(`.btn-print-${wrapperId}`);
+            const originalText = btnPrint.innerHTML;
+            
+            btnPrint.innerHTML = "⏳ Memproses..."; btnPrint.disabled = true;
+            
+            // 1. Aksi Print
+            const printArea = document.getElementById('print-area');
+            printArea.innerHTML = ''; printArea.appendChild(wrapper.cloneNode(true));
+            window.print();
+            printArea.innerHTML = '';
+            
+            // 2. Aksi Simpan Background
+            const data = ekstrakDataDariUI(wrapperId);
+            const isSuccess = await eksekusiSimpanAPI(data, document.querySelector(`.btn-simpan-${wrapperId}`));
+            
+            if(isSuccess) showToast("Selesai", `Print & Simpan untuk ${data.noSO} berhasil.`);
+            btnPrint.innerHTML = originalText; btnPrint.disabled = false;
+            loadRiwayatData();
+        }
+
+        function printSemuaKertas() {
+            const printArea = document.getElementById('print-area');
+            printArea.innerHTML = '';
+            
+            const wrappers = document.querySelectorAll('.paper-wrapper');
+            if(wrappers.length === 0) return alert("Tidak ada dokumen di layar.");
+            
+            wrappers.forEach(w => {
+                const clone = w.cloneNode(true);
+                printArea.appendChild(clone);
+            });
+            
+            window.print();
+            printArea.innerHTML = '';
+            showToast("Print Massal", `Mengirim ${wrappers.length} dokumen berurutan ke printer.`);
+        }
+
+        async function simpanSemuaKertas() {
+            const wrappers = document.querySelectorAll('.paper-wrapper');
+            if(wrappers.length === 0) return;
+            
+            let sukses = 0, duplikat = 0, error = 0;
+            showToast("Memproses Batch...", `Menyimpan ${wrappers.length} dokumen ke Google Sheets.`);
+            
+            for(let w of wrappers) {
+                const btnSimpan = document.querySelector(`.btn-simpan-${w.id}`);
+                const data = ekstrakDataDariUI(w.id);
+                const validasi = validasiDataSebelumSimpan(data);
+                
+                if(validasi.status === 'DUPLICATE') { 
+                    duplikat++; 
+                    if(btnSimpan) { btnSimpan.innerHTML = "⚠️ Skip (Duplikat)"; btnSimpan.disabled = true; } 
+                    continue; 
+                }
+                
+                const isSukses = await eksekusiSimpanAPI(data, btnSimpan);
+                if(isSukses) sukses++; else error++;
+            }
+            
+            loadRiwayatData(); 
+            showToast("Laporan Batch Selesai", `Tersimpan: ${sukses} | Skip (Duplikat): ${duplikat} | Gagal: ${error}`);
+        }
+
+        // ================= SISTEM PARSING PDF MENGGUNAKAN PDF.JS =================
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
         
-        const dropArea = document.getElementById('dropArea'); const fileInput = document.getElementById('fileSoInput'); const btnProses = document.getElementById('btnProses');
+        const dropArea = document.getElementById('dropArea'); 
+        const fileInput = document.getElementById('fileSoInput'); 
+        const btnProses = document.getElementById('btnProses');
 
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => { dropArea.addEventListener(eventName, preventDefaults, false); });
         function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
@@ -1390,7 +1408,6 @@
         async function prosesBanyakPDF() {
             const statusText = document.getElementById('status-text');
             const allPapersContainer = document.getElementById('all-papers-container');
-            const btnDownloadAll = document.getElementById('btnDownloadAll');
             
             if (fileInput.files.length === 0) return;
             btnProses.disabled = true; allPapersContainer.innerHTML = ''; 
@@ -1406,95 +1423,23 @@
                 for (let i = 0; i < fileInput.files.length; i++) {
                     statusText.innerText = `Memproses file ${i + 1} dari ${fileInput.files.length}...`;
                     let data = await extractDataFromPDF(fileInput.files[i]);
-                    let barisBarang = "";
-                    data.dataBarang.forEach((barang, index) => {
-                        barisBarang += `
-                            <tr>
-                                <td class="text-center" contenteditable="true">${index + 1}</td>
-                                <td contenteditable="true">${barang.nama}</td>
-                                <td class="text-center" contenteditable="true">${barang.qty}</td>
-                                <td contenteditable="true"></td>
-                            </tr>`;
-                    });
-
-                    const wrapperId = `paper-wrapper-batch-${i}-${Date.now()}`;
-
-                    let htmlSuratJalan = `
-                    ${i > 0 ? '<div class="html2pdf__page-break"></div>' : ''}
-                    <div class="paper-container">
-                        <div id="${wrapperId}" class="paper-wrapper">
-                            <div class="cetakan-surat-jalan">
-                                <div class="header-text">
-                                    <div class="title1">PENERBIT & PERCETAKAN</div>
-                                    <div class="title2">ANDI OFFSET</div>
-                                    <div class="address">Jl. BEO 38-40 TELP. (0274)561881 HUNTING. FAX.588282 YOGYAKARTA 55281 E-mail: pemasaran@andipublisher.net.id</div>
-                                </div>
-                                <table class="sub-header">
-                                    <tr>
-                                        <td style="width: 25%; vertical-align: top;"><div class="box-hijau">DIKIRIM KEMBALI</div></td>
-                                        <td style="width: 50%;">
-                                            <div class="sj-title">SURAT JALAN</div>
-                                            <div class="sj-no">
-                                                NO : AO / 
-                                                <span class="editable-field val-bulan" contenteditable="true">${bulanStr}</span> / 
-                                                <span class="editable-field val-tahun" contenteditable="true">${tahunStr}</span> / 
-                                                <span class="editable-field val-noso" contenteditable="true">${data.noSO}</span>
-                                            </div>
-                                        </td>
-                                        <td style="width: 25%; vertical-align: top; padding-top: 5px;">
-                                            <div class="date-right editable-field val-tanggal" contenteditable="true">${tanggalStr}</div>
-                                        </td>
-                                    </tr>
-                                </table>
-                                <table class="kepada-yth">
-                                    <tr>
-                                        <td style="width: 55%;"></td>
-                                        <td style="width: 45%;">
-                                            <span class="kepada-bold">Kepada Yth,</span><br><br>
-                                            <span class="kepada-bold editable-field val-pelanggan" contenteditable="true">${data.pelanggan}</span>
-                                        </td>
-                                    </tr>
-                                </table>
-                                <table class="keterangan-table">
-                                    <tr>
-                                        <td style="width: 11%;">Ekspedisi</td><td style="width: 2%;">:</td>
-                                        <td style="width: 87%;"><span class="editable-field val-ekspedisi" style="width: 100%; display: inline-block; min-height: 15px;" contenteditable="true"></span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Keterangan</td><td>:</td>
-                                        <td><span class="editable-field val-keterangan" style="width: 100%; display: inline-block; min-height: 15px;" contenteditable="true">${data.keterangan}</span></td>
-                                    </tr>
-                                </table>
-                                <table class="main-table">
-                                    <thead>
-                                        <tr><th style="width: 5%;">NO</th><th style="width: 65%;">NAMA BARANG</th><th style="width: 10%;">QTY</th><th style="width: 20%;">KOLI</th></tr>
-                                    </thead>
-                                    <tbody>${barisBarang}</tbody>
-                                    <tfoot>
-                                        <tr><td colspan="4" class="footer-note">* 3 HARI SETELAH BARANG DITERIMA TIDAK ADA KOMPLAIN MAKA BARANG KAMI ANGGAP LENGKAP</td></tr>
-                                    </tfoot>
-                                </table>
-                                <table class="ttd-table">
-                                    <tr><td style="width: 25%;">DITERIMA OLEH</td><td style="width: 25%;">EKSPEDISI</td><td style="width: 25%;">KEPALA GUDANG</td><td style="width: 25%;">MENGETAHUI</td></tr>
-                                </table>
-                            </div>
-                        </div>
-                        
-                        <div style="display:flex; gap:10px; justify-content:center; margin-top:10px; width: 100%;">
-                            <button class="btn-process btn-sm" style="background: #3b82f6; max-width: 120px;" onclick="printKertas('${wrapperId}')">🖨️ Print</button>
-                            <button class="btn-process btn-sm" style="background: #eab308; max-width: 120px;" onclick="unduhSatuPDF('${wrapperId}', '${data.noSO}')">⤓ Unduh</button>
-                            <button class="btn-process btn-sm btn-simpan-${wrapperId}" style="background: #10B981; max-width: 140px;" onclick="simpanKertas('${wrapperId}')">☁️ Simpan</button>
-                        </div>
-                    </div>
-                    `;
-                    allPapersContainer.insertAdjacentHTML('beforeend', htmlSuratJalan);
+                    
+                    renderDokumen({
+                        noSO: data.noSO || "",
+                        tanggal: tanggalStr, bulan: bulanStr, tahun: tahunStr,
+                        pelanggan: data.pelanggan || "",
+                        keterangan: data.keterangan || "",
+                        dataBarang: data.dataBarang
+                    }, false);
                 }
 
                 statusText.innerText = "Semua file PDF berhasil diekstrak!";
                 btnProses.disabled = false; btnProses.innerText = "Mulai Proses File PDF";
                 
-                if(fileInput.files.length > 1) btnDownloadAll.style.display = 'inline-block';
-                else btnDownloadAll.style.display = 'none';
+                // Tampilkan menu aksi massal jika dokumen > 1
+                const renderedPapers = document.querySelectorAll('.paper-wrapper').length;
+                document.getElementById('batch-actions-container').style.display = renderedPapers > 1 ? 'flex' : 'none';
+                
             } catch (error) {
                 console.error(error);
                 statusText.style.color = "#E11D48"; statusText.innerText = "Gagal memproses file PDF.";
@@ -1502,7 +1447,58 @@
             }
         }
 
-        // --- SISTEM UNDUH PDF (HTML2PDF) ---
+        // ================= SCRIPT MODAL INPUT MANUAL =================
+        function openManualModal() { document.getElementById('modal-manual').style.display = 'flex'; }
+        function closeManualModal() { document.getElementById('modal-manual').style.display = 'none'; }
+        
+        function tambahBarisManual() {
+            const tbody = document.querySelector('#manual-items-table tbody');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td><input type="text" class="form-input item-nama" placeholder="Nama Barang"></td><td><input type="number" class="form-input item-qty" value="1" min="1"></td><td><button class="btn-delete-item" onclick="hapusBarisManual(this)">X</button></td>`;
+            tbody.appendChild(tr);
+        }
+        function hapusBarisManual(btn) { btn.closest('tr').remove(); }
+
+        function generateManualSuratJalan() {
+            let noSO = document.getElementById('manual-noso').value.trim();
+            if(!noSO) noSO = "MANUAL-" + Math.floor(Math.random() * 10000); 
+            
+            const pelanggan = document.getElementById('manual-pelanggan').value.trim();
+            const keterangan = document.getElementById('manual-keterangan').value.trim();
+            
+            let dataBarang = [];
+            document.querySelectorAll('#manual-items-table tbody tr').forEach(tr => {
+                const nama = tr.querySelector('.item-nama').value.trim();
+                const qty = tr.querySelector('.item-qty').value.trim();
+                if(nama) dataBarang.push({ nama, qty });
+            });
+            if(dataBarang.length === 0) { alert("Masukkan minimal 1 nama barang!"); return; }
+
+            const d = new Date();
+            const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            const angkaRomawi = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
+            
+            let tanggalStr = `Yogyakarta, ${d.getDate()} ${namaBulan[d.getMonth()]} ${d.getFullYear()}`;
+            let bulanStr = angkaRomawi[d.getMonth()]; let tahunStr = d.getFullYear();
+
+            let data = {
+                noSO: noSO, pelanggan: pelanggan, keterangan: keterangan,
+                tanggal: tanggalStr, bulan: bulanStr, tahun: tahunStr, dataBarang: dataBarang
+            };
+            
+            renderDokumen(data, false);
+            closeManualModal();
+            
+            // Tampilkan menu aksi massal jika dokumen > 1
+            const renderedPapers = document.querySelectorAll('.paper-wrapper').length;
+            document.getElementById('batch-actions-container').style.display = renderedPapers > 1 ? 'flex' : 'none';
+            
+            // Reset Form Manual
+            document.getElementById('manual-noso').value = ''; document.getElementById('manual-pelanggan').value = ''; document.getElementById('manual-keterangan').value = '';
+            document.querySelector('#manual-items-table tbody').innerHTML = `<tr><td><input type="text" class="form-input item-nama" placeholder="Nama Barang"></td><td><input type="number" class="form-input item-qty" value="1" min="1"></td><td><button class="btn-delete-item" onclick="hapusBarisManual(this)">X</button></td></tr>`;
+        }
+
+        // ================= SISTEM UNDUH PDF =================
         function getOpsiPDF(filename) {
             return {
                 margin:       [15, 15, 15, 10], filename: filename,
@@ -1519,7 +1515,7 @@
             document.body.classList.add('exporting');
             
             const btnGroup = wrapperCetak.nextElementSibling;
-            const tombolUnduh = btnGroup ? btnGroup.querySelector('.btn-process:nth-child(2)') : null;
+            const tombolUnduh = btnGroup ? btnGroup.querySelector('.btn-process:last-child') : null;
             let teksAsli = "⤓ Unduh";
             if(tombolUnduh) { teksAsli = tombolUnduh.innerText; tombolUnduh.innerText = "⏳..."; tombolUnduh.disabled = true; }
 
@@ -1537,16 +1533,17 @@
             window.scrollTo(0, 0); 
             const wadahUtama = document.getElementById('all-papers-container');
             document.body.classList.add('exporting');
-            const tombolGabungan = document.getElementById('btnDownloadAll');
-            tombolGabungan.innerText = "Menyusun PDF Gabungan..."; tombolGabungan.disabled = true;
+            const tombolGabungan = document.querySelector('.batch-actions-container .btn-yellow');
+            let textOriginal = tombolGabungan.innerText;
+            tombolGabungan.innerText = "Menyusun Gabungan..."; tombolGabungan.disabled = true;
 
             html2pdf().set(getOpsiPDF('Kumpulan_Surat_Jalan_Batch.pdf')).from(wadahUtama).save().then(() => {
                 document.body.classList.remove('exporting');
-                tombolGabungan.innerText = "Unduh Semua (Gabung PDF)"; tombolGabungan.disabled = false;
-                document.getElementById('status-text').innerText = "PDF Gabungan berhasil diunduh.";
+                tombolGabungan.innerText = textOriginal; tombolGabungan.disabled = false;
+                showToast("Selesai", "PDF Gabungan berhasil diunduh.");
             }).catch(err => {
                 console.error(err); document.body.classList.remove('exporting');
-                tombolGabungan.innerText = "Unduh Semua (Gabung PDF)"; tombolGabungan.disabled = false;
+                tombolGabungan.innerText = textOriginal; tombolGabungan.disabled = false;
             });
         }
     </script>
