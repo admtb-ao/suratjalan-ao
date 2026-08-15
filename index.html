@@ -518,7 +518,7 @@
         }
     </style>
 </head>
-<body>
+<body class="light-mode">
     
     <!-- Tempat Tersembunyi untuk Print -->
     <div id="print-area"></div>
@@ -739,10 +739,9 @@
                     <div class="sj-main-panel">
                         <div id="status-text"></div>
                         
-                        <!-- TOMBOL BATCH AKSI (Print Semua / Simpan Semua) -->
+                        <!-- TOMBOL BATCH AKSI (Print & Simpan Semua / Gabung PDF) -->
                         <div class="batch-actions-container" id="batch-actions-container">
-                            <button class="btn-process btn-blue" style="max-width: 180px;" onclick="printSemuaKertas()">🖨️ Print Semua</button>
-                            <button class="btn-process btn-success" style="max-width: 180px;" onclick="simpanSemuaKertas()">☁️ Simpan Semua DB</button>
+                            <button class="btn-process btn-blue" id="btn-batch-print-simpan" style="max-width: 220px;" onclick="printDanSimpanSemuaKertas()">🖨️☁️ Print & Simpan Semua</button>
                             <button class="btn-process btn-yellow" style="max-width: 180px;" onclick="unduhSemuaGabungan()">⤓ Unduh Gabung PDF</button>
                         </div>
 
@@ -1254,30 +1253,27 @@
             loadRiwayatData();
         }
 
-        function printSemuaKertas() {
-            const printArea = document.getElementById('print-area');
-            printArea.innerHTML = '';
-            
+        // --- FUNGSI GABUNGAN BATCH: PRINT + SIMPAN SEMUA ---
+        async function printDanSimpanSemuaKertas() {
             const wrappers = document.querySelectorAll('.paper-wrapper');
             if(wrappers.length === 0) return alert("Tidak ada dokumen di layar.");
             
+            const btnBatch = document.getElementById('btn-batch-print-simpan');
+            if(btnBatch) { btnBatch.innerHTML = "⏳ Memproses Batch..."; btnBatch.disabled = true; }
+
+            // 1. Aksi Print Massal Dulu
+            const printArea = document.getElementById('print-area');
+            printArea.innerHTML = '';
             wrappers.forEach(w => {
                 const clone = w.cloneNode(true);
                 printArea.appendChild(clone);
             });
-            
             window.print();
             printArea.innerHTML = '';
             showToast("Print Massal", `Mengirim ${wrappers.length} dokumen berurutan ke printer.`);
-        }
-
-        async function simpanSemuaKertas() {
-            const wrappers = document.querySelectorAll('.paper-wrapper');
-            if(wrappers.length === 0) return;
             
+            // 2. Lanjut Aksi Simpan Background Satu Per Satu
             let sukses = 0, duplikat = 0, error = 0;
-            showToast("Memproses Batch...", `Menyimpan ${wrappers.length} dokumen ke Google Sheets.`);
-            
             for(let w of wrappers) {
                 const btnSimpan = document.querySelector(`.btn-simpan-${w.id}`);
                 const data = ekstrakDataDariUI(w.id);
@@ -1295,6 +1291,8 @@
             
             loadRiwayatData(); 
             showToast("Laporan Batch Selesai", `Tersimpan: ${sukses} | Skip (Duplikat): ${duplikat} | Gagal: ${error}`);
+            
+            if(btnBatch) { btnBatch.innerHTML = "🖨️☁️ Print & Simpan Semua"; btnBatch.disabled = false; }
         }
 
         // ================= SISTEM PARSING PDF MENGGUNAKAN PDF.JS =================
