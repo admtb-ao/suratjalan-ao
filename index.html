@@ -366,20 +366,46 @@
             background-color: rgba(16, 185, 129, 0.2);
         }
 
+        /* --- ATURAN CSS KHUSUS SAAT EKSPOR KE PDF OLEH HTML2PDF --- */
+        
+        /* 1. Sembunyikan Tombol Aksi */
+        body.exporting .hide-on-export, .exporting .hide-on-export { display: none !important; }
+        
+        /* 2. Bersihkan Background Input Editable */
         body.exporting .editable-field, .exporting .editable-field { border-bottom: none !important; background-color: transparent !important; padding: 1px 0 !important; }
         body.exporting td[contenteditable="true"], .exporting td[contenteditable="true"] { background-color: transparent !important; }
-        body.exporting, body.exporting .paper-container, .exporting .paper-container { margin: 0 !important; padding: 0 !important; box-shadow: none !important; }
+        
+        /* 3. Atur Margin Container Kertas agar rapi di dalam halaman PDF */
+        body.exporting .paper-container, .exporting .paper-container { 
+            margin: 0 !important; padding: 0 !important; box-shadow: none !important; 
+            page-break-inside: avoid !important; break-inside: avoid !important;
+        }
 
+        /* 4. Atur Ukuran Kertas Spesifik */
         body.exporting .paper-wrapper, .exporting .paper-wrapper {
             width: 182mm !important; max-width: 182mm !important;
             padding: 12mm 0 0 0 !important; margin: 0 auto !important;
             box-shadow: none !important; border: none !important;
         }
 
+        /* 5. Paksa Pisah Halaman Baru untuk setiap Container Kertas berikutnya (untuk batch) */
+        body.exporting .paper-container + .paper-container, .exporting .paper-container + .paper-container {
+            page-break-before: always !important;
+            break-before: page !important;
+        }
+
+        /* 6. Atur Element Tabel agar tidak terpotong sembarangan */
         body.exporting tr, .exporting tr, 
         body.exporting .footer-note, .exporting .footer-note, 
         body.exporting .ttd-table, .exporting .ttd-table {
             page-break-inside: avoid !important; break-inside: avoid !important;
+        }
+
+        /* 7. SUPER PENTING: Matikan Batasan Scroll pada Panel saat Ekspor agar Kertas Terbawah tidak terpotong */
+        body.exporting .main-content, body.exporting .sj-workspace-grid, body.exporting .sj-main-panel, body.exporting .dashboard-layout {
+            overflow: visible !important;
+            height: auto !important;
+            max-height: none !important;
         }
         
         .cetakan-surat-jalan { width: 100%; background: white !important; box-sizing: border-box; font-family: Arial, sans-serif !important; color: #000000 !important; }
@@ -1141,8 +1167,7 @@
                     <button class="btn-process btn-sm btn-outline" style="max-width: 110px;" onclick="unduhSatuPDF('${uniqueId}', '${data.noSO}')">⤓ Unduh PDF</button>
                 `;
             } else {
-                // Di mode cetak baru: Tombol "Simpan DB" dobel dihapus sesuai permintaan
-                // Hanya menyisakan Print & Simpan dan Unduh PDF
+                // Sesuai revisi: Tombol "Simpan DB" dobel dihapus.
                 actionButtonsHTML = `
                     <button class="btn-process btn-sm btn-blue btn-print-${uniqueId}" style="max-width: 160px;" onclick="printDanSimpan('${uniqueId}')">🖨️☁️ Print & Simpan</button>
                     <button class="btn-process btn-sm btn-outline" style="max-width: 110px;" onclick="unduhSatuPDF('${uniqueId}', '${data.noSO}')">⤓ Unduh PDF</button>
@@ -1209,7 +1234,8 @@
                     </div>
                 </div>
                 
-                <div style="display:flex; gap:10px; justify-content:center; margin-top:10px; width: 100%;">
+                <!-- CLASS "hide-on-export" INI YANG MENCEGAH TOMBOL MUNCUL DI PDF -->
+                <div class="hide-on-export" style="display:flex; gap:10px; justify-content:center; margin-top:20px; width: 100%;">
                     ${actionButtonsHTML}
                 </div>
             </div>
@@ -1315,7 +1341,6 @@
             
             // 2. Aksi Simpan Background
             const data = ekstrakDataDariUI(wrapperId);
-            // Melemparkan btnPrint agar tombol Print berubah tulisan menjadi "Tersimpan" otomatis
             const isSuccess = await eksekusiSimpanAPI(data, btnPrint);
             
             if(isSuccess) {
@@ -1572,22 +1597,25 @@
         // ================= SISTEM UNDUH PDF =================
         function getOpsiPDF(filename) {
             return {
-                margin:       [15, 15, 15, 10], filename: filename,
+                margin:       [10, 15, 15, 10], // Atur margin halamannya
+                filename:     filename,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2, useCORS: true, logging: false, scrollY: 0, scrollX: 0 }, 
                 jsPDF:        { unit: 'mm', format: 'letter', orientation: 'portrait' }, 
-                pagebreak:    { mode: ['css', 'legacy'], avoid: 'tr' } 
+                // Instruksikan html2pdf untuk mendengarkan aturan CSS saat memotong halaman
+                pagebreak:    { mode: ['css', 'legacy'], avoid: ['tr', '.ttd-table'] } 
             };
         }
 
         function unduhSatuPDF(id, noSO) {
             window.scrollTo(0, 0); 
-            const wrapperCetak = document.getElementById(id);
+            // Ambil elemen induknya (paper-container) agar tombol yang di dalam class "hide-on-export" ikut diolah (disembunyikan CSS)
+            const wrapperCetak = document.getElementById(id).closest('.paper-container');
             document.body.classList.add('exporting');
             
-            const btnGroup = wrapperCetak.nextElementSibling;
-            const tombolUnduh = btnGroup ? btnGroup.querySelector('.btn-process:last-child') : null;
-            let teksAsli = "⤓ Unduh";
+            const btnGroup = wrapperCetak.querySelector('.hide-on-export');
+            const tombolUnduh = btnGroup ? btnGroup.querySelector('.btn-outline') : null;
+            let teksAsli = "⤓ Unduh PDF";
             if(tombolUnduh) { teksAsli = tombolUnduh.innerText; tombolUnduh.innerText = "⏳..."; tombolUnduh.disabled = true; }
 
             const namaFilePDF = noSO ? `Surat_Jalan_${noSO}.pdf` : `Surat_Jalan_${id}.pdf`;
@@ -1604,6 +1632,7 @@
             window.scrollTo(0, 0); 
             const wadahUtama = document.getElementById('all-papers-container');
             document.body.classList.add('exporting');
+            
             const tombolGabungan = document.querySelector('.batch-actions-container .btn-yellow');
             let textOriginal = tombolGabungan.innerText;
             tombolGabungan.innerText = "Menyusun Gabungan..."; tombolGabungan.disabled = true;
