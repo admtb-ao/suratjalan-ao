@@ -993,6 +993,7 @@
         // ================= MANAJEMEN DATABASE & RIWAYAT (SIDEBAR KIRI) =================
         window.allDatabaseData = [];
         
+        // 1. Fungsi Utama Tarik Data (Menampilkan status loading)
         async function loadRiwayatData() {
             const container = document.getElementById('sidebar-riwayat-container');
             container.innerHTML = '<span style="font-size:11px; color:var(--text-muted); text-align:center; padding:15px;">Memuat data database...</span>';
@@ -1002,7 +1003,7 @@
                 const result = await res.json();
                 if(result.status === 'success') {
                     window.allDatabaseData = result.data;
-                    renderSidebarRiwayat(window.allDatabaseData);
+                    renderSidebarRiwayat(window.allDatabaseData, false);
                 } else {
                     container.innerHTML = `<span style="font-size:11px; color:#ef4444; text-align:center; padding:10px;">Gagal memuat.</span>`;
                 }
@@ -1011,7 +1012,51 @@
             }
         }
 
-        function renderSidebarRiwayat(dataList) {
+        // 2. Fungsi Polling (Latar Belakang / Tanpa Loading)
+        async function silentlyLoadRiwayatData() {
+            try {
+                const res = await fetch(API_URL);
+                const result = await res.json();
+                if(result.status === 'success') {
+                    // Cek jika ada data baru masuk
+                    if(result.data.length !== window.allDatabaseData.length) {
+                        window.allDatabaseData = result.data;
+                        
+                        // Perbarui tampilan sidebar otomatis jika sedang tidak mencari
+                        const keyword = document.getElementById('input-search-riwayat').value.trim();
+                        if (keyword === "") {
+                            renderSidebarRiwayat(window.allDatabaseData, false);
+                        } else {
+                            filterRiwayatList();
+                        }
+                    }
+                }
+            } catch(e) {
+                // Abaikan error koneksi latar belakang
+            }
+        }
+
+        // 3. Interval Polling Setiap 15 Detik (Dengan Pengaman)
+        setInterval(() => {
+            const sectionSuratJalan = document.getElementById('view-surat-jalan');
+            const isModalOpen = document.getElementById('modal-manual').style.display === 'flex';
+            const sedangMengetik = document.activeElement && (
+                document.activeElement.tagName === 'INPUT' || 
+                document.activeElement.tagName === 'TEXTAREA' || 
+                document.activeElement.getAttribute('contenteditable') === 'true'
+            );
+
+            // Hanya refresh data jika:
+            // - Tab surat jalan sedang aktif
+            // - Modal manual sedang tertutup
+            // - User TIDAK sedang mengetik / edit data di layar
+            if (sectionSuratJalan && sectionSuratJalan.classList.contains('active') && !isModalOpen && !sedangMengetik) {
+                silentlyLoadRiwayatData();
+            }
+        }, 15000); 
+
+        // 4. Render Riwayat dengan Pembatasan (Lazy Load 10 Terbaru)
+        function renderSidebarRiwayat(dataList, isSearching = false) {
             const container = document.getElementById('sidebar-riwayat-container');
             container.innerHTML = '';
             
@@ -1020,7 +1065,13 @@
                 return;
             }
 
-            dataList.forEach((item) => {
+            // Batasi tampilan hanya 10 item terbaru saat tidak sedang "Search"
+            let displayList = dataList;
+            if (!isSearching && dataList.length > 10) {
+                displayList = dataList.slice(0, 10);
+            }
+
+            displayList.forEach((item) => {
                 const dateObj = new Date(item.timestamp);
                 const tsStr = `${dateObj.getDate()}/${dateObj.getMonth()+1} ${String(dateObj.getHours()).padStart(2,'0')}:${String(dateObj.getMinutes()).padStart(2,'0')}`;
                 
@@ -1036,16 +1087,35 @@
                 `;
                 container.appendChild(card);
             });
+
+            // Beri notifikasi kecil di bawah jika ada data yang disembunyikan
+            if (!isSearching && dataList.length > 10) {
+                const infoDiv = document.createElement('div');
+                infoDiv.style.cssText = "font-size:10px; color:var(--text-muted); text-align:center; padding:5px; margin-top:5px;";
+                infoDiv.innerText = `Menampilkan 10 dari ${dataList.length} data. Cari untuk melihat lainnya.`;
+                container.appendChild(infoDiv);
+            }
         }
 
+        // 5. Fungsi Pencarian
         function filterRiwayatList() {
             const keyword = document.getElementById('input-search-riwayat').value.toLowerCase();
+            
+            if (keyword.trim() === "") {
+                // Tampilkan mode normal (dibatasi 10)
+                renderSidebarRiwayat(window.allDatabaseData, false);
+                return;
+            }
+
+            // Filter semua data jika sedang diketik
             const filtered = window.allDatabaseData.filter(item => {
                 const noSO = (item.noSO || "").toLowerCase();
                 const pelanggan = (item.pelanggan || "").toLowerCase();
                 return noSO.includes(keyword) || pelanggan.includes(keyword);
             });
-            renderSidebarRiwayat(filtered);
+            
+            // Mode searching (isSearching = true), tampilkan semua hasil tanpa batas 10
+            renderSidebarRiwayat(filtered, true);
         }
 
         // ================= ENGINE RENDER DOKUMEN & UI =================
@@ -1068,13 +1138,14 @@
             if(isReprint) {
                 actionButtonsHTML = `
                     <button class="btn-process btn-sm btn-blue btn-print-${uniqueId}" style="max-width: 130px;" onclick="printKertasIndividu('${uniqueId}')">🖨️ Re-Print Fisik</button>
-                    <button class="btn-process btn-sm btn-yellow" style="max-width: 110px;" onclick="unduhSatuPDF('${uniqueId}', '${data.noSO}')">⤓ Unduh PDF</button>
+                    <button class="btn-process btn-sm btn-outline" style="max-width: 110px;" onclick="unduhSatuPDF('${uniqueId}', '${data.noSO}')">⤓ Unduh PDF</button>
                 `;
             } else {
+                // Di mode cetak baru: Tombol "Simpan DB" dobel dihapus sesuai permintaan
+                // Hanya menyisakan Print & Simpan dan Unduh PDF
                 actionButtonsHTML = `
-                    <button class="btn-process btn-sm btn-blue btn-print-${uniqueId}" style="max-width: 150px;" onclick="printDanSimpan('${uniqueId}')">🖨️ Print & Simpan</button>
-                    <button class="btn-process btn-sm btn-success btn-simpan-${uniqueId}" style="max-width: 130px;" onclick="simpanKertasIndividual('${uniqueId}')">☁️ Simpan DB</button>
-                    <button class="btn-process btn-sm btn-outline" style="max-width: 110px;" onclick="unduhSatuPDF('${uniqueId}', '${data.noSO}')">⤓ Unduh</button>
+                    <button class="btn-process btn-sm btn-blue btn-print-${uniqueId}" style="max-width: 160px;" onclick="printDanSimpan('${uniqueId}')">🖨️☁️ Print & Simpan</button>
+                    <button class="btn-process btn-sm btn-outline" style="max-width: 110px;" onclick="unduhSatuPDF('${uniqueId}', '${data.noSO}')">⤓ Unduh PDF</button>
                 `;
             }
 
@@ -1222,14 +1293,6 @@
             }
         }
 
-        async function simpanKertasIndividual(wrapperId) {
-            const btn = document.querySelector(`.btn-simpan-${wrapperId}`);
-            if(btn) { btn.innerHTML = "⏳..."; btn.disabled = true; }
-            const data = ekstrakDataDariUI(wrapperId);
-            const isSuccess = await eksekusiSimpanAPI(data, btn);
-            if(isSuccess) loadRiwayatData(); // Refresh sidebar DB
-        }
-
         // ================= INDIVIDUAL & BATCH ACTIONS (PRINT & SAVE) =================
         function printKertasIndividu(id) {
             const printArea = document.getElementById('print-area');
@@ -1252,11 +1315,15 @@
             
             // 2. Aksi Simpan Background
             const data = ekstrakDataDariUI(wrapperId);
-            const isSuccess = await eksekusiSimpanAPI(data, document.querySelector(`.btn-simpan-${wrapperId}`));
+            // Melemparkan btnPrint agar tombol Print berubah tulisan menjadi "Tersimpan" otomatis
+            const isSuccess = await eksekusiSimpanAPI(data, btnPrint);
             
-            if(isSuccess) showToast("Selesai", `Print & Simpan untuk ${data.noSO} berhasil.`);
-            btnPrint.innerHTML = originalText; btnPrint.disabled = false;
-            loadRiwayatData();
+            if(isSuccess) {
+                showToast("Selesai", `Print & Simpan untuk ${data.noSO} berhasil.`);
+                silentlyLoadRiwayatData();
+            } else {
+                btnPrint.innerHTML = originalText; btnPrint.disabled = false;
+            }
         }
 
         // --- FUNGSI GABUNGAN BATCH: PRINT + SIMPAN SEMUA ---
@@ -1281,21 +1348,21 @@
             // 2. Lanjut Aksi Simpan Background Satu Per Satu
             let sukses = 0, duplikat = 0, error = 0;
             for(let w of wrappers) {
-                const btnSimpan = document.querySelector(`.btn-simpan-${w.id}`);
+                const btnAksiIndividu = document.querySelector(`.btn-print-${w.id}`);
                 const data = ekstrakDataDariUI(w.id);
                 const validasi = validasiDataSebelumSimpan(data);
                 
                 if(validasi.status === 'DUPLICATE') { 
                     duplikat++; 
-                    if(btnSimpan) { btnSimpan.innerHTML = "⚠️ Skip (Duplikat)"; btnSimpan.disabled = true; } 
+                    if(btnAksiIndividu) { btnAksiIndividu.innerHTML = "⚠️ Skip (Duplikat)"; btnAksiIndividu.disabled = true; } 
                     continue; 
                 }
                 
-                const isSukses = await eksekusiSimpanAPI(data, btnSimpan);
+                const isSukses = await eksekusiSimpanAPI(data, btnAksiIndividu);
                 if(isSukses) sukses++; else error++;
             }
             
-            loadRiwayatData(); 
+            silentlyLoadRiwayatData(); 
             showToast("Laporan Batch Selesai", `Tersimpan: ${sukses} | Skip (Duplikat): ${duplikat} | Gagal: ${error}`);
             
             if(btnBatch) { btnBatch.innerHTML = "🖨️☁️ Print & Simpan Semua"; btnBatch.disabled = false; }
