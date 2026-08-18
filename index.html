@@ -324,6 +324,20 @@
             display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; width: 100%; display: none; flex-wrap: wrap;
         }
 
+        /* --- CSS BARU UNTUK FILTER TANGGAL & CHECKBOX --- */
+        .filter-group { display: flex; gap: 5px; margin-bottom: 5px; }
+        .filter-group input[type="date"] {
+            flex: 1; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--glass-border);
+            background: rgba(128,128,128,0.1); color: var(--text-main); font-size: 11px;
+            font-family: inherit; outline: none; transition: var(--transition);
+        }
+        .filter-group input[type="date"]:focus { border-color: var(--primary); }
+        .filter-group input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.6; filter: invert(var(--invert-icon, 0)); }
+        body.light-mode { --invert-icon: 0; }
+        body:not(.light-mode) { --invert-icon: 1; }
+
+        .riwayat-checkbox { width: 15px; height: 15px; cursor: pointer; accent-color: var(--primary); flex-shrink: 0; }
+
         /* Kartu Riwayat di Sidebar */
         .history-item-card {
             background: rgba(128,128,128,0.05); border: 1px solid var(--glass-border);
@@ -747,18 +761,31 @@
                         </div>
                         <div class="file-info" id="fileInfo"></div>
                         
-                        <button class="btn-process" id="btnProses" onclick="prosesBanyakPDF()" disabled>Mulai Proses File PDF</button>
-                        <button class="btn-process btn-outline" style="background: rgba(128,128,128,0.1); border: 1px solid var(--glass-border); color: var(--text-main);" onclick="openManualModal()">✍️ Buat Manual</button>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn-process" id="btnProses" onclick="prosesBanyakPDF()" disabled style="flex: 1;">Mulai Proses PDF</button>
+                            <button class="btn-process btn-outline" style="width: auto; padding: 14px; background: rgba(128,128,128,0.1); border: 1px solid var(--glass-border); color: var(--text-main);" onclick="openManualModal()" title="Buat Manual">✍️</button>
+                        </div>
 
                         <hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 5px 0;">
 
-                        <!-- BAGIAN PENCARIAN & RE-PRINT RIWAYAT -->
+                        <!-- BAGIAN PENCARIAN & RE-PRINT RIWAYAT DENGAN CHECKBOX -->
                         <div style="display: flex; flex-direction: column; gap: 10px;">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <label style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Cari Riwayat Database</label>
+                                <label style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Riwayat Database</label>
                                 <button onclick="loadRiwayatData()" style="background: none; border: none; color: var(--primary); font-size: 11px; cursor: pointer; font-weight: 500;">🔄 Refresh DB</button>
                             </div>
-                            <input type="text" id="input-search-riwayat" class="form-input" placeholder="🔍 Cari No. SO atau Pelanggan..." oninput="filterRiwayatList()">
+                            
+                            <input type="text" id="input-search-riwayat" class="form-input" style="padding: 10px 12px;" placeholder="🔍 Cari SO / Pelanggan..." oninput="terapkanFilter()">
+                            
+                            <div class="filter-group">
+                                <input type="date" id="filter-start" onchange="terapkanFilter()" title="Tanggal Awal">
+                                <input type="date" id="filter-end" onchange="terapkanFilter()" title="Tanggal Akhir">
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 5px;">
+                                <button class="btn-process btn-outline btn-sm" onclick="renderYangDiceklis()" style="font-size: 10px; padding: 8px; height: 100%;">☑️ Render Terpilih</button>
+                                <button class="btn-process btn-yellow btn-sm" onclick="renderSemuaFilter()" style="font-size: 10px; padding: 8px; height: 100%; color: #000;">📑 Render Semua</button>
+                            </div>
                         </div>
 
                         <!-- LIST HASIL PENCARIAN RIWAYAT -->
@@ -771,10 +798,10 @@
                     <div class="sj-main-panel">
                         <div id="status-text"></div>
                         
-                        <!-- TOMBOL BATCH AKSI (Print & Simpan Semua / Gabung PDF) -->
+                        <!-- TOMBOL BATCH AKSI (DINAMIS: Print & Simpan Semua / Re-Print Semua) -->
                         <div class="batch-actions-container" id="batch-actions-container">
                             <button class="btn-process btn-blue" id="btn-batch-print-simpan" style="max-width: 220px;" onclick="printDanSimpanSemuaKertas()">🖨️☁️ Print & Simpan Semua</button>
-                            <button class="btn-process btn-yellow" style="max-width: 180px;" onclick="unduhSemuaGabungan()">⤓ Unduh Gabung PDF</button>
+                            <button class="btn-process btn-yellow" style="max-width: 180px; color: #000;" onclick="unduhSemuaGabungan()">⤓ Unduh Gabung PDF</button>
                         </div>
 
                         <div id="all-papers-container" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
@@ -853,6 +880,9 @@
     <script>
         // API URL Google Sheets Anda
         const API_URL = 'https://script.google.com/macros/s/AKfycbyPhh5vp1usJ8PUl4YG0JfVmTnVvqYI50mXSbIwvV5j_H9Cts_fF5ngjhFUlN0AQ7A0yA/exec';
+        
+        // Simpan state filter terkini
+        window.currentFilteredData = [];
 
         // --- SCRIPT OTENTIKASI & TRIGGER EFEK HUJAN ---
         function checkLogin() {
@@ -1019,7 +1049,7 @@
         // ================= MANAJEMEN DATABASE & RIWAYAT (SIDEBAR KIRI) =================
         window.allDatabaseData = [];
         
-        // 1. Fungsi Utama Tarik Data (Menampilkan status loading)
+        // 1. Fungsi Utama Tarik Data
         async function loadRiwayatData() {
             const container = document.getElementById('sidebar-riwayat-container');
             container.innerHTML = '<span style="font-size:11px; color:var(--text-muted); text-align:center; padding:15px;">Memuat data database...</span>';
@@ -1029,7 +1059,7 @@
                 const result = await res.json();
                 if(result.status === 'success') {
                     window.allDatabaseData = result.data;
-                    renderSidebarRiwayat(window.allDatabaseData, false);
+                    terapkanFilter();
                 } else {
                     container.innerHTML = `<span style="font-size:11px; color:#ef4444; text-align:center; padding:10px;">Gagal memuat.</span>`;
                 }
@@ -1044,25 +1074,14 @@
                 const res = await fetch(API_URL);
                 const result = await res.json();
                 if(result.status === 'success') {
-                    // Cek jika ada data baru masuk
                     if(result.data.length !== window.allDatabaseData.length) {
                         window.allDatabaseData = result.data;
-                        
-                        // Perbarui tampilan sidebar otomatis jika sedang tidak mencari
-                        const keyword = document.getElementById('input-search-riwayat').value.trim();
-                        if (keyword === "") {
-                            renderSidebarRiwayat(window.allDatabaseData, false);
-                        } else {
-                            filterRiwayatList();
-                        }
+                        terapkanFilter();
                     }
                 }
-            } catch(e) {
-                // Abaikan error koneksi latar belakang
-            }
+            } catch(e) {}
         }
 
-        // 3. Interval Polling Setiap 15 Detik (Dengan Pengaman)
         setInterval(() => {
             const sectionSuratJalan = document.getElementById('view-surat-jalan');
             const isModalOpen = document.getElementById('modal-manual').style.display === 'flex';
@@ -1072,16 +1091,39 @@
                 document.activeElement.getAttribute('contenteditable') === 'true'
             );
 
-            // Hanya refresh data jika:
-            // - Tab surat jalan sedang aktif
-            // - Modal manual sedang tertutup
-            // - User TIDAK sedang mengetik / edit data di layar
             if (sectionSuratJalan && sectionSuratJalan.classList.contains('active') && !isModalOpen && !sedangMengetik) {
                 silentlyLoadRiwayatData();
             }
         }, 15000); 
 
-        // 4. Render Riwayat dengan Pembatasan (Lazy Load 10 Terbaru)
+        // 3. Fungsi Filter Pencarian & Tanggal
+        function terapkanFilter() {
+            const keyword = document.getElementById('input-search-riwayat').value.toLowerCase();
+            const startStr = document.getElementById('filter-start').value; 
+            const endStr = document.getElementById('filter-end').value;
+            let filtered = window.allDatabaseData || [];
+            
+            if (keyword.trim() !== "") {
+                filtered = filtered.filter(item => { 
+                    const noSO = (item.noSO || "").toLowerCase(); 
+                    const pelanggan = (item.pelanggan || "").toLowerCase(); 
+                    return noSO.includes(keyword) || pelanggan.includes(keyword); 
+                });
+            }
+            if (startStr || endStr) {
+                const start = startStr ? new Date(startStr).getTime() : 0; 
+                const end = endStr ? new Date(endStr).setHours(23,59,59,999) : Infinity;
+                filtered = filtered.filter(item => { 
+                    const t = new Date(item.timestamp).getTime(); 
+                    return t >= start && t <= end; 
+                });
+            }
+            window.currentFilteredData = filtered;
+            const isSearching = (keyword.trim() !== "" || startStr !== "" || endStr !== "");
+            renderSidebarRiwayat(filtered, isSearching);
+        }
+
+        // 4. Render Riwayat dengan Pembatasan & Checkbox
         function renderSidebarRiwayat(dataList, isSearching = false) {
             const container = document.getElementById('sidebar-riwayat-container');
             container.innerHTML = '';
@@ -1091,7 +1133,6 @@
                 return;
             }
 
-            // Batasi tampilan hanya 10 item terbaru saat tidak sedang "Search"
             let displayList = dataList;
             if (!isSearching && dataList.length > 10) {
                 displayList = dataList.slice(0, 10);
@@ -1103,55 +1144,97 @@
                 
                 const card = document.createElement('div');
                 card.className = 'history-item-card';
-                card.onclick = () => renderDokumen(item, true); // true = mode Re-Print
+                card.onclick = (e) => { 
+                    // Render individual jika bukan klik checkbox
+                    if(e.target.type !== 'checkbox') renderDokumen(item, true, false); 
+                }; 
+                
                 card.innerHTML = `
                     <div class="history-item-header">
-                        <span>${item.noSO || 'Tanpa No'}</span>
-                        <span style="font-size:10px; color:var(--text-muted); font-weight:normal;">${tsStr}</span>
+                        <input type="checkbox" class="riwayat-checkbox" value="${item.noSO}">
+                        <div style="display:flex; justify-content:space-between; width:100%; align-items:center; margin-left:8px;">
+                            <span>${item.noSO || 'Tanpa No'}</span>
+                            <span style="font-size:10px; color:var(--text-muted); font-weight:normal;">${tsStr}</span>
+                        </div>
                     </div>
-                    <div class="history-item-sub">${item.pelanggan || 'Pelanggan Umum'}</div>
+                    <div class="history-item-sub" style="margin-left: 23px;">${item.pelanggan || 'Pelanggan Umum'}</div>
                 `;
                 container.appendChild(card);
             });
 
-            // Beri notifikasi kecil di bawah jika ada data yang disembunyikan
             if (!isSearching && dataList.length > 10) {
                 const infoDiv = document.createElement('div');
                 infoDiv.style.cssText = "font-size:10px; color:var(--text-muted); text-align:center; padding:5px; margin-top:5px;";
-                infoDiv.innerText = `Menampilkan 10 dari ${dataList.length} data. Cari untuk melihat lainnya.`;
+                infoDiv.innerText = `Menampilkan 10 dari ${dataList.length} data. Cari/Filter untuk melihat lainnya.`;
+                container.appendChild(infoDiv);
+            } else if (isSearching) {
+                const infoDiv = document.createElement('div');
+                infoDiv.style.cssText = "font-size:10px; color:var(--primary); text-align:center; padding:5px; margin-top:5px;";
+                infoDiv.innerText = `Total ditemukan: ${dataList.length} dokumen.`;
                 container.appendChild(infoDiv);
             }
         }
 
-        // 5. Fungsi Pencarian
-        function filterRiwayatList() {
-            const keyword = document.getElementById('input-search-riwayat').value.toLowerCase();
-            
-            if (keyword.trim() === "") {
-                // Tampilkan mode normal (dibatasi 10)
-                renderSidebarRiwayat(window.allDatabaseData, false);
-                return;
-            }
+        // ================= FITUR BATCH RENDERING DARI RIWAYAT =================
+        function renderYangDiceklis() {
+            const checkboxes = document.querySelectorAll('.riwayat-checkbox:checked');
+            if(checkboxes.length === 0) return alert("Silakan centang (☑️) minimal 1 data pada daftar riwayat di bawah.");
+            const selectedSOs = Array.from(checkboxes).map(cb => cb.value);
+            const dataToShow = window.currentFilteredData.filter(item => selectedSOs.includes(item.noSO));
+            jalankanRenderBatch(dataToShow);
+        }
 
-            // Filter semua data jika sedang diketik
-            const filtered = window.allDatabaseData.filter(item => {
-                const noSO = (item.noSO || "").toLowerCase();
-                const pelanggan = (item.pelanggan || "").toLowerCase();
-                return noSO.includes(keyword) || pelanggan.includes(keyword);
-            });
+        function renderSemuaFilter() {
+            const dataToShow = window.currentFilteredData || [];
+            if(dataToShow.length === 0) return alert("Tidak ada data yang tersedia untuk di-render.");
+            if(dataToShow.length > 50) { 
+                if(!confirm(`Terdapat ${dataToShow.length} dokumen. Membuka semua sekaligus bisa membuat browser lag sementara. Lanjutkan?`)) return; 
+            }
+            jalankanRenderBatch(dataToShow);
+        }
+
+        function jalankanRenderBatch(dataToShow) {
+            const container = document.getElementById('all-papers-container'); container.innerHTML = '';
+            document.getElementById('status-text').innerText = `Menampilkan ${dataToShow.length} dokumen. Siap diprint/diexport.`;
+            dataToShow.forEach(item => { renderDokumen(item, true, true); });
+
+            // LOGIKA DINAMIS: UBAH TOMBOL MENJADI RE-PRINT SEMUA
+            const btnBatchPrint = document.getElementById('btn-batch-print-simpan');
+            if(dataToShow.length > 1) {
+                document.getElementById('batch-actions-container').style.display = 'flex';
+                btnBatchPrint.innerHTML = "🖨️ Re-Print Semua";
+                btnBatchPrint.setAttribute('onclick', 'reprintSemuaKertas()'); // Set ke fungsi murni print
+            } else {
+                document.getElementById('batch-actions-container').style.display = 'none';
+            }
+        }
+
+        // AKSI MURNI PRINT KHUSUS UNTUK RIWAYAT/RE-PRINT BATCH (TANPA HIT DATABASE)
+        function reprintSemuaKertas() {
+            const wrappers = document.querySelectorAll('.paper-wrapper');
+            if(wrappers.length === 0) return alert("Tidak ada dokumen di layar.");
             
-            // Mode searching (isSearching = true), tampilkan semua hasil tanpa batas 10
-            renderSidebarRiwayat(filtered, true);
+            const btnBatch = document.getElementById('btn-batch-print-simpan');
+            if(btnBatch) { btnBatch.innerHTML = "⏳ Memproses Print..."; btnBatch.disabled = true; }
+
+            const printArea = document.getElementById('print-area'); printArea.innerHTML = '';
+            wrappers.forEach(w => { const clone = w.cloneNode(true); printArea.appendChild(clone); }); 
+            window.print(); 
+            printArea.innerHTML = '';
+            
+            showToast("Print Massal", `Mengirim ${wrappers.length} dokumen ke printer.`);
+            
+            if(btnBatch) { btnBatch.innerHTML = "🖨️ Re-Print Semua"; btnBatch.disabled = false; }
         }
 
         // ================= ENGINE RENDER DOKUMEN & UI =================
-        function renderDokumen(data, isReprint = false) {
+        function renderDokumen(data, isReprint = false, isBatchLoad = false) {
             const container = document.getElementById('all-papers-container');
-            if(isReprint) {
+            if(isReprint && !isBatchLoad) {
                 container.innerHTML = ''; 
                 document.getElementById('batch-actions-container').style.display = 'none';
                 document.getElementById('status-text').innerText = `Mode Re-Print: SO ${data.noSO} dimuat dari Database.`;
-            } else {
+            } else if (!isReprint && !isBatchLoad) {
                 if(container.innerHTML.includes('Belum ada dokumen')) container.innerHTML = '';
             }
             
@@ -1167,7 +1250,6 @@
                     <button class="btn-process btn-sm btn-outline" style="max-width: 110px;" onclick="unduhSatuPDF('${uniqueId}', '${data.noSO}')">⤓ Unduh PDF</button>
                 `;
             } else {
-                // Sesuai revisi: Tombol "Simpan DB" dobel dihapus.
                 actionButtonsHTML = `
                     <button class="btn-process btn-sm btn-blue btn-print-${uniqueId}" style="max-width: 160px;" onclick="printDanSimpan('${uniqueId}')">🖨️☁️ Print & Simpan</button>
                     <button class="btn-process btn-sm btn-outline" style="max-width: 110px;" onclick="unduhSatuPDF('${uniqueId}', '${data.noSO}')">⤓ Unduh PDF</button>
@@ -1351,7 +1433,7 @@
             }
         }
 
-        // --- FUNGSI GABUNGAN BATCH: PRINT + SIMPAN SEMUA ---
+        // --- FUNGSI GABUNGAN BATCH: PRINT + SIMPAN SEMUA UNTUK DATA BARU ---
         async function printDanSimpanSemuaKertas() {
             const wrappers = document.querySelectorAll('.paper-wrapper');
             if(wrappers.length === 0) return alert("Tidak ada dokumen di layar.");
@@ -1532,9 +1614,16 @@
                 statusText.innerText = "Semua file PDF berhasil diekstrak!";
                 btnProses.disabled = false; btnProses.innerText = "Mulai Proses File PDF";
                 
-                // Tampilkan menu aksi massal jika dokumen > 1
+                // LOGIKA DINAMIS: SET TOMBOL UNTUK DATA BARU
                 const renderedPapers = document.querySelectorAll('.paper-wrapper').length;
-                document.getElementById('batch-actions-container').style.display = renderedPapers > 1 ? 'flex' : 'none';
+                if(renderedPapers > 1) {
+                    document.getElementById('batch-actions-container').style.display = 'flex';
+                    const btnBatchPrint = document.getElementById('btn-batch-print-simpan');
+                    btnBatchPrint.innerHTML = "🖨️☁️ Print & Simpan Semua";
+                    btnBatchPrint.setAttribute('onclick', 'printDanSimpanSemuaKertas()');
+                } else {
+                    document.getElementById('batch-actions-container').style.display = 'none';
+                }
                 
             } catch (error) {
                 console.error(error);
@@ -1585,9 +1674,16 @@
             renderDokumen(data, false);
             closeManualModal();
             
-            // Tampilkan menu aksi massal jika dokumen > 1
+            // LOGIKA DINAMIS: SET TOMBOL UNTUK DATA BARU
             const renderedPapers = document.querySelectorAll('.paper-wrapper').length;
-            document.getElementById('batch-actions-container').style.display = renderedPapers > 1 ? 'flex' : 'none';
+            if(renderedPapers > 1) {
+                document.getElementById('batch-actions-container').style.display = 'flex';
+                const btnBatchPrint = document.getElementById('btn-batch-print-simpan');
+                btnBatchPrint.innerHTML = "🖨️☁️ Print & Simpan Semua";
+                btnBatchPrint.setAttribute('onclick', 'printDanSimpanSemuaKertas()');
+            } else {
+                document.getElementById('batch-actions-container').style.display = 'none';
+            }
             
             // Reset Form Manual
             document.getElementById('manual-noso').value = ''; document.getElementById('manual-pelanggan').value = ''; document.getElementById('manual-keterangan').value = '';
