@@ -275,19 +275,25 @@
            5. WORKSPACE SURAT JALAN & RE-PRINT TERINTEGRASI
         ========================================================= */
         .sj-workspace-grid {
-            display: grid; grid-template-columns: 360px 1fr; gap: 24px; height: calc(100vh - 160px);
+            display: grid; 
+            grid-template-columns: 270px 1fr; /* Diperkecil agar area dokumen lebih luas */
+            gap: 20px; 
+            height: calc(100vh - 160px);
         }
 
         .sj-sidebar-panel {
             background: var(--glass-bg); backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border); border-radius: 24px; padding: 24px;
+            border: 1px solid var(--glass-border); border-radius: 24px; 
+            padding: 18px; /* Padding dikurangi */
             display: flex; flex-direction: column; gap: 16px; overflow-y: auto;
         }
 
         .sj-main-panel {
             background: var(--glass-bg); backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border); border-radius: 24px; padding: 30px;
-            overflow-y: auto; display: flex; flex-direction: column; align-items: center;
+            border: 1px solid var(--glass-border); border-radius: 24px; 
+            padding: 15px; /* Padding dikurangi */
+            overflow-y: auto; overflow-x: hidden; /* Mencegah scroll menyamping */
+            display: flex; flex-direction: column; align-items: center;
         }
 
         .drop-zone {
@@ -344,7 +350,17 @@
             border-radius: 14px; padding: 12px 14px; cursor: pointer; transition: var(--transition);
             display: flex; flex-direction: column; gap: 4px; text-align: left;
         }
-        .history-item-card:hover { border-color: var(--primary); background: rgba(16,185,129,0.05); transform: translateY(-2px); }
+        /* EFEK HOVER & EFEK AKTIF (SAAT DIKLIK) */
+        .history-item-card:hover, .history-item-card.active-card { 
+            border-color: var(--primary); 
+            background: rgba(16,185,129,0.05); 
+            transform: translateY(-2px); 
+        }
+        /* Penanda garis kiri khusus saat aktif */
+        .history-item-card.active-card {
+            border-left: 4px solid var(--primary);
+        }
+
         .history-item-header { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 600; color: var(--primary); }
         .history-item-sub { font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
@@ -366,7 +382,17 @@
         /* =========================================================
            6. CSS CETAK & EXPORT PDF (NORMAL VIEW)
         ========================================================= */
-        .paper-container { margin-bottom: 30px; display: flex; flex-direction: column; align-items: center; width: 100%; }
+        .paper-container { 
+            margin-bottom: 30px; display: flex; flex-direction: column; 
+            align-items: center; width: 100%; transform-origin: top center; 
+        }
+
+        /* --- AUTO ZOOM KERTAS UNTUK LAYAR KECIL --- */
+        @media screen and (max-width: 1400px) { .paper-container { zoom: 0.9; } }
+        @media screen and (max-width: 1250px) { .paper-container { zoom: 0.8; } }
+        @media screen and (max-width: 1100px) { .paper-container { zoom: 0.7; } }
+        @media screen and (max-width: 950px)  { .paper-container { zoom: 0.6; } }
+
         .paper-wrapper {
             background: white !important; width: 215.9mm; margin: 0 auto 15px auto;
             box-shadow: 0 10px 25px rgba(0,0,0,0.15); text-align: left;
@@ -393,6 +419,7 @@
         body.exporting .paper-container, .exporting .paper-container { 
             margin: 0 !important; padding: 0 !important; box-shadow: none !important; 
             page-break-inside: avoid !important; break-inside: avoid !important;
+            zoom: 1 !important; transform: none !important; /* Reset saat export */
         }
 
         /* 4. Atur Ukuran Kertas Spesifik */
@@ -457,7 +484,8 @@
                 padding: 0 !important; 
                 margin: 0 !important; 
                 min-height: auto !important; 
-                display: block !important;   
+                display: block !important; 
+                zoom: 1 !important; /* Reset zoom saat di printer */
             }
             body > * { display: none !important; }
             
@@ -1146,7 +1174,14 @@
                 card.className = 'history-item-card';
                 card.onclick = (e) => { 
                     // Render individual jika bukan klik checkbox
-                    if(e.target.type !== 'checkbox') renderDokumen(item, true, false); 
+                    if(e.target.type !== 'checkbox') {
+                        // Bersihkan efek aktif dari semua kartu riwayat lainnya
+                        document.querySelectorAll('.history-item-card').forEach(el => el.classList.remove('active-card'));
+                        // Berikan efek aktif ke kartu yang sedang diklik ini
+                        card.classList.add('active-card');
+                        
+                        renderDokumen(item, true, false); 
+                    }
                 }; 
                 
                 card.innerHTML = `
@@ -1194,6 +1229,9 @@
         }
 
         function jalankanRenderBatch(dataToShow) {
+            // Bersihkan indikator aktif jika membuka banyak dokumen sekaligus
+            document.querySelectorAll('.history-item-card').forEach(el => el.classList.remove('active-card'));
+            
             const container = document.getElementById('all-papers-container'); container.innerHTML = '';
             document.getElementById('status-text').innerText = `Menampilkan ${dataToShow.length} dokumen. Siap diprint/diexport.`;
             dataToShow.forEach(item => { renderDokumen(item, true, true); });
