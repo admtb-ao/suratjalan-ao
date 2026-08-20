@@ -1793,14 +1793,16 @@
             let teksAsli = "⤓ Unduh PDF";
             if(tombolUnduh) { teksAsli = tombolUnduh.innerText; tombolUnduh.innerText = "⏳..."; tombolUnduh.disabled = true; }
 
-            const namaFilePDF = noSO ? `Surat_Jalan_${noSO}.pdf` : `Surat_Jalan_${id}.pdf`;
-            html2pdf().set(getOpsiPDF(namaFilePDF)).from(wrapperCetak).save().then(() => {
-                document.body.classList.remove('exporting');
-                if(tombolUnduh) { tombolUnduh.innerText = teksAsli; tombolUnduh.disabled = false; }
-            }).catch(err => {
-                console.error(err); document.body.classList.remove('exporting');
-                if(tombolUnduh) { tombolUnduh.innerText = teksAsli; tombolUnduh.disabled = false; }
-            });
+            setTimeout(() => {
+                const namaFilePDF = noSO ? `Surat_Jalan_${noSO}.pdf` : `Surat_Jalan_${id}.pdf`;
+                html2pdf().set(getOpsiPDF(namaFilePDF)).from(wrapperCetak).save().then(() => {
+                    document.body.classList.remove('exporting');
+                    if(tombolUnduh) { tombolUnduh.innerText = teksAsli; tombolUnduh.disabled = false; }
+                }).catch(err => {
+                    console.error(err); document.body.classList.remove('exporting');
+                    if(tombolUnduh) { tombolUnduh.innerText = teksAsli; tombolUnduh.disabled = false; }
+                });
+            }, 300);
         }
 
         function unduhSemuaGabungan() {
@@ -1812,14 +1814,17 @@
             let textOriginal = tombolGabungan.innerText;
             tombolGabungan.innerText = "Menyusun Gabungan..."; tombolGabungan.disabled = true;
 
-            html2pdf().set(getOpsiPDF('Kumpulan_Surat_Jalan_Batch.pdf')).from(wadahUtama).save().then(() => {
-                document.body.classList.remove('exporting');
-                tombolGabungan.innerText = textOriginal; tombolGabungan.disabled = false;
-                showToast("Selesai", "PDF Gabungan berhasil diunduh.");
-            }).catch(err => {
-                console.error(err); document.body.classList.remove('exporting');
-                tombolGabungan.innerText = textOriginal; tombolGabungan.disabled = false;
-            });
+            // Berikan jeda 500ms agar DOM sepenuhnya stabil sebelum html2pdf membaca elemen
+            setTimeout(() => {
+                html2pdf().set(getOpsiPDF('Kumpulan_Surat_Jalan_Batch.pdf')).from(wadahUtama).save().then(() => {
+                    document.body.classList.remove('exporting');
+                    tombolGabungan.innerText = textOriginal; tombolGabungan.disabled = false;
+                    showToast("Selesai", "PDF Gabungan berhasil diunduh.");
+                }).catch(err => {
+                    console.error(err); document.body.classList.remove('exporting');
+                    tombolGabungan.innerText = textOriginal; tombolGabungan.disabled = false;
+                });
+            }, 500);
         }
     </script>
 </body>
