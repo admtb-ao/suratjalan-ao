@@ -137,11 +137,12 @@
         }
         .sidebar-brand svg { width: 24px; height: 24px; color: var(--text-main); }
 
-        .nav-menu { display: flex; flex-direction: column; gap: 20px; flex: 1; width: 100%; align-items: center; }
+        .nav-menu { display: flex; flex-direction: column; gap: 20px; flex: 1; width: 100%; align-items: center; overflow-y: auto; overflow-x: visible; }
+        .nav-menu::-webkit-scrollbar { display: none; }
 
         .nav-item {
             display: flex; justify-content: center; align-items: center;
-            width: 50px; height: 50px; border-radius: 16px;
+            width: 50px; height: 50px; border-radius: 16px; flex-shrink: 0;
             color: var(--text-muted); cursor: pointer; transition: var(--transition);
             position: relative;
         }
@@ -155,6 +156,7 @@
             background: rgba(0,0,0,0.8); color: white; padding: 6px 12px; border-radius: 8px;
             font-size: 12px; font-weight: 500; opacity: 0; pointer-events: none;
             transition: var(--transition); white-space: nowrap; border: 1px solid rgba(255,255,255,0.1);
+            z-index: 999;
         }
         .nav-item:hover::after { opacity: 1; transform: translateX(5px); }
 
@@ -247,7 +249,12 @@
         .widget-sub { font-size: 11px; color: var(--text-muted); }
         .widget-val { font-size: 15px; font-weight: 600; color: var(--primary); }
 
-        .control-panel { display: flex; flex-direction: column; gap: 16px; padding-right: 10px; }
+        .control-panel { 
+            display: flex; flex-direction: column; gap: 16px; padding-right: 10px; 
+            overflow-y: auto; max-height: 100%;
+        }
+        .control-panel::-webkit-scrollbar { width: 4px; }
+
         .glass-card {
             background: var(--glass-bg); backdrop-filter: blur(15px);
             border: 1px solid var(--glass-border); border-radius: 24px; padding: 20px;
@@ -276,7 +283,7 @@
         ========================================================= */
         .sj-workspace-grid {
             display: grid; 
-            grid-template-columns: 270px 1fr; /* Diperkecil agar area dokumen lebih luas */
+            grid-template-columns: 270px 1fr; 
             gap: 20px; 
             height: calc(100vh - 160px);
         }
@@ -284,15 +291,15 @@
         .sj-sidebar-panel {
             background: var(--glass-bg); backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border); border-radius: 24px; 
-            padding: 18px; /* Padding dikurangi */
+            padding: 18px; 
             display: flex; flex-direction: column; gap: 16px; overflow-y: auto;
         }
 
         .sj-main-panel {
             background: var(--glass-bg); backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border); border-radius: 24px; 
-            padding: 15px; /* Padding dikurangi */
-            overflow-y: auto; overflow-x: hidden; /* Mencegah scroll menyamping */
+            padding: 15px; 
+            overflow-y: auto; overflow-x: hidden; 
             display: flex; flex-direction: column; align-items: center;
         }
 
@@ -325,12 +332,10 @@
         .btn-outline { background: rgba(128,128,128,0.1); border: 1px solid var(--glass-border); color: var(--text-main); }
         .btn-sm { padding: 8px 12px; font-size: 12px; }
 
-        /* Container Tombol Batch */
         .batch-actions-container {
             display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; width: 100%; display: none; flex-wrap: wrap;
         }
 
-        /* --- CSS BARU UNTUK FILTER TANGGAL & CHECKBOX --- */
         .filter-group { display: flex; gap: 5px; margin-bottom: 5px; }
         .filter-group input[type="date"] {
             flex: 1; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--glass-border);
@@ -344,22 +349,17 @@
 
         .riwayat-checkbox { width: 15px; height: 15px; cursor: pointer; accent-color: var(--primary); flex-shrink: 0; }
 
-        /* Kartu Riwayat di Sidebar */
         .history-item-card {
             background: rgba(128,128,128,0.05); border: 1px solid var(--glass-border);
             border-radius: 14px; padding: 12px 14px; cursor: pointer; transition: var(--transition);
             display: flex; flex-direction: column; gap: 4px; text-align: left;
         }
-        /* EFEK HOVER & EFEK AKTIF (SAAT DIKLIK) */
         .history-item-card:hover, .history-item-card.active-card { 
             border-color: var(--primary); 
             background: rgba(16,185,129,0.05); 
             transform: translateY(-2px); 
         }
-        /* Penanda garis kiri khusus saat aktif */
-        .history-item-card.active-card {
-            border-left: 4px solid var(--primary);
-        }
+        .history-item-card.active-card { border-left: 4px solid var(--primary); }
 
         .history-item-header { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 600; color: var(--primary); }
         .history-item-sub { font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -373,7 +373,7 @@
         }
         .btn-back:hover { background: rgba(128,128,128,0.2); }
 
-        #view-twidytools, #view-alamat { padding-top: 0; }
+        #view-twidytools, #view-alamat, #view-maksi { padding-top: 0; }
         iframe {
             flex: 1; width: 100%; border: 1px solid var(--glass-border); border-radius: 20px;
             min-height: calc(100vh - 150px); background: #fff;
@@ -386,8 +386,6 @@
             margin-bottom: 30px; display: flex; flex-direction: column; 
             align-items: center; width: 100%; transform-origin: top center; 
         }
-
-        /* --- AUTO ZOOM KERTAS UNTUK LAYAR KECIL --- */
         @media screen and (max-width: 1400px) { .paper-container { zoom: 0.9; } }
         @media screen and (max-width: 1250px) { .paper-container { zoom: 0.8; } }
         @media screen and (max-width: 1100px) { .paper-container { zoom: 0.7; } }
@@ -406,47 +404,34 @@
             background-color: rgba(16, 185, 129, 0.2);
         }
 
-        /* --- ATURAN CSS KHUSUS SAAT EKSPOR KE PDF OLEH HTML2PDF --- */
-        
-        /* 1. Sembunyikan Tombol Aksi */
         body.exporting .hide-on-export, .exporting .hide-on-export { display: none !important; }
-        
-        /* 2. Bersihkan Background Input Editable */
         body.exporting .editable-field, .exporting .editable-field { border-bottom: none !important; background-color: transparent !important; padding: 1px 0 !important; }
         body.exporting td[contenteditable="true"], .exporting td[contenteditable="true"] { background-color: transparent !important; }
         
-        /* 3. Atur Margin Container Kertas agar rapi di dalam halaman PDF */
         body.exporting .paper-container, .exporting .paper-container { 
             margin: 0 !important; padding: 0 !important; box-shadow: none !important; 
             page-break-inside: avoid !important; break-inside: avoid !important;
-            zoom: 1 !important; transform: none !important; /* Reset saat export */
+            zoom: 1 !important; transform: none !important; 
         }
 
-        /* 4. Atur Ukuran Kertas Spesifik */
         body.exporting .paper-wrapper, .exporting .paper-wrapper {
             width: 182mm !important; max-width: 182mm !important;
             padding: 12mm 0 0 0 !important; margin: 0 auto !important;
             box-shadow: none !important; border: none !important;
         }
 
-        /* 5. Paksa Pisah Halaman Baru untuk setiap Container Kertas berikutnya (untuk batch) */
         body.exporting .paper-container + .paper-container, .exporting .paper-container + .paper-container {
-            page-break-before: always !important;
-            break-before: page !important;
+            page-break-before: always !important; break-before: page !important;
         }
 
-        /* 6. Atur Element Tabel agar tidak terpotong sembarangan */
         body.exporting tr, .exporting tr, 
         body.exporting .footer-note, .exporting .footer-note, 
         body.exporting .ttd-table, .exporting .ttd-table {
             page-break-inside: avoid !important; break-inside: avoid !important;
         }
 
-        /* 7. SUPER PENTING: Matikan Batasan Scroll pada Panel saat Ekspor agar Kertas Terbawah tidak terpotong */
         body.exporting .main-content, body.exporting .sj-workspace-grid, body.exporting .sj-main-panel, body.exporting .dashboard-layout {
-            overflow: visible !important;
-            height: auto !important;
-            max-height: none !important;
+            overflow: visible !important; height: auto !important; max-height: none !important;
         }
         
         .cetakan-surat-jalan { width: 100%; background: white !important; box-sizing: border-box; font-family: Arial, sans-serif !important; color: #000000 !important; }
@@ -474,50 +459,16 @@
         .ttd-table td { border: none !important; height: 70px; vertical-align: bottom; padding-bottom: 5px; }
 
         /* =========================================================
-           PRINT MODE KHUSUS: DIOPTIMALKAN UNTUK EPSON LX310 & LETTER
+           PRINT MODE KHUSUS
         ========================================================= */
         #print-area { display: none; }
-        
         @media print {
-            body { 
-                background: white !important; 
-                padding: 0 !important; 
-                margin: 0 !important; 
-                min-height: auto !important; 
-                display: block !important; 
-                zoom: 1 !important; /* Reset zoom saat di printer */
-            }
+            body { background: white !important; padding: 0 !important; margin: 0 !important; min-height: auto !important; display: block !important; zoom: 1 !important; }
             body > * { display: none !important; }
-            
-            #print-area { 
-                display: block !important; 
-                position: static !important; 
-                width: 100%; 
-                margin: 0; padding: 0; 
-                background: white;
-            }
-            
-            #print-area .paper-wrapper { 
-                box-shadow: none !important; 
-                border: none !important; 
-                width: 182mm !important; 
-                max-width: 182mm !important; 
-                margin: 0 auto !important; 
-                padding: 10mm 0 0 0 !important; 
-                page-break-after: auto !important; 
-                break-after: auto !important;
-            }
-            
-            /* Hanya beri jeda halaman baru (break-before) jika ada lembar kertas berikutnya */
-            #print-area .paper-wrapper + .paper-wrapper {
-                page-break-before: always !important;
-                break-before: page !important;
-            }
-            
-            @page { 
-                size: letter portrait; 
-                margin: 15mm 15mm 10mm 15mm; 
-            }
+            #print-area { display: block !important; position: static !important; width: 100%; margin: 0; padding: 0; background: white; }
+            #print-area .paper-wrapper { box-shadow: none !important; border: none !important; width: 182mm !important; max-width: 182mm !important; margin: 0 auto !important; padding: 10mm 0 0 0 !important; page-break-after: auto !important; break-after: auto !important; }
+            #print-area .paper-wrapper + .paper-wrapper { page-break-before: always !important; break-before: page !important; }
+            @page { size: letter portrait; margin: 15mm 15mm 10mm 15mm; }
         }
 
         /* =========================================================
@@ -525,8 +476,7 @@
         ========================================================= */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
             z-index: 9999; display: none; justify-content: center; align-items: center;
         }
         .modal-card {
@@ -547,25 +497,14 @@
         .item-table-modal th { font-size: 12px; color: var(--text-muted); text-align: left; padding-bottom: 8px; border-bottom: 1px solid var(--glass-border); }
         .item-table-modal td { padding: 8px 0; }
         .item-table-modal input { width: 95%; }
-        .btn-add-item { 
-            background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px dashed #3b82f6; 
-            padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 12px; 
-            font-weight: 600; margin-bottom: 20px; width: 100%; transition: var(--transition);
-        }
+        .btn-add-item { background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px dashed #3b82f6; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; margin-bottom: 20px; width: 100%; transition: var(--transition); }
         .btn-add-item:hover { background: rgba(59, 130, 246, 0.2); }
-        .btn-delete-item { 
-            background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); 
-            width: 30px; height: 30px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: var(--transition);
-        }
+        .btn-delete-item { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); width: 30px; height: 30px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: var(--transition); }
         .btn-delete-item:hover { background: rgba(239, 68, 68, 0.3); }
         .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; border-top: 1px solid var(--glass-border); padding-top: 20px;}
-        .btn-cancel { 
-            background: rgba(128,128,128,0.1); color: var(--text-main); border: 1px solid var(--glass-border); 
-            padding: 10px 20px; border-radius: 12px; cursor: pointer; font-weight: 600; transition: var(--transition);
-        }
+        .btn-cancel { background: rgba(128,128,128,0.1); color: var(--text-main); border: 1px solid var(--glass-border); padding: 10px 20px; border-radius: 12px; cursor: pointer; font-weight: 600; transition: var(--transition); }
         .btn-cancel:hover { background: rgba(128,128,128,0.2); }
 
-        /* Toast Notifikasi */
         .toast-notification {
             position: fixed; bottom: 30px; right: 30px; background: var(--glass-bg); backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border); border-left: 4px solid var(--primary); border-radius: 12px;
@@ -580,10 +519,11 @@
             .dashboard-layout { height: 100vh; max-width: 100%; border-radius: 0; border: none; flex-direction: column;}
             .sidebar { width: 100%; height: 60px; flex-direction: row; padding: 0 20px; justify-content: space-between; border-right: none; border-bottom: 1px solid var(--glass-border); }
             .sidebar-brand { margin-bottom: 0; width: 40px; height: 40px; }
-            .nav-menu { flex-direction: row; justify-content: flex-end; gap: 10px; }
-            .nav-item { width: 40px; height: 40px; }
+            .nav-menu { flex-direction: row; justify-content: flex-start; gap: 10px; overflow-x: auto; overflow-y: hidden; }
+            .nav-item { width: 40px; height: 40px; flex-shrink: 0; }
             .nav-item::after { display: none; }
-            .btn-theme { margin: 0; }
+            .btn-theme { margin: 0; margin-left: auto; }
+            .btn-logout { margin-top: 0; }
             .home-layout { grid-template-columns: 1fr; }
             .sj-workspace-grid { grid-template-columns: 1fr; height: auto; }
             .smart-header { flex-direction: column; align-items: flex-start; gap: 15px; padding: 20px; }
@@ -594,10 +534,8 @@
 </head>
 <body class="light-mode">
     
-    <!-- Tempat Tersembunyi untuk Print -->
     <div id="print-area"></div>
     
-    <!-- Elemen Toast Notifikasi -->
     <div id="toast" class="toast-notification">
         <span class="toast-title" id="toast-title">Pesan</span>
         <span class="toast-msg" id="toast-msg">Detail</span>
@@ -636,11 +574,15 @@
                 <div class="nav-item" id="nav-alamat" onclick="switchTab('alamat')" data-tooltip="Address Label">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                 </div>
+                
+                <div class="nav-item" id="nav-maksi" onclick="switchTab('maksi')" data-tooltip="Menu Makan Siang">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg>
+                </div>
+
                 <div class="nav-item" id="nav-twidytools" onclick="switchTab('twidytools')" data-tooltip="TwidyTools">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
                 </div>
                 
-                <!-- TOMBOL GANTI TEMA -->
                 <div class="nav-item btn-theme" onclick="toggleTheme()" data-tooltip="Ubah Tema">
                     <svg id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
@@ -744,6 +686,7 @@
                             </div>
                             <p style="color: var(--text-muted); font-size: 12px; margin-top: -5px;">Upload batch PDF, buat manual, & cari riwayat re-print.</p>
                         </div>
+                        
                         <div class="glass-card feature-card-lg" onclick="switchTab('alamat')">
                             <div class="header">
                                 <div class="title-area">
@@ -754,6 +697,18 @@
                             </div>
                             <p style="color: var(--text-muted); font-size: 12px; margin-top: -5px;">Cetak label alamat langsung terhubung database.</p>
                         </div>
+
+                        <div class="glass-card feature-card-lg" onclick="switchTab('maksi')">
+                            <div class="header">
+                                <div class="title-area">
+                                    <div class="icon" style="background: #eab308;"><svg viewBox="0 0 24 24" width="18" fill="none" stroke="#fff" stroke-width="2"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg></div>
+                                    <h4 style="margin:0; font-size: 16px;">Menu Makan Siang</h4>
+                                </div>
+                                <div class="toggle-switch"></div>
+                            </div>
+                            <p style="color: var(--text-muted); font-size: 12px; margin-top: -5px;">Lihat jadwal dan menu makan siang bulan ini.</p>
+                        </div>
+                        
                         <div class="glass-card feature-card-lg" onclick="switchTab('twidytools')">
                             <div class="header">
                                 <div class="title-area">
@@ -768,7 +723,7 @@
                 </div>
             </div>
 
-            <!-- ================= VIEW: SURAT JALAN TERINTEGRASI (WORKSPACE 2 KOLOM) ================= -->
+            <!-- ================= VIEW: SURAT JALAN TERINTEGRASI ================= -->
             <div id="view-surat-jalan" class="view-section">
                 <button class="btn-back" onclick="switchTab('home')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
@@ -776,11 +731,9 @@
                 </button>
 
                 <div class="sj-workspace-grid">
-                    <!-- PANEL KIRI: UPLOAD, MANUAL, & SEARCH RIWAYAT -->
                     <div class="sj-sidebar-panel">
                         <h3 style="font-size: 16px; font-weight: 600;">Modul Surat Jalan</h3>
                         
-                        <!-- Upload Drop Zone -->
                         <div class="drop-zone" id="dropArea" onclick="document.getElementById('fileSoInput').click()">
                             <input type="file" id="fileSoInput" accept="application/pdf" multiple>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
@@ -796,7 +749,6 @@
 
                         <hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 5px 0;">
 
-                        <!-- BAGIAN PENCARIAN & RE-PRINT RIWAYAT DENGAN CHECKBOX -->
                         <div style="display: flex; flex-direction: column; gap: 10px;">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <label style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Database Tersimpan</label>
@@ -816,17 +768,14 @@
                             </div>
                         </div>
 
-                        <!-- LIST HASIL PENCARIAN RIWAYAT -->
                         <div id="sidebar-riwayat-container" style="display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto; padding-right: 2px;">
                             <span style="font-size: 11px; color: var(--text-muted); text-align: center; padding: 15px;">Klik Refresh DB untuk memuat data...</span>
                         </div>
                     </div>
 
-                    <!-- PANEL KANAN: WORKSPACE PREVIEW KERTAS -->
                     <div class="sj-main-panel">
                         <div id="status-text"></div>
                         
-                        <!-- TOMBOL BATCH AKSI (DINAMIS: Print & Simpan Semua / Re-Print Semua) -->
                         <div class="batch-actions-container" id="batch-actions-container">
                             <button class="btn-process btn-blue" id="btn-batch-print-simpan" style="max-width: 220px;" onclick="printDanSimpanSemuaKertas()">🖨️☁️ Print & Simpan Semua</button>
                             <button class="btn-process btn-yellow" style="max-width: 180px; color: #000;" onclick="unduhSemuaGabungan()">⤓ Unduh Gabung PDF</button>
@@ -849,6 +798,15 @@
                     Tutup Modul
                 </button>
                 <iframe src="./alamat/"></iframe>
+            </div>
+
+            <!-- ================= VIEW: MENU MAKAN SIANG ================= -->
+            <div id="view-maksi" class="view-section">
+                <button class="btn-back" onclick="switchTab('home')" style="margin-bottom: 20px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    Tutup Modul
+                </button>
+                <iframe src="Menu_Maksi_Agustus_2026_cd67c3ba.pdf#toolbar=0&navpanes=0&scrollbar=0&view=FitH" title="Menu Makan Siang" style="border: none; border-radius: 20px;"></iframe>
             </div>
 
             <!-- ================= VIEW: TWIDY TOOLS ================= -->
@@ -909,10 +867,8 @@
         // API URL Google Sheets Anda
         const API_URL = 'https://script.google.com/macros/s/AKfycbyPhh5vp1usJ8PUl4YG0JfVmTnVvqYI50mXSbIwvV5j_H9Cts_fF5ngjhFUlN0AQ7A0yA/exec';
         
-        // Simpan state filter terkini
         window.currentFilteredData = [];
 
-        // --- SCRIPT OTENTIKASI & TRIGGER EFEK HUJAN ---
         function checkLogin() {
             if (sessionStorage.getItem('isLoggedIn') === 'true') {
                 document.getElementById('login-screen').style.display = 'none';
@@ -941,7 +897,6 @@
             switchTab('home');
         }
         
-        // --- SCRIPT EFEK HUJAN (CANVAS) ---
         const canvas = document.getElementById('rain-canvas');
         const ctx = canvas.getContext('2d');
         let rainDrops = [];
@@ -981,7 +936,6 @@
         function startRain() { if (!isRainStarted) { initRain(); animateRain(); isRainStarted = true; } else { initRain(); } }
         window.addEventListener('resize', () => { initRain(); });
 
-        // --- SCRIPT TOAST NOTIFICATION ---
         function showToast(title, message, isError = false) {
             const toast = document.getElementById('toast');
             document.getElementById('toast-title').innerText = title;
@@ -991,7 +945,6 @@
             setTimeout(() => toast.classList.remove('show'), 4000);
         }
 
-        // --- SCRIPT PENGATURAN TEMA ---
         function initTheme() {
             const savedTheme = localStorage.getItem('app-theme');
             const heroImage = document.getElementById('hero-image');
@@ -1033,6 +986,7 @@
                 'home': 'Twidy Console', 
                 'surat-jalan': 'Modul: Surat Jalan & Database', 
                 'alamat': 'Modul: Address Label', 
+                'maksi': 'Menu Makan Siang',
                 'twidytools': 'Modul: TwidyTools' 
             };
             document.getElementById('top-title').innerText = titles[tabId];
@@ -1042,7 +996,6 @@
             }
         }
 
-        // --- SCRIPT WIDGET SYSTEM INFO ---
         function updateSystemHealth() {
             const statusEl = document.getElementById('network-status-val');
             if (navigator.onLine) statusEl.innerHTML = '<span style="color: #10B981;">Online 🟢</span>';
@@ -1074,10 +1027,9 @@
         }
         setInterval(updateDateTime, 1000); updateDateTime(); updateWeather();
 
-        // ================= MANAJEMEN DATABASE & RIWAYAT (SIDEBAR KIRI) =================
+        // ================= MANAJEMEN DATABASE =================
         window.allDatabaseData = [];
         
-        // 1. Fungsi Utama Tarik Data
         async function loadRiwayatData() {
             const container = document.getElementById('sidebar-riwayat-container');
             container.innerHTML = '<span style="font-size:11px; color:var(--text-muted); text-align:center; padding:15px;">Memuat data database...</span>';
@@ -1096,7 +1048,6 @@
             }
         }
 
-        // 2. Fungsi Polling (Latar Belakang / Tanpa Loading)
         async function silentlyLoadRiwayatData() {
             try {
                 const res = await fetch(API_URL);
@@ -1124,7 +1075,6 @@
             }
         }, 15000); 
 
-        // 3. Fungsi Filter Pencarian & Tanggal
         function terapkanFilter() {
             const keyword = document.getElementById('input-search-riwayat').value.toLowerCase();
             const startStr = document.getElementById('filter-start').value; 
@@ -1151,7 +1101,6 @@
             renderSidebarRiwayat(filtered, isSearching);
         }
 
-        // 4. Render Riwayat dengan Pembatasan & Checkbox
         function renderSidebarRiwayat(dataList, isSearching = false) {
             const container = document.getElementById('sidebar-riwayat-container');
             container.innerHTML = '';
@@ -1173,13 +1122,9 @@
                 const card = document.createElement('div');
                 card.className = 'history-item-card';
                 card.onclick = (e) => { 
-                    // Render individual jika bukan klik checkbox
                     if(e.target.type !== 'checkbox') {
-                        // Bersihkan efek aktif dari semua kartu riwayat lainnya
                         document.querySelectorAll('.history-item-card').forEach(el => el.classList.remove('active-card'));
-                        // Berikan efek aktif ke kartu yang sedang diklik ini
                         card.classList.add('active-card');
-                        
                         renderDokumen(item, true, false); 
                     }
                 }; 
@@ -1210,7 +1155,6 @@
             }
         }
 
-        // ================= FITUR BATCH RENDERING DARI RIWAYAT =================
         function renderYangDiceklis() {
             const checkboxes = document.querySelectorAll('.riwayat-checkbox:checked');
             if(checkboxes.length === 0) return alert("Silakan centang (☑️) minimal 1 data pada daftar riwayat di bawah.");
@@ -1229,25 +1173,21 @@
         }
 
         function jalankanRenderBatch(dataToShow) {
-            // Bersihkan indikator aktif jika membuka banyak dokumen sekaligus
             document.querySelectorAll('.history-item-card').forEach(el => el.classList.remove('active-card'));
-            
             const container = document.getElementById('all-papers-container'); container.innerHTML = '';
             document.getElementById('status-text').innerText = `Menampilkan ${dataToShow.length} dokumen. Siap diprint/diexport.`;
             dataToShow.forEach(item => { renderDokumen(item, true, true); });
 
-            // LOGIKA DINAMIS: UBAH TOMBOL MENJADI RE-PRINT SEMUA
             const btnBatchPrint = document.getElementById('btn-batch-print-simpan');
             if(dataToShow.length > 1) {
                 document.getElementById('batch-actions-container').style.display = 'flex';
                 btnBatchPrint.innerHTML = "🖨️ Re-Print Semua";
-                btnBatchPrint.setAttribute('onclick', 'reprintSemuaKertas()'); // Set ke fungsi murni print
+                btnBatchPrint.setAttribute('onclick', 'reprintSemuaKertas()'); 
             } else {
                 document.getElementById('batch-actions-container').style.display = 'none';
             }
         }
 
-        // AKSI MURNI PRINT KHUSUS UNTUK RIWAYAT/RE-PRINT BATCH (TANPA HIT DATABASE)
         function reprintSemuaKertas() {
             const wrappers = document.querySelectorAll('.paper-wrapper');
             if(wrappers.length === 0) return alert("Tidak ada dokumen di layar.");
@@ -1261,11 +1201,9 @@
             printArea.innerHTML = '';
             
             showToast("Print Massal", `Mengirim ${wrappers.length} dokumen ke printer.`);
-            
             if(btnBatch) { btnBatch.innerHTML = "🖨️ Re-Print Semua"; btnBatch.disabled = false; }
         }
 
-        // ================= ENGINE RENDER DOKUMEN & UI =================
         function renderDokumen(data, isReprint = false, isBatchLoad = false) {
             const container = document.getElementById('all-papers-container');
             if(isReprint && !isBatchLoad) {
@@ -1280,7 +1218,6 @@
             let barisBarang = "";
             (data.dataBarang || []).forEach((b, i) => { barisBarang += `<tr><td class="text-center" contenteditable="true">${i + 1}</td><td contenteditable="true">${b.nama}</td><td class="text-center" contenteditable="true">${b.qty||'1'}</td><td contenteditable="true"></td></tr>`; });
 
-            // Pengaturan Tombol Berdasarkan Mode
             let actionButtonsHTML = '';
             if(isReprint) {
                 actionButtonsHTML = `
@@ -1354,7 +1291,6 @@
                     </div>
                 </div>
                 
-                <!-- CLASS "hide-on-export" INI YANG MENCEGAH TOMBOL MUNCUL DI PDF -->
                 <div class="hide-on-export" style="display:flex; gap:10px; justify-content:center; margin-top:20px; width: 100%;">
                     ${actionButtonsHTML}
                 </div>
@@ -1364,7 +1300,6 @@
             container.insertAdjacentHTML('beforeend', htmlSuratJalan);
         }
 
-        // ================= LOGIKA DATABASE (ANTI DUPLIKAT & OVERWRITE) =================
         function ekstrakDataDariUI(wrapperId) {
             const w = document.getElementById(wrapperId);
             const data = {
@@ -1393,7 +1328,6 @@
                 const isPelangganSama = (existingData.pelanggan || "").trim() === (dataToSave.pelanggan || "").trim();
                 const isKetSama = (existingData.keterangan || "").trim() === (dataToSave.keterangan || "").trim();
                 
-                // Deep Equality: Jika nomor, pelanggan, dan keterangan sama = DUPLIKAT. Jika ada yang beda = REVISI.
                 if (isPelangganSama && isKetSama) {
                     return { status: 'DUPLICATE', message: `SO ${dataToSave.noSO} sudah ada tanpa perubahan.` };
                 } else {
@@ -1412,7 +1346,6 @@
                 return false; 
             }
             
-            // Flag untuk backend script Google Apps Script agar mengerti ini adalah perintah overwrite
             if (validasi.status === 'REVISION') {
                 dataToSave.isUpdate = true; 
             }
@@ -1423,7 +1356,6 @@
                 if (result.status === 'success') {
                     if(btnElement) { btnElement.innerHTML = "✔️ Tersimpan"; btnElement.disabled = true; btnElement.style.background = "#6B7280"; }
                     
-                    // Update cache lokal langsung agar validasi di aksi selanjutnya akurat
                     if(validasi.status === 'NEW') window.allDatabaseData.push(dataToSave);
                     else {
                         const idx = window.allDatabaseData.findIndex(d => d.noSO === dataToSave.noSO);
@@ -1439,7 +1371,6 @@
             }
         }
 
-        // ================= INDIVIDUAL & BATCH ACTIONS (PRINT & SAVE) =================
         function printKertasIndividu(id) {
             const printArea = document.getElementById('print-area');
             printArea.innerHTML = ''; printArea.appendChild(document.getElementById(id).cloneNode(true));
@@ -1453,13 +1384,11 @@
             
             btnPrint.innerHTML = "⏳ Memproses..."; btnPrint.disabled = true;
             
-            // 1. Aksi Print
             const printArea = document.getElementById('print-area');
             printArea.innerHTML = ''; printArea.appendChild(wrapper.cloneNode(true));
             window.print();
             printArea.innerHTML = '';
             
-            // 2. Aksi Simpan Background
             const data = ekstrakDataDariUI(wrapperId);
             const isSuccess = await eksekusiSimpanAPI(data, btnPrint);
             
@@ -1471,7 +1400,6 @@
             }
         }
 
-        // --- FUNGSI GABUNGAN BATCH: PRINT + SIMPAN SEMUA UNTUK DATA BARU ---
         async function printDanSimpanSemuaKertas() {
             const wrappers = document.querySelectorAll('.paper-wrapper');
             if(wrappers.length === 0) return alert("Tidak ada dokumen di layar.");
@@ -1479,7 +1407,6 @@
             const btnBatch = document.getElementById('btn-batch-print-simpan');
             if(btnBatch) { btnBatch.innerHTML = "⏳ Memproses Batch..."; btnBatch.disabled = true; }
 
-            // 1. Aksi Print Massal Dulu
             const printArea = document.getElementById('print-area');
             printArea.innerHTML = '';
             wrappers.forEach(w => {
@@ -1490,7 +1417,6 @@
             printArea.innerHTML = '';
             showToast("Print Massal", `Mengirim ${wrappers.length} dokumen berurutan ke printer.`);
             
-            // 2. Lanjut Aksi Simpan Background Satu Per Satu
             let sukses = 0, duplikat = 0, error = 0;
             for(let w of wrappers) {
                 const btnAksiIndividu = document.querySelector(`.btn-print-${w.id}`);
@@ -1513,7 +1439,6 @@
             if(btnBatch) { btnBatch.innerHTML = "🖨️☁️ Print & Simpan Semua"; btnBatch.disabled = false; }
         }
 
-        // ================= SISTEM PARSING PDF MENGGUNAKAN PDF.JS =================
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
         
         const dropArea = document.getElementById('dropArea'); 
@@ -1652,7 +1577,6 @@
                 statusText.innerText = "Semua file PDF berhasil diekstrak!";
                 btnProses.disabled = false; btnProses.innerText = "Mulai Proses File PDF";
                 
-                // LOGIKA DINAMIS: SET TOMBOL UNTUK DATA BARU
                 const renderedPapers = document.querySelectorAll('.paper-wrapper').length;
                 if(renderedPapers > 1) {
                     document.getElementById('batch-actions-container').style.display = 'flex';
@@ -1670,7 +1594,6 @@
             }
         }
 
-        // ================= SCRIPT MODAL INPUT MANUAL =================
         function openManualModal() { document.getElementById('modal-manual').style.display = 'flex'; }
         function closeManualModal() { document.getElementById('modal-manual').style.display = 'none'; }
         
@@ -1712,7 +1635,6 @@
             renderDokumen(data, false);
             closeManualModal();
             
-            // LOGIKA DINAMIS: SET TOMBOL UNTUK DATA BARU
             const renderedPapers = document.querySelectorAll('.paper-wrapper').length;
             if(renderedPapers > 1) {
                 document.getElementById('batch-actions-container').style.display = 'flex';
@@ -1723,27 +1645,23 @@
                 document.getElementById('batch-actions-container').style.display = 'none';
             }
             
-            // Reset Form Manual
             document.getElementById('manual-noso').value = ''; document.getElementById('manual-pelanggan').value = ''; document.getElementById('manual-keterangan').value = '';
             document.querySelector('#manual-items-table tbody').innerHTML = `<tr><td><input type="text" class="form-input item-nama" placeholder="Nama Barang"></td><td><input type="number" class="form-input item-qty" value="1" min="1"></td><td><button class="btn-delete-item" onclick="hapusBarisManual(this)">X</button></td></tr>`;
         }
 
-        // ================= SISTEM UNDUH PDF =================
         function getOpsiPDF(filename) {
             return {
-                margin:       [10, 15, 15, 10], // Atur margin halamannya
+                margin:       [10, 15, 15, 10], 
                 filename:     filename,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2, useCORS: true, logging: false, scrollY: 0, scrollX: 0 }, 
                 jsPDF:        { unit: 'mm', format: 'letter', orientation: 'portrait' }, 
-                // Instruksikan html2pdf untuk mendengarkan aturan CSS saat memotong halaman
                 pagebreak:    { mode: ['css', 'legacy'], avoid: ['tr', '.ttd-table'] } 
             };
         }
 
         function unduhSatuPDF(id, noSO) {
             window.scrollTo(0, 0); 
-            // Ambil elemen induknya (paper-container) agar tombol yang di dalam class "hide-on-export" ikut diolah (disembunyikan CSS)
             const wrapperCetak = document.getElementById(id).closest('.paper-container');
             document.body.classList.add('exporting');
             
