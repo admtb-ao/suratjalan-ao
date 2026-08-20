@@ -843,7 +843,7 @@
                         </div>
                         
                         <div id="daftar-memo" style="display: flex; flex-direction: column; gap: 5px;">
-                            <div class="file-item">Kli menu Memo untuk memuat data...</div>
+                            <div class="file-item">Memuat data...</div>
                         </div>
                     </div>
 
@@ -925,7 +925,7 @@
         // API URL Google Sheets Anda (Untuk Surat Jalan)
         const API_URL = 'https://script.google.com/macros/s/AKfycbyPhh5vp1usJ8PUl4YG0JfVmTnVvqYI50mXSbIwvV5j_H9Cts_fF5ngjhFUlN0AQ7A0yA/exec';
         
-        // PENTING: GANTI URL DI BAWAH INI DENGAN URL WEB APP DARI GOOGLE APPS SCRIPT KAMU YANG BARU
+        // URL Web App Google Apps Script untuk Memo
         const DRIVE_API_URL = 'https://script.google.com/macros/s/AKfycbxUo0_Y9zjqqDL-tJJjQRv-CaYHTK48c5PWAlXKXer9-qJEbFMN4y3HfHTjqVEckvoL/exec?action=getMemo';
         
         window.currentFilteredData = [];
@@ -1056,15 +1056,15 @@
             if(tabId === 'surat-jalan' && window.allDatabaseData.length === 0) {
                 loadRiwayatData(); 
             }
+
+            // OTOMATIS MEMUAT DATA MEMO SAAT MENU MEMO DIKLIK
+            if(tabId === 'memo') {
+                loadMemoDariDrive();
+            }
         }
 
         // --- FUNGSI UNTUK MEMO (GOOGLE DRIVE API) ---
         async function loadMemoDariDrive() {
-            if (DRIVE_API_URL === 'MASUKKAN_URL_WEB_APP_APPS_SCRIPT_DI_SINI') {
-                document.getElementById('daftar-memo').innerHTML = '<div style="font-size:12px; color:#ef4444; padding:10px;">Harap masukkan URL Web App Apps Script di dalam kode HTML!</div>';
-                return;
-            }
-
             const container = document.getElementById('daftar-memo');
             container.innerHTML = '<div class="file-item">⏳ Sedang memuat data dari Google Drive...</div>';
 
@@ -1081,11 +1081,9 @@
                         div.innerText = '📄 ' + item.nama_file;
                         
                         div.onclick = () => {
-                            // Hapus status aktif dari file lain
                             document.querySelectorAll('#daftar-memo .file-item').forEach(el => el.classList.remove('active'));
                             div.classList.add('active');
                             
-                            // Tampilkan PDF di iframe
                             document.getElementById('memo-placeholder').style.display = 'none';
                             const iframe = document.getElementById('memo-iframe');
                             iframe.style.display = 'block';
@@ -1102,15 +1100,6 @@
                 console.error("Gagal menarik data dari Drive:", error);
             }
         }
-
-        // Panggil fungsi saat menu Memo diklik pertama kali
-        document.getElementById('nav-memo').addEventListener('click', () => {
-            const container = document.getElementById('daftar-memo');
-            if (container.children.length > 0 && container.children[0].innerText.includes('Kli menu Memo')) {
-                loadMemoDariDrive();
-            }
-        });
-
 
         function updateSystemHealth() {
             const statusEl = document.getElementById('network-status-val');
