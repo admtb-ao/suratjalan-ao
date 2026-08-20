@@ -835,14 +835,17 @@
                 </button>
 
                 <div class="sj-workspace-grid">
-                    <!-- PANEL KIRI: DAFTAR FILE DARI DRIVE -->
+                    <!-- PANEL KIRI: DAFTAR FILE DARI DRIVE & SEARCH -->
                     <div class="sj-sidebar-panel">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                             <h3 style="font-size: 16px; font-weight: 600;">Daftar Memo</h3>
                             <button onclick="loadMemoDariDrive()" style="background: none; border: none; color: var(--primary); font-size: 11px; cursor: pointer; font-weight: 500;">🔄 Refresh</button>
                         </div>
                         
-                        <div id="daftar-memo" style="display: flex; flex-direction: column; gap: 5px;">
+                        <!-- SEARCH BAR MEMO -->
+                        <input type="text" id="input-search-memo" class="form-input" style="padding: 10px 12px; margin-bottom: 5px;" placeholder="🔍 Cari nama memo..." oninput="filterMemoList()">
+
+                        <div id="daftar-memo" style="display: flex; flex-direction: column; gap: 5px; overflow-y: auto; max-height: calc(100vh - 300px);">
                             <div class="file-item">Memuat data...</div>
                         </div>
                     </div>
@@ -922,12 +925,10 @@
          SCRIPT LOGIKA SISTEM UTAMA
     =========================================== -->
     <script>
-        // API URL Google Sheets Anda (Untuk Surat Jalan)
         const API_URL = 'https://script.google.com/macros/s/AKfycbyPhh5vp1usJ8PUl4YG0JfVmTnVvqYI50mXSbIwvV5j_H9Cts_fF5ngjhFUlN0AQ7A0yA/exec';
-        
-        // URL Web App Google Apps Script untuk Memo
         const DRIVE_API_URL = 'https://script.google.com/macros/s/AKfycbxUo0_Y9zjqqDL-tJJjQRv-CaYHTK48c5PWAlXKXer9-qJEbFMN4y3HfHTjqVEckvoL/exec?action=getMemo';
         
+        window.allMemoData = []; // Menyimpan data mentah memo untuk pencarian
         window.currentFilteredData = [];
 
         function checkLogin() {
@@ -1057,48 +1058,65 @@
                 loadRiwayatData(); 
             }
 
-            // OTOMATIS MEMUAT DATA MEMO SAAT MENU MEMO DIKLIK
-            if(tabId === 'memo') {
+            if(tabId === 'memo' && window.allMemoData.length === 0) {
                 loadMemoDariDrive();
             }
         }
 
-        // --- FUNGSI UNTUK MEMO (GOOGLE DRIVE API) ---
+        // --- FUNGSI UNTUK MEMO (GOOGLE DRIVE API & SEARCH) ---
         async function loadMemoDariDrive() {
             const container = document.getElementById('daftar-memo');
-            container.innerHTML = '<div class="file-item">⏳ Sedang memuat data dari Google Drive...</div>';
+            container.innerHTML = '<div class="file-item">⏳ Memuat data dari Google Drive...</div>';
 
             try {
                 const response = await fetch(DRIVE_API_URL);
                 const result = await response.json();
                 
-                container.innerHTML = '';
-
                 if(result.status === 'success' && result.data.length > 0) {
-                    result.data.forEach(item => {
-                        const div = document.createElement('div');
-                        div.className = 'file-item';
-                        div.innerText = '📄 ' + item.nama_file;
-                        
-                        div.onclick = () => {
-                            document.querySelectorAll('#daftar-memo .file-item').forEach(el => el.classList.remove('active'));
-                            div.classList.add('active');
-                            
-                            document.getElementById('memo-placeholder').style.display = 'none';
-                            const iframe = document.getElementById('memo-iframe');
-                            iframe.style.display = 'block';
-                            iframe.src = item.url_file;
-                        };
-                        
-                        container.appendChild(div);
-                    });
+                    window.allMemoData = result.data;
+                    renderMemoList(window.allMemoData);
                 } else {
+                    window.allMemoData = [];
                     container.innerHTML = '<div class="file-item">Folder Drive kosong / tidak ada file PDF.</div>';
                 }
             } catch (error) {
                 container.innerHTML = '<div class="file-item" style="color:#ef4444;">Gagal memuat. Periksa URL atau koneksi.</div>';
                 console.error("Gagal menarik data dari Drive:", error);
             }
+        }
+
+        function renderMemoList(dataList) {
+            const container = document.getElementById('daftar-memo');
+            container.innerHTML = '';
+
+            if (dataList.length === 0) {
+                container.innerHTML = '<div class="file-item">Memo tidak ditemukan.</div>';
+                return;
+            }
+
+            dataList.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'file-item';
+                div.innerText = '📄 ' + item.nama_file;
+                
+                div.onclick = () => {
+                    document.querySelectorAll('#daftar-memo .file-item').forEach(el => el.classList.remove('active'));
+                    div.classList.add('active');
+                    
+                    document.getElementById('memo-placeholder').style.display = 'none';
+                    const iframe = document.getElementById('memo-iframe');
+                    iframe.style.display = 'block';
+                    iframe.src = item.url_file;
+                };
+                
+                container.appendChild(div);
+            });
+        }
+
+        function filterMemoList() {
+            const keyword = document.getElementById('input-search-memo').value.toLowerCase();
+            const filtered = window.allMemoData.filter(item => item.nama_file.toLowerCase().includes(keyword));
+            renderMemoList(filtered);
         }
 
         function updateSystemHealth() {
