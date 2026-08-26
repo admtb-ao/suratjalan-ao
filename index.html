@@ -469,6 +469,22 @@
         .ttd-table td { border: none !important; height: 70px; vertical-align: bottom; padding-bottom: 5px; }
 
         /* =========================================================
+           TAMBAHAN: CSS KOP GME
+        ========================================================= */
+        .sp-header { text-align: center; font-family: 'Times New Roman', Times, serif; color: #000; }
+        .sp-title { font-size: 26pt; font-weight: bold; letter-spacing: 1px; margin-bottom: 5px; }
+        .sp-no { font-size: 15pt; font-weight: bold; color: #000; }
+        .sp-divider { border-top: 2px solid #000; margin-top: 6px; padding-top: 4px; display: flex; justify-content: space-between; align-items: flex-start; }
+        .sp-box { border: 2px solid #000; padding: 4px 10px; font-weight: bold; font-size: 11pt; color: #000; font-family: Arial, sans-serif; text-transform: uppercase; }
+        .sp-date { font-size: 12pt; color: #000; font-family: Arial, sans-serif; font-weight: bold; }
+        .sp-kepada-container { display: flex; justify-content: flex-end; margin-top: 20px; }
+        .sp-kepada { width: 50%; font-size: 12pt; font-family: Arial, sans-serif; }
+        .sp-kepada-title { font-weight: bold; color: #000; margin-bottom: 4px; }
+        .sp-kepada-nama { font-weight: bold; color: #000; }
+        .sp-keterangan { width: 100%; font-size: 11pt; margin-top: 20px; font-family: Arial, sans-serif; font-weight: bold; color: #000; border-collapse: collapse; }
+        .sp-keterangan td { padding-bottom: 5px; vertical-align: top; }
+
+        /* =========================================================
            PRINT MODE KHUSUS
         ========================================================= */
         #print-area { display: none; }
@@ -578,14 +594,19 @@
                 <div class="nav-item active" id="nav-home" onclick="switchTab('home')" data-tooltip="Dashboard">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                 </div>
-                <div class="nav-item" id="nav-surat-jalan" onclick="switchTab('surat-jalan')" data-tooltip="Surat Jalan & Database">
+                <!-- Nav AO -->
+                <div class="nav-item" id="nav-surat-jalan-ao" onclick="switchTab('surat-jalan-ao')" data-tooltip="Surat Jalan AO">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
                 </div>
+                <!-- Nav GME -->
+                <div class="nav-item" id="nav-surat-jalan-gme" onclick="switchTab('surat-jalan-gme')" data-tooltip="Surat Pengantar GME">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                </div>
+                
                 <div class="nav-item" id="nav-alamat" onclick="switchTab('alamat')" data-tooltip="Address Label">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                 </div>
                 
-                <!-- MENU MEMO -->
                 <div class="nav-item" id="nav-memo" onclick="switchTab('memo')" data-tooltip="Memo">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
                 </div>
@@ -691,15 +712,26 @@
                     </div>
 
                     <div class="control-panel">
-                        <div class="glass-card feature-card-lg" onclick="switchTab('surat-jalan')">
+                        <div class="glass-card feature-card-lg" onclick="switchTab('surat-jalan-ao')">
                             <div class="header">
                                 <div class="title-area">
                                     <div class="icon"><svg viewBox="0 0 24 24" width="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg></div>
-                                    <h4 style="margin:0; font-size: 16px;">Surat Jalan & Database</h4>
+                                    <h4 style="margin:0; font-size: 16px;">Surat Jalan AO</h4>
                                 </div>
                                 <div class="toggle-switch"></div>
                             </div>
-                            <p style="color: var(--text-muted); font-size: 12px; margin-top: -5px;">Upload batch PDF, buat manual, & cari riwayat re-print.</p>
+                            <p style="color: var(--text-muted); font-size: 12px; margin-top: -5px;">Upload & cetak Surat Jalan (Kop Asli AO).</p>
+                        </div>
+
+                        <div class="glass-card feature-card-lg" onclick="switchTab('surat-jalan-gme')">
+                            <div class="header">
+                                <div class="title-area">
+                                    <div class="icon" style="background: #14b8a6;"><svg viewBox="0 0 24 24" width="18" fill="none" stroke="#fff" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg></div>
+                                    <h4 style="margin:0; font-size: 16px;">Surat Pengantar GME</h4>
+                                </div>
+                                <div class="toggle-switch"></div>
+                            </div>
+                            <p style="color: var(--text-muted); font-size: 12px; margin-top: -5px;">Upload & cetak Surat Jalan (Kop Format GME).</p>
                         </div>
                         
                         <div class="glass-card feature-card-lg" onclick="switchTab('alamat')">
@@ -713,7 +745,6 @@
                             <p style="color: var(--text-muted); font-size: 12px; margin-top: -5px;">Cetak label alamat langsung terhubung database.</p>
                         </div>
 
-                        <!-- CARD: MEMO -->
                         <div class="glass-card feature-card-lg" onclick="switchTab('memo')">
                             <div class="header">
                                 <div class="title-area">
@@ -739,7 +770,7 @@
                         <div class="glass-card feature-card-lg" onclick="switchTab('twidytools')">
                             <div class="header">
                                 <div class="title-area">
-                                    <div class="icon" style="background: #f43f5e;"><svg viewBox="0 0 24 24" width="18" fill="none" stroke="#fff" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94z"></path></svg></div>
+                                    <div class="icon" style="background: #f43f5e;"><svg viewBox="0 0 24 24" width="18" fill="none" stroke="#fff" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg></div>
                                     <h4 style="margin:0; font-size: 16px;">TwidyTools</h4>
                                 </div>
                                 <div class="toggle-switch"></div>
@@ -750,7 +781,7 @@
                 </div>
             </div>
 
-            <!-- ================= VIEW: SURAT JALAN TERINTEGRASI ================= -->
+            <!-- ================= VIEW: SURAT JALAN TERINTEGRASI (AO & GME) ================= -->
             <div id="view-surat-jalan" class="view-section">
                 <button class="btn-back" onclick="switchTab('home')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
@@ -759,7 +790,7 @@
 
                 <div class="sj-workspace-grid">
                     <div class="sj-sidebar-panel">
-                        <h3 style="font-size: 16px; font-weight: 600;">Modul Surat Jalan</h3>
+                        <h3 id="sj-module-title" style="font-size: 16px; font-weight: 600;">Modul Surat Jalan</h3>
                         
                         <div class="drop-zone" id="dropArea" onclick="document.getElementById('fileSoInput').click()">
                             <input type="file" id="fileSoInput" accept="application/pdf" multiple>
@@ -835,22 +866,16 @@
                 </button>
 
                 <div class="sj-workspace-grid">
-                    <!-- PANEL KIRI: DAFTAR FILE DARI DRIVE & SEARCH -->
                     <div class="sj-sidebar-panel">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                             <h3 style="font-size: 16px; font-weight: 600;">Daftar Memo</h3>
                             <button onclick="loadMemoDariDrive()" style="background: none; border: none; color: var(--primary); font-size: 11px; cursor: pointer; font-weight: 500;">🔄 Refresh</button>
                         </div>
-                        
-                        <!-- SEARCH BAR MEMO -->
                         <input type="text" id="input-search-memo" class="form-input" style="padding: 10px 12px; margin-bottom: 5px;" placeholder="🔍 Cari nama memo..." oninput="filterMemoList()">
-
                         <div id="daftar-memo" style="display: flex; flex-direction: column; gap: 5px; overflow-y: auto; max-height: calc(100vh - 300px);">
                             <div class="file-item">Memuat data...</div>
                         </div>
                     </div>
-
-                    <!-- PANEL KANAN: PREVIEW PDF -->
                     <div class="sj-main-panel" style="padding: 0; overflow: hidden; display: flex; justify-content: center; align-items: center;">
                         <div id="memo-placeholder" style="margin: auto; color: var(--text-muted); text-align: center; padding: 60px 20px;">
                             <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.4; margin-bottom: 12px;"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
@@ -884,7 +909,7 @@
     <!-- ================= MODAL INPUT MANUAL ================= -->
     <div id="modal-manual" class="modal-overlay">
         <div class="modal-card">
-            <h3>Buat Surat Jalan Manual</h3>
+            <h3 id="manual-modal-title">Buat Dokumen Manual</h3>
             
             <div class="form-group">
                 <label>No. SO / Referensi</label>
@@ -925,11 +950,15 @@
          SCRIPT LOGIKA SISTEM UTAMA
     =========================================== -->
     <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycbyPhh5vp1usJ8PUl4YG0JfVmTnVvqYI50mXSbIwvV5j_H9Cts_fF5ngjhFUlN0AQ7A0yA/exec';
+        // API URL TERPISAH
+        const API_URL_AO = 'https://script.google.com/macros/s/AKfycbyPhh5vp1usJ8PUl4YG0JfVmTnVvqYI50mXSbIwvV5j_H9Cts_fF5ngjhFUlN0AQ7A0yA/exec';
+        const API_URL_GME = 'https://script.google.com/macros/s/AKfycbwZvjiURXQrjx81Pfi41ZB1gwhkYnlfJwDLyBMvC_9dflBRHtJGR6BmDaeawYSopjSRog/exec';
+        
         const DRIVE_API_URL = 'https://script.google.com/macros/s/AKfycbxUo0_Y9zjqqDL-tJJjQRv-CaYHTK48c5PWAlXKXer9-qJEbFMN4y3HfHTjqVEckvoL/exec?action=getMemo';
         
         window.allMemoData = []; 
         window.currentFilteredData = [];
+        let activeSuratMode = 'AO'; // 'AO' atau 'GME'
 
         function checkLogin() {
             if (sessionStorage.getItem('isLoggedIn') === 'true') {
@@ -1040,22 +1069,58 @@
         function switchTab(tabId) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            document.getElementById('view-' + tabId).classList.add('active');
+            
+            let targetViewId = (tabId === 'surat-jalan-ao' || tabId === 'surat-jalan-gme') ? 'view-surat-jalan' : 'view-' + tabId;
+            const viewEl = document.getElementById(targetViewId);
+            if(viewEl) viewEl.classList.add('active');
+            
             let navItem = document.getElementById('nav-' + tabId);
             if(navItem) navItem.classList.add('active');
             
+            let previousMode = activeSuratMode;
+
+            if (tabId === 'surat-jalan-ao') {
+                activeSuratMode = 'AO';
+                document.getElementById('sj-module-title').innerText = "Modul Surat Jalan AO";
+            } else if (tabId === 'surat-jalan-gme') {
+                activeSuratMode = 'GME';
+                document.getElementById('sj-module-title').innerText = "Modul Surat Pengantar GME";
+            }
+            
+            // Hapus cache database jika berpindah antara modul AO dan GME
+            if (previousMode !== activeSuratMode && (tabId === 'surat-jalan-ao' || tabId === 'surat-jalan-gme')) {
+                window.allDatabaseData = []; 
+            }
+
             const titles = { 
                 'home': 'Twidy Console', 
-                'surat-jalan': 'Modul: Surat Jalan & Database', 
+                'surat-jalan-ao': 'Modul: Surat Jalan AO',
+                'surat-jalan-gme': 'Modul: Surat Pengantar GME', 
                 'alamat': 'Modul: Address Label',
                 'memo': 'Modul: Memo',
                 'maksi': 'Menu Makan Siang',
                 'twidytools': 'Modul: TwidyTools' 
             };
-            document.getElementById('top-title').innerText = titles[tabId];
+            document.getElementById('top-title').innerText = titles[tabId] || titles['home'];
 
-            if(tabId === 'surat-jalan' && window.allDatabaseData.length === 0) {
-                loadRiwayatData(); 
+            if(tabId === 'surat-jalan-ao' || tabId === 'surat-jalan-gme') {
+                if(window.allDatabaseData.length === 0) {
+                    loadRiwayatData(); 
+                } else {
+                    terapkanFilter();
+                }
+                
+                // Clear UI to prevent accidental mixups between AO and GME when switching tabs
+                document.getElementById('all-papers-container').innerHTML = `
+                    <div style="margin: auto; color: var(--text-muted); text-align: center; padding: 60px 20px;">
+                        <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.4; margin-bottom: 12px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                        <p style="font-size: 13px;">Belum ada dokumen aktif.<br>Mode saat ini: <b>${activeSuratMode === 'AO' ? 'Kop Asli AO' : 'Kop GME'}</b>.<br>Silakan upload PDF, buat manual, atau pilih riwayat.</p>
+                    </div>
+                `;
+                document.getElementById('batch-actions-container').style.display = 'none';
+                document.getElementById('fileInfo').style.display = 'none';
+                document.getElementById('btnProses').disabled = true;
+                document.getElementById('fileSoInput').value = '';
             }
 
             if(tabId === 'memo' && window.allMemoData.length === 0) {
@@ -1081,7 +1146,6 @@
                 }
             } catch (error) {
                 container.innerHTML = '<div class="file-item" style="color:#ef4444;">Gagal memuat. Periksa URL atau koneksi.</div>';
-                console.error("Gagal menarik data dari Drive:", error);
             }
         }
 
@@ -1157,8 +1221,11 @@
             const container = document.getElementById('sidebar-riwayat-container');
             container.innerHTML = '<span style="font-size:11px; color:var(--text-muted); text-align:center; padding:15px;">Memuat data database...</span>';
             
+            // Penentuan API sesuai mode saat ini
+            const API_TO_USE = activeSuratMode === 'AO' ? API_URL_AO : API_URL_GME;
+
             try {
-                const res = await fetch(API_URL);
+                const res = await fetch(API_TO_USE);
                 const result = await res.json();
                 if(result.status === 'success') {
                     window.allDatabaseData = result.data;
@@ -1172,8 +1239,9 @@
         }
 
         async function silentlyLoadRiwayatData() {
+            const API_TO_USE = activeSuratMode === 'AO' ? API_URL_AO : API_URL_GME;
             try {
-                const res = await fetch(API_URL);
+                const res = await fetch(API_TO_USE);
                 const result = await res.json();
                 if(result.status === 'success') {
                     if(result.data.length !== window.allDatabaseData.length) {
@@ -1202,8 +1270,10 @@
             const keyword = document.getElementById('input-search-riwayat').value.toLowerCase();
             const startStr = document.getElementById('filter-start').value; 
             const endStr = document.getElementById('filter-end').value;
-            let filtered = window.allDatabaseData || [];
             
+            // Karena database sudah dipisah di Google Sheet, kita tidak perlu lagi memfilter berdasarkan jenis dari array.
+            let filtered = window.allDatabaseData || [];
+
             if (keyword.trim() !== "") {
                 filtered = filtered.filter(item => { 
                     const noSO = (item.noSO || "").toLowerCase(); 
@@ -1229,7 +1299,7 @@
             container.innerHTML = '';
             
             if(dataList.length === 0) {
-                container.innerHTML = '<span style="font-size:11px; color:var(--text-muted); text-align:center; padding:15px;">Tidak ada data ditemukan.</span>';
+                container.innerHTML = `<span style="font-size:11px; color:var(--text-muted); text-align:center; padding:15px;">Tidak ada data riwayat ${activeSuratMode} ditemukan.</span>`;
                 return;
             }
 
@@ -1337,27 +1407,15 @@
                 if(container.innerHTML.includes('Belum ada dokumen')) container.innerHTML = '';
             }
             
+            let tipeDokumen = activeSuratMode;
             const uniqueId = `paper-wrapper-${Date.now()}-${Math.floor(Math.random()*100)}`;
+            
             let barisBarang = "";
             (data.dataBarang || []).forEach((b, i) => { barisBarang += `<tr><td class="text-center" contenteditable="true">${i + 1}</td><td contenteditable="true">${b.nama}</td><td class="text-center" contenteditable="true">${b.qty||'1'}</td><td contenteditable="true"></td></tr>`; });
 
-            let actionButtonsHTML = '';
-            if(isReprint) {
-                actionButtonsHTML = `
-                    <button class="btn-process btn-sm btn-blue btn-print-${uniqueId}" style="max-width: 130px;" onclick="printKertasIndividu('${uniqueId}')">🖨️ Re-Print Fisik</button>
-                    <button class="btn-process btn-sm btn-outline" style="max-width: 110px;" onclick="unduhSatuPDF('${uniqueId}', '${data.noSO}')">⤓ Unduh PDF</button>
-                `;
-            } else {
-                actionButtonsHTML = `
-                    <button class="btn-process btn-sm btn-blue btn-print-${uniqueId}" style="max-width: 160px;" onclick="printDanSimpan('${uniqueId}')">🖨️☁️ Print & Simpan</button>
-                    <button class="btn-process btn-sm btn-outline" style="max-width: 110px;" onclick="unduhSatuPDF('${uniqueId}', '${data.noSO}')">⤓ Unduh PDF</button>
-                `;
-            }
-
-            const htmlSuratJalan = `
-            <div class="paper-container">
-                <div id="${uniqueId}" class="paper-wrapper">
-                    <div class="cetakan-surat-jalan">
+            let htmlKop = '';
+            if (tipeDokumen === 'AO') {
+                htmlKop = `
                         <div class="header-text">
                             <div class="title1">PENERBIT & PERCETAKAN</div>
                             <div class="title2">ANDI OFFSET</div>
@@ -1399,6 +1457,66 @@
                                 <td><span class="editable-field val-keterangan" style="width: 100%; display: inline-block; min-height: 15px;" contenteditable="true">${data.keterangan || ''}</span></td>
                             </tr>
                         </table>
+                `;
+            } else {
+                htmlKop = `
+                        <div class="sp-header">
+                            <div class="sp-title">SURAT PENGANTAR</div>
+                            <div class="sp-no">
+                                NO : 00-<span class="editable-field val-noso" contenteditable="true">${data.noSO || ''}</span>/AO/<span class="editable-field val-tahun" contenteditable="true">${data.tahun || '2026'}</span>
+                                <span class="val-bulan" style="display:none;">${data.bulan || 'I'}</span>
+                            </div>
+                        </div>
+
+                        <div class="sp-divider">
+                            <div class="sp-box">DIKIRIM KEMBALI</div>
+                            <div class="sp-date editable-field val-tanggal" contenteditable="true">${data.tanggal || ''}</div>
+                        </div>
+
+                        <div class="sp-kepada-container">
+                            <div class="sp-kepada">
+                                <div class="sp-kepada-title">Kepada Yth,</div>
+                                <div class="sp-kepada-nama editable-field val-pelanggan" contenteditable="true">${(data.pelanggan || '').replace(/\n/g, '<br>')}</div>
+                            </div>
+                        </div>
+
+                        <table class="sp-keterangan">
+                            <tr>
+                                <td style="width: 13%;">Ekspedisi</td>
+                                <td style="width: 2%;">:</td>
+                                <td style="width: 85%;">
+                                    <span class="editable-field val-ekspedisi" style="width: 100%; display: inline-block; min-height: 15px;" contenteditable="true">${data.ekspedisi || ''}</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Keterangan</td>
+                                <td>:</td>
+                                <td>
+                                    <span class="editable-field val-keterangan" style="width: 100%; display: inline-block; min-height: 15px;" contenteditable="true">${data.keterangan || ''}</span>
+                                </td>
+                            </tr>
+                        </table>
+                `;
+            }
+
+            let actionButtonsHTML = '';
+            if(isReprint) {
+                actionButtonsHTML = `
+                    <button class="btn-process btn-sm btn-blue btn-print-${uniqueId}" style="max-width: 130px;" onclick="printKertasIndividu('${uniqueId}')">🖨️ Re-Print Fisik</button>
+                    <button class="btn-process btn-sm btn-outline" style="max-width: 110px;" onclick="unduhSatuPDF('${uniqueId}', '${data.noSO}')">⤓ Unduh PDF</button>
+                `;
+            } else {
+                actionButtonsHTML = `
+                    <button class="btn-process btn-sm btn-blue btn-print-${uniqueId}" style="max-width: 160px;" onclick="printDanSimpan('${uniqueId}')">🖨️☁️ Print & Simpan</button>
+                    <button class="btn-process btn-sm btn-outline" style="max-width: 110px;" onclick="unduhSatuPDF('${uniqueId}', '${data.noSO}')">⤓ Unduh PDF</button>
+                `;
+            }
+
+            const htmlSuratJalan = `
+            <div class="paper-container">
+                <div id="${uniqueId}" class="paper-wrapper" data-jenis="${tipeDokumen}">
+                    <div class="cetakan-surat-jalan">
+                        ${htmlKop}
                         <table class="main-table">
                             <thead>
                                 <tr><th style="width: 5%;">NO</th><th style="width: 65%;">NAMA BARANG</th><th style="width: 10%;">QTY</th><th style="width: 20%;">KOLI</th></tr>
@@ -1426,6 +1544,7 @@
         function ekstrakDataDariUI(wrapperId) {
             const w = document.getElementById(wrapperId);
             const data = {
+                jenis: w.getAttribute('data-jenis') || 'AO',
                 noSO: w.querySelector('.val-noso').innerText.trim(),
                 tanggal: w.querySelector('.val-tanggal').innerText.trim(),
                 bulan: w.querySelector('.val-bulan').innerText.trim(),
@@ -1445,6 +1564,7 @@
         }
 
         function validasiDataSebelumSimpan(dataToSave) {
+            // Karena sheet dipisah, kita cek duplikat pada window.allDatabaseData saja (yg sudah berisi data dari link API yang benar)
             const existingData = window.allDatabaseData.find(d => d.noSO === dataToSave.noSO);
             
             if (existingData) {
@@ -1473,8 +1593,11 @@
                 dataToSave.isUpdate = true; 
             }
 
+            // Gunakan API yang sesuai dengan tipe dokumen yang sedang di save
+            const API_TO_USE = dataToSave.jenis === 'AO' ? API_URL_AO : API_URL_GME;
+
             try {
-                const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(dataToSave) });
+                const res = await fetch(API_TO_USE, { method: 'POST', body: JSON.stringify(dataToSave) });
                 const result = await res.json();
                 if (result.status === 'success') {
                     if(btnElement) { btnElement.innerHTML = "✔️ Tersimpan"; btnElement.disabled = true; btnElement.style.background = "#6B7280"; }
@@ -1689,6 +1812,7 @@
                     let data = await extractDataFromPDF(fileInput.files[i]);
                     
                     renderDokumen({
+                        jenis: activeSuratMode, // Tambahkan param jenis agar terikat saat simpan/generate
                         noSO: data.noSO || "",
                         tanggal: tanggalStr, bulan: bulanStr, tahun: tahunStr,
                         pelanggan: data.pelanggan || "",
@@ -1717,7 +1841,10 @@
             }
         }
 
-        function openManualModal() { document.getElementById('modal-manual').style.display = 'flex'; }
+        function openManualModal() { 
+            document.getElementById('modal-manual').style.display = 'flex'; 
+            document.getElementById('manual-modal-title').innerText = `Buat Manual - ${activeSuratMode === 'AO' ? 'Surat Jalan AO' : 'Surat Pengantar GME'}`;
+        }
         function closeManualModal() { document.getElementById('modal-manual').style.display = 'none'; }
         
         function tambahBarisManual() {
@@ -1751,6 +1878,7 @@
             let bulanStr = angkaRomawi[d.getMonth()]; let tahunStr = d.getFullYear();
 
             let data = {
+                jenis: activeSuratMode, // Tambahkan param jenis agar terikat saat generate
                 noSO: noSO, pelanggan: pelanggan, keterangan: keterangan,
                 tanggal: tanggalStr, bulan: bulanStr, tahun: tahunStr, dataBarang: dataBarang
             };
@@ -1794,7 +1922,7 @@
             if(tombolUnduh) { teksAsli = tombolUnduh.innerText; tombolUnduh.innerText = "⏳..."; tombolUnduh.disabled = true; }
 
             setTimeout(() => {
-                const namaFilePDF = noSO ? `Surat_Jalan_${noSO}.pdf` : `Surat_Jalan_${id}.pdf`;
+                const namaFilePDF = noSO ? `Surat_${activeSuratMode}_${noSO}.pdf` : `Surat_${activeSuratMode}_${id}.pdf`;
                 html2pdf().set(getOpsiPDF(namaFilePDF)).from(wrapperCetak).save().then(() => {
                     document.body.classList.remove('exporting');
                     if(tombolUnduh) { tombolUnduh.innerText = teksAsli; tombolUnduh.disabled = false; }
@@ -1814,9 +1942,8 @@
             let textOriginal = tombolGabungan.innerText;
             tombolGabungan.innerText = "Menyusun Gabungan..."; tombolGabungan.disabled = true;
 
-            // Berikan jeda 500ms agar DOM sepenuhnya stabil sebelum html2pdf membaca elemen
             setTimeout(() => {
-                html2pdf().set(getOpsiPDF('Kumpulan_Surat_Jalan_Batch.pdf')).from(wadahUtama).save().then(() => {
+                html2pdf().set(getOpsiPDF(`Kumpulan_Surat_${activeSuratMode}_Batch.pdf`)).from(wadahUtama).save().then(() => {
                     document.body.classList.remove('exporting');
                     tombolGabungan.innerText = textOriginal; tombolGabungan.disabled = false;
                     showToast("Selesai", "PDF Gabungan berhasil diunduh.");
