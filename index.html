@@ -249,7 +249,7 @@
             background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.7) 100%);
         }
 
-        #rain-canvas { z-index: 2; pointer-events: none; display: block; }
+        #effect-canvas { z-index: 2; pointer-events: none; display: block; }
 
         .hero-content { position: relative; z-index: 3; color: white; }
         
@@ -701,9 +701,9 @@
                 <div class="home-layout">
                     
                     <div class="hero-section">
-                        <img src="image_619675.jpg" class="hero-bg-media" id="hero-image" alt="3D Smart House">
+                        <img src="bg-andi-light.jpg" class="hero-bg-media" id="hero-image" alt="Andi Offset HQ">
                         <div class="hero-overlay"></div>
-                        <canvas id="rain-canvas" class="hero-bg-media"></canvas>
+                        <canvas id="effect-canvas" class="hero-bg-media"></canvas>
                         
                         <div class="hero-content">
                             <h2 style="font-size: 28px; font-weight: 300; margin-bottom: 5px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">AO <strong>Dashboard</strong></h2>
@@ -1048,7 +1048,7 @@
     =========================================== -->
     <script>
         const API_URL_AO = 'https://script.google.com/macros/s/AKfycbyPhh5vp1usJ8PUl4YG0JfVmTnVvqYI50mXSbIwvV5j_H9Cts_fF5ngjhFUlN0AQ7A0yA/exec';
-        const API_URL_GME = 'https://script.google.com/macros/s/AKfycbzABIiq9cFNFd0DXvsRp4vVAsKxj6CA0PZdkDmILsJ_Ly-W4_Ngp7dMM2GQo2gCDqdK/exec';
+        const API_URL_GME = 'https://script.google.com/macros/s/AKfycbwZvjiURXQrjx81Pfi41ZB1gwhkYnlfJwDLyBMvC_9dflBRHtJGR6BmDaeawYSopjSRog/exec';
         const DRIVE_API_URL = 'https://script.google.com/macros/s/AKfycbxUo0_Y9zjqqDL-tJJjQRv-CaYHTK48c5PWAlXKXer9-qJEbFMN4y3HfHTjqVEckvoL/exec?action=getMemo';
         
         window.allMemoData = []; 
@@ -1059,7 +1059,7 @@
             if (sessionStorage.getItem('isLoggedIn') === 'true') {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('app-container').style.display = 'flex';
-                setTimeout(startRain, 150); 
+                setTimeout(startEffects, 150); 
             } else {
                 document.getElementById('login-screen').style.display = 'flex';
                 document.getElementById('app-container').style.display = 'none';
@@ -1083,44 +1083,103 @@
             switchTab('home');
         }
         
-        const canvas = document.getElementById('rain-canvas');
+        // ================= KUNANG-KUNANG EFFECT (KHUSUS DARK MODE) =================
+        const canvas = document.getElementById('effect-canvas');
         const ctx = canvas.getContext('2d');
-        let rainDrops = [];
-        let rainAnimationId;
-        let isRainStarted = false;
+        let fireflies = [];
+        let animationId;
+        let isAnimationRunning = false;
         
-        function initRain() {
+        function initFireflies() {
             if (canvas.offsetWidth === 0) return; 
             canvas.width = canvas.offsetWidth;
             canvas.height = canvas.offsetHeight;
-            rainDrops = [];
-            for (let i = 0; i < 100; i++) { 
-                rainDrops.push({
-                    x: Math.random() * canvas.width, y: Math.random() * canvas.height,
-                    length: Math.random() * 15 + 10, speed: Math.random() * 7 + 5,
-                    opacity: Math.random() * 0.4 + 0.2, wind: Math.random() * 2 - 1
+            fireflies = [];
+            const numFireflies = 35; // Agak jarang
+            for (let i = 0; i < numFireflies; i++) { 
+                fireflies.push({
+                    x: Math.random() * canvas.width, 
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2 + 1, 
+                    speedX: (Math.random() - 0.5) * 0.5,
+                    speedY: (Math.random() - 0.5) * 0.5,
+                    opacity: Math.random(), 
+                    fadeSpeed: (Math.random() * 0.02) + 0.005,
+                    fadingOut: Math.random() > 0.5
                 });
             }
         }
-        function drawRain() {
+        
+        function drawFireflies() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let i = 0; i < rainDrops.length; i++) {
-                let drop = rainDrops[i];
-                ctx.beginPath(); ctx.strokeStyle = `rgba(255, 255, 255, ${drop.opacity})`;
-                ctx.lineWidth = 1; ctx.lineCap = 'round';
-                ctx.moveTo(drop.x, drop.y); ctx.lineTo(drop.x + drop.wind, drop.y + drop.length); ctx.stroke();
+            
+            // Cuma render kalau di Dark Mode
+            if (!document.body.classList.contains('dark-mode')) return;
+            
+            for (let i = 0; i < fireflies.length; i++) {
+                let f = fireflies[i];
+                ctx.beginPath(); 
+                ctx.arc(f.x, f.y, f.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 240, 150, ${f.opacity})`;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = `rgba(255, 240, 150, ${f.opacity})`;
+                ctx.fill();
+                ctx.shadowBlur = 0; // reset
             }
         }
-        function updateRain() {
-            for (let i = 0; i < rainDrops.length; i++) {
-                let drop = rainDrops[i];
-                drop.x += drop.wind; drop.y += drop.speed;
-                if (drop.y > canvas.height) { drop.y = -drop.length; drop.x = Math.random() * canvas.width; }
+        
+        function updateFireflies() {
+            if (!document.body.classList.contains('dark-mode')) return;
+            
+            for (let i = 0; i < fireflies.length; i++) {
+                let f = fireflies[i];
+                
+                // Sedikit acak arahnya biar natural
+                f.speedX += (Math.random() - 0.5) * 0.05;
+                f.speedY += (Math.random() - 0.5) * 0.05;
+                
+                // Batasi kecepatan
+                if(f.speedX > 0.5) f.speedX = 0.5;
+                if(f.speedX < -0.5) f.speedX = -0.5;
+                if(f.speedY > 0.5) f.speedY = 0.5;
+                if(f.speedY < -0.5) f.speedY = -0.5;
+
+                f.x += f.speedX; 
+                f.y += f.speedY;
+                
+                // Tembus batas layar
+                if (f.x < 0) f.x = canvas.width;
+                if (f.x > canvas.width) f.x = 0;
+                if (f.y < 0) f.y = canvas.height;
+                if (f.y > canvas.height) f.y = 0;
+                
+                // Efek kedap-kedip cahaya
+                if (f.fadingOut) {
+                    f.opacity -= f.fadeSpeed;
+                    if (f.opacity <= 0.1) { f.opacity = 0.1; f.fadingOut = false; }
+                } else {
+                    f.opacity += f.fadeSpeed;
+                    if (f.opacity >= 0.8) { f.opacity = 0.8; f.fadingOut = true; }
+                }
             }
         }
-        function animateRain() { drawRain(); updateRain(); rainAnimationId = requestAnimationFrame(animateRain); }
-        function startRain() { if (!isRainStarted) { initRain(); animateRain(); isRainStarted = true; } else { initRain(); } }
-        window.addEventListener('resize', () => { initRain(); });
+        
+        function animateEffects() { 
+            drawFireflies(); 
+            updateFireflies(); 
+            animationId = requestAnimationFrame(animateEffects); 
+        }
+        
+        function startEffects() { 
+            if (!isAnimationRunning) { 
+                initFireflies(); 
+                animateEffects(); 
+                isAnimationRunning = true; 
+            } else { 
+                initFireflies(); 
+            } 
+        }
+        window.addEventListener('resize', () => { initFireflies(); });
 
         function showToast(title, message, isError = false) {
             const toast = document.getElementById('toast');
@@ -1142,7 +1201,7 @@
                 document.getElementById('icon-moon').style.display = 'none';
             } else {
                 document.body.classList.remove('dark-mode');
-                heroImage.src = 'image_619675.jpg'; 
+                heroImage.src = 'bg-andi-light.jpg'; 
                 document.getElementById('icon-sun').style.display = 'none';
                 document.getElementById('icon-moon').style.display = 'block';
             }
@@ -1160,7 +1219,7 @@
                 document.getElementById('icon-moon').style.display = 'none';
             } else {
                 localStorage.setItem('app-theme', 'light'); 
-                heroImage.src = 'image_619675.jpg'; 
+                heroImage.src = 'bg-andi-light.jpg'; 
                 document.getElementById('icon-sun').style.display = 'none'; 
                 document.getElementById('icon-moon').style.display = 'block';
             }
