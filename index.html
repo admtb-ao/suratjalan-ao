@@ -14,27 +14,9 @@
     
     <style>
         /* =========================================================
-           1. MODERN DASHBOARD VARIABLES (DARK MODE - DEFAULT)
+           1. MODERN DASHBOARD VARIABLES (LIGHT MODE - DEFAULT)
         ========================================================= */
         :root {
-            --bg-outer: #2a3439;
-            --bg-app: #121212;
-            --bg-app-gradient: radial-gradient(circle at 30% 40%, #2a1610 0%, #121212 60%);
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --glass-bg-hover: rgba(255, 255, 255, 0.08);
-            --primary: #4ADE80; /* Mint Green */
-            --primary-dark: #1E293B;
-            --text-main: #FFFFFF;
-            --text-muted: #9CA3AF;
-            --sidebar-width: 90px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* =========================================================
-           1.A. LIGHT MODE VARIABLES
-        ========================================================= */
-        body.light-mode {
             --bg-outer: #E2E8F0;
             --bg-app: #F8FAFC;
             --bg-app-gradient: linear-gradient(135deg, #F8FAFC 0%, #E2E8F0 100%);
@@ -42,8 +24,27 @@
             --glass-border: rgba(0, 0, 0, 0.08);
             --glass-bg-hover: rgba(0, 0, 0, 0.05);
             --primary: #10B981; 
+            --primary-dark: #059669;
             --text-main: #0F172A;
             --text-muted: #64748B;
+            --sidebar-width: 90px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* =========================================================
+           1.A. DARK MODE VARIABLES
+        ========================================================= */
+        body.dark-mode {
+            --bg-outer: #2a3439;
+            --bg-app: #121212;
+            --bg-app-gradient: radial-gradient(circle at 30% 40%, #2a1610 0%, #121212 60%);
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-bg-hover: rgba(255, 255, 255, 0.08);
+            --primary: #4ADE80; 
+            --primary-dark: #1E293B;
+            --text-main: #FFFFFF;
+            --text-muted: #9CA3AF;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -241,11 +242,11 @@
         #hero-image { z-index: 0; }
         .hero-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.7) 100%);
+            background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.6) 100%);
             z-index: 1; transition: var(--transition);
         }
-        body.light-mode .hero-overlay {
-            background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.6) 100%);
+        body.dark-mode .hero-overlay {
+            background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.7) 100%);
         }
 
         #rain-canvas { z-index: 2; pointer-events: none; display: block; }
@@ -382,8 +383,8 @@
         }
         .filter-group input[type="date"]:focus { border-color: var(--primary); }
         .filter-group input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.6; filter: invert(var(--invert-icon, 0)); }
-        body.light-mode { --invert-icon: 0; }
-        body:not(.light-mode) { --invert-icon: 1; }
+        body:not(.dark-mode) { --invert-icon: 0; }
+        body.dark-mode { --invert-icon: 1; }
 
         .riwayat-checkbox { width: 15px; height: 15px; cursor: pointer; accent-color: var(--primary); flex-shrink: 0; }
 
@@ -586,7 +587,7 @@
         }
     </style>
 </head>
-<body class="light-mode">
+<body>
     
     <div id="print-area"></div>
     
@@ -662,10 +663,10 @@
                 </div>
                 
                 <div class="nav-item btn-theme" onclick="toggleTheme()" data-tooltip="Ubah Tema">
-                    <svg id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg id="icon-sun" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
                     </svg>
-                    <svg id="icon-moon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                     </svg>
                 </div>
@@ -700,7 +701,7 @@
                 <div class="home-layout">
                     
                     <div class="hero-section">
-                        <img src="image_619674.jpg" class="hero-bg-media" id="hero-image" alt="3D Smart House">
+                        <img src="image_619675.jpg" class="hero-bg-media" id="hero-image" alt="3D Smart House">
                         <div class="hero-overlay"></div>
                         <canvas id="rain-canvas" class="hero-bg-media"></canvas>
                         
@@ -966,33 +967,37 @@
                 <iframe src="https://twidytools.my.id"></iframe>
             </div>
 
-            <!-- ================= VIEW: TRAKTIR (WIDGET RESMI) ================= -->
-            <div id="view-traktir" class="view-section" style="justify-content: center; align-items: center;">
+            <!-- ================= VIEW: TRAKTIR (NATIVE UI / QRIS) ================= -->
+            <div id="view-traktir" class="view-section" style="justify-content: center; align-items: center; position: relative;">
                 <button class="btn-back" onclick="switchTab('home')" style="position: absolute; top: 30px; left: 40px; margin-bottom: 0;">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                     Kembali ke Dashboard
                 </button>
 
-                <div class="login-card" style="max-width: 480px; margin: auto; text-align: center; padding: 40px 30px; display: flex; flex-direction: column; align-items: center; gap: 20px;">
-                    <div style="background: rgba(244, 63, 94, 0.1); width: 70px; height: 70px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 1px solid rgba(244, 63, 94, 0.3);">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2" width="36" height="36" stroke-linecap="round" stroke-linejoin="round">
+                <div class="login-card" style="max-width: 480px; margin: auto; text-align: center; padding: 35px 25px; display: flex; flex-direction: column; align-items: center; gap: 14px;">
+                    
+                    <div style="background: rgba(16, 185, 129, 0.1); width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 1px solid rgba(16, 185, 129, 0.3);">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" width="30" height="30" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
                             <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
-                            <line x1="6" y1="1" x2="6" y2="4"></line>
-                            <line x1="10" y1="1" x2="10" y2="4"></line>
-                            <line x1="14" y1="1" x2="14" y2="4"></line>
+                            <line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line>
                         </svg>
                     </div>
-                    <h2 style="font-size: 22px; font-weight: 600; color: var(--text-main); margin-bottom: 0;">Dukung Kreator</h2>
-                    <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 0;">
-                        Klik tombol di bawah ini untuk memberikan dukungan via Trakteer!
+                    
+                    <h2 style="font-size: 22px; font-weight: 600; color: var(--text-main); margin-bottom: 0;">Traktir Kopi Mimin Yuk! ☕</h2>
+                    <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 5px;">
+                        Biar sistem-nya nggak ngadat dan tetep melek karena yang punya kurang asupan kafein, yuk donasi biji kopi biar webnya tetep HEPI 😘☕🔥
                     </p>
                     
-                    <!-- SCRIPT TRAKTEER -->
-                    <div id="trakteer-widget-container" style="display: flex; justify-content: center; width: 100%; margin-top: 10px;">
-                        <script type='text/javascript' src='https://edge-cdn.trakteer.id/js/embed/trbtn.min.js?v=14-05-2025'></script>
-                        <script type='text/javascript'>(function(){var trbtnId=trbtn.init('Traktir Mimin Yuk Biar Semangat Berkarya 😘','#be1e2d','https://trakteer.id/twidy','https://mirror-uploads.trakteer.id/images/units/uic-CG61ynBt8KFzN2UP9fTqWGEc9NXrOSej1787746268.jpeg','40');trbtn.draw(trbtnId);})();</script>
+                    <!-- AREA QRIS / INFO REKENING LOKAL -->
+                    <div style="background: white; padding: 15px; border-radius: 16px; border: 2px dashed var(--primary); display: inline-block; width: 100%; max-width: 250px; box-shadow: 0 8px 20px rgba(0,0,0,0.1);">
+                        <img src="QrisStatisTwidy Shop .png" alt="QRIS Twidy Shop" style="width: 100%; height: auto; border-radius: 8px;">
+                        <div style="margin-top: 10px; font-size: 14px; font-weight: bold; color: #000;">QRIS Twidy Shop</div>
                     </div>
+
+                    <p style="font-size: 11px; color: var(--text-muted); margin-top: 5px;">
+                        Scan pakai GoPay, OVO, DANA, BCA, ShopeePay, atau Mobile Banking apa aja. Terima kasih banyak orang baik! ✨
+                    </p>
                 </div>
             </div>
         </main>
@@ -1126,31 +1131,38 @@
             setTimeout(() => toast.classList.remove('show'), 4000);
         }
 
+        // FUNGSI TEMA YANG SUDAH DIREVISI (DEFAULT LIGHT)
         function initTheme() {
             const savedTheme = localStorage.getItem('app-theme');
             const heroImage = document.getElementById('hero-image');
-            if (savedTheme === 'light') {
-                document.body.classList.add('light-mode');
-                heroImage.src = 'image_619675.jpg'; 
-                document.getElementById('icon-sun').style.display = 'none';
-                document.getElementById('icon-moon').style.display = 'block';
-            } else {
-                document.body.classList.remove('light-mode');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
                 heroImage.src = 'image_619674.jpg'; 
                 document.getElementById('icon-sun').style.display = 'block';
                 document.getElementById('icon-moon').style.display = 'none';
+            } else {
+                document.body.classList.remove('dark-mode');
+                heroImage.src = 'image_619675.jpg'; 
+                document.getElementById('icon-sun').style.display = 'none';
+                document.getElementById('icon-moon').style.display = 'block';
             }
         }
         function toggleTheme() {
-            const body = document.body; body.classList.toggle('light-mode');
-            const isLight = body.classList.contains('light-mode');
+            const body = document.body; 
+            body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
             const heroImage = document.getElementById('hero-image');
-            if (isLight) {
-                localStorage.setItem('app-theme', 'light'); heroImage.src = 'image_619675.jpg'; 
-                document.getElementById('icon-sun').style.display = 'none'; document.getElementById('icon-moon').style.display = 'block';
+            
+            if (isDark) {
+                localStorage.setItem('app-theme', 'dark'); 
+                heroImage.src = 'image_619674.jpg'; 
+                document.getElementById('icon-sun').style.display = 'block'; 
+                document.getElementById('icon-moon').style.display = 'none';
             } else {
-                localStorage.setItem('app-theme', 'dark'); heroImage.src = 'image_619674.jpg'; 
-                document.getElementById('icon-sun').style.display = 'block'; document.getElementById('icon-moon').style.display = 'none';
+                localStorage.setItem('app-theme', 'light'); 
+                heroImage.src = 'image_619675.jpg'; 
+                document.getElementById('icon-sun').style.display = 'none'; 
+                document.getElementById('icon-moon').style.display = 'block';
             }
         }
         document.addEventListener('DOMContentLoaded', () => { initTheme(); checkLogin(); });
