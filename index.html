@@ -12,9 +12,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
-    <!-- Midtrans Snap JS Official (Sandbox/Production Client Key) -->
-    <script src="https://app.midtrans.com/snap/snap.js" data-client-key="YOUR_CLIENT_KEY"></script>
-    
     <style>
         /* =========================================================
            1. MODERN DASHBOARD VARIABLES (DARK MODE - DEFAULT)
@@ -969,33 +966,13 @@
                 <iframe src="https://twidytools.my.id"></iframe>
             </div>
 
-            <!-- ================= VIEW: TRAKTIR (MUNCUL SEBAGAI POPUP MELAYANG DI DALAM DASHBOARD) ================= -->
-            <div id="view-traktir" class="view-section" style="justify-content: center; align-items: center;">
-                <button class="btn-back" onclick="switchTab('home')" style="position: absolute; top: 30px; left: 40px; margin-bottom: 0;">
+            <!-- ================= VIEW: TRAKTIR (FULL IFRAME TRAKTEER) ================= -->
+            <div id="view-traktir" class="view-section">
+                <button class="btn-back" onclick="switchTab('home')" style="margin-bottom: 20px;">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                    Kembali ke Dashboard
+                    Tutup Modul
                 </button>
-
-                <div class="login-card" style="max-width: 480px; margin: auto; text-align: center; padding: 40px 30px;">
-                    <div style="background: rgba(244, 63, 94, 0.1); width: 70px; height: 70px; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 20px auto; border: 1px solid rgba(244, 63, 94, 0.3);">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2" width="36" height="36" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
-                            <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
-                            <line x1="6" y1="1" x2="6" y2="4"></line>
-                            <line x1="10" y1="1" x2="10" y2="4"></line>
-                            <line x1="14" y1="1" x2="14" y2="4"></line>
-                        </svg>
-                    </div>
-                    <h2 style="font-size: 22px; font-weight: 600; margin-bottom: 8px; color: var(--text-main);">Traktir Kopi Developer ☕</h2>
-                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 25px; line-height: 1.6;">
-                        Yuk support admin biar semangat updatenya 😍. Klik tombol di bawah untuk memunculkan jendela pembayaran Midtrans langsung di dalam dashboard ini tanpa pindah halaman!
-                    </p>
-                    
-                    <!-- Tombol interaktif Snap Pop-up Midtrans -->
-                    <button class="btn-process" onclick="bukaMidtransPopup()" style="background: #f43f5e; justify-content: center; padding: 16px; font-size: 15px; border-radius: 16px; width: 100%; border: none; cursor: pointer; color: white; font-weight: 600;">
-                        ☕ Munculkan Pop-up Pembayaran
-                    </button>
-                </div>
+                <iframe src="https://trakteer.id/twidy/tip"></iframe>
             </div>
         </main>
     </div>
@@ -1078,35 +1055,6 @@
             sessionStorage.removeItem('isLoggedIn'); 
             checkLogin(); 
             switchTab('home');
-        }
-
-        // Fungsi Snap Pop-up Midtrans Resmi (Menampilkan modal langsung di dalam halaman tanpa redirect)
-        function bukaMidtransPopup() {
-            // Menggunakan token/snap_token dari payment link kamu atau trigger snap.pay
-            // Jika menggunakan link URL pembayaran mentah, kita bisa arahkan snap ke token terkait atau pakai redirect aman jika snap token tidak tersedia.
-            // Sebagai alternatif pop-up Snap JS resmi:
-            const snapToken = "64a90dd2-038d-4309-955e-beacb14507c2-Z3ls1R4h"; 
-            
-            if (window.snap) {
-                window.snap.pay(snapToken, {
-                    onSuccess: function(result){
-                        showToast("Berhasil", "Terima kasih atas traktirannya! 🎉");
-                        switchTab('home');
-                    },
-                    onPending: function(result){
-                        showToast("Pending", "Menunggu pembayaran selesai.");
-                    },
-                    onError: function(result){
-                        showToast("Gagal", "Pembayaran gagal diproses.", true);
-                    },
-                    onClose: function(){
-                        // Pengguna menutup pop-up tanpa menyelesaikan pembayaran, tetap di dashboard
-                    }
-                });
-            } else {
-                // Fallback jika script snap belum termuat sempurna: buka di window pop-up ukuran kecil kustom agar tidak meninggalkan dashboard penuh
-                window.open("https://app.midtrans.com/payment-links/64a90dd2-038d-4309-955e-beacb14507c2-Z3ls1R4h", "MidtransPayment", "width=500,height=700,left=200,top=100");
-            }
         }
         
         const canvas = document.getElementById('rain-canvas');
