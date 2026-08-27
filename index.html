@@ -254,7 +254,7 @@
         .hero-content { position: relative; z-index: 3; color: white; }
         
         .floating-widget {
-            position: absolute; bottom: 30px; left: 30px; 
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
             z-index: 4; background: var(--glass-bg); backdrop-filter: blur(20px); 
             -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border); 
             border-radius: 24px; padding: 20px 30px; 
@@ -583,7 +583,7 @@
             .sj-workspace-grid { grid-template-columns: 1fr; height: auto; }
             .smart-header { flex-direction: column; align-items: flex-start; gap: 15px; padding: 20px; }
             .view-section { padding: 20px; }
-            .floating-widget { flex-direction: column; bottom: 20px; left: 20px; gap: 20px; }
+            .floating-widget { flex-direction: column; bottom: 20px; left: 20px; transform: none; gap: 20px; }
         }
     </style>
 </head>
@@ -991,8 +991,8 @@
                     
                     <!-- AREA QRIS / INFO REKENING LOKAL -->
                     <div style="background: white; padding: 15px; border-radius: 16px; border: 2px dashed var(--primary); display: inline-block; width: 100%; max-width: 250px; box-shadow: 0 8px 20px rgba(0,0,0,0.1);">
-                        <img src="QrisStatisTwidy Shop .png" alt="SCAN ME" style="width: 100%; height: auto; border-radius: 8px;">
-                        <div style="margin-top: 10px; font-size: 14px; font-weight: bold; color: #000;">SCAN ME</div>
+                        <img src="QrisStatisTwidy Shop .png" alt="QRIS Twidy Shop" style="width: 100%; height: auto; border-radius: 8px;">
+                        <div style="margin-top: 10px; font-size: 14px; font-weight: bold; color: #000;">QRIS Twidy Shop</div>
                     </div>
 
                     <p style="font-size: 11px; color: var(--text-muted); margin-top: 5px; line-height: 1.4; font-style: italic;">
