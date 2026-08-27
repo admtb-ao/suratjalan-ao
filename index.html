@@ -242,11 +242,11 @@
         #hero-image { z-index: 0; }
         .hero-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.6) 100%);
+            background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.6) 100%);
             z-index: 1; transition: var(--transition);
         }
         body.dark-mode .hero-overlay {
-            background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.7) 100%);
+            background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 40%, rgba(0,0,0,0.8) 100%);
         }
 
         #effect-canvas { z-index: 2; pointer-events: none; display: block; }
@@ -274,7 +274,7 @@
         .widget-val { font-size: 15px; font-weight: 600; color: var(--primary); }
 
         .control-panel { 
-            display: flex; flex-direction: column; gap: 14px; padding-right: 5px; 
+            display: flex; flex-direction: column; gap: 10px; padding-right: 5px; 
             overflow-y: auto; overflow-x: hidden; max-height: 100%;
             width: 310px;
             transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -288,8 +288,8 @@
 
         .glass-card {
             background: var(--glass-bg); backdrop-filter: blur(15px);
-            border: 1px solid var(--glass-border); border-radius: 24px; padding: 18px 20px;
-            display: flex; align-items: center; gap: 16px; cursor: pointer; transition: var(--transition);
+            border: 1px solid var(--glass-border); border-radius: 20px; padding: 12px 16px;
+            display: flex; align-items: center; gap: 14px; cursor: pointer; transition: var(--transition);
         }
         .glass-card:hover { border-color: var(--primary); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
 
@@ -304,10 +304,10 @@
         .glass-card:hover .toggle-switch { background: var(--primary); }
         .glass-card:hover .toggle-switch::after { background: #fff; transform: translateX(20px); }
 
-        .feature-card-lg { flex-direction: column; align-items: stretch; padding: 18px 20px; }
-        .feature-card-lg .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .feature-card-lg { flex-direction: column; align-items: stretch; }
+        .feature-card-lg .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .feature-card-lg .header .title-area { display: flex; align-items: center; gap: 12px; }
-        .feature-card-lg .icon { width: 36px; height: 36px; background: var(--primary); color: #fff; border-radius: 10px; display: flex; justify-content: center; align-items: center;}
+        .feature-card-lg .icon { width: 32px; height: 32px; background: var(--primary); color: #fff; border-radius: 10px; display: flex; justify-content: center; align-items: center;}
 
         /* =========================================================
            5. CSS UMUM UNTUK WORKSPACE & RE-PRINT
@@ -706,8 +706,8 @@
                         <canvas id="effect-canvas" class="hero-bg-media"></canvas>
                         
                         <div class="hero-content">
-                            <h2 style="font-size: 28px; font-weight: 300; margin-bottom: 5px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">AO <strong>Dashboard</strong></h2>
-                            <p style="color: rgba(255,255,255,0.9); font-size: 13px; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">Manage your daily operations efficiently.</p>
+                            <h2 style="font-size: 28px; font-weight: 500; margin-bottom: 5px; text-shadow: 0 2px 8px rgba(0,0,0,0.8);">AO <strong>Dashboard</strong></h2>
+                            <p style="color: rgba(255,255,255,0.95); font-size: 13px; font-weight: 500; text-shadow: 0 2px 6px rgba(0,0,0,0.8);">Manage your daily operations efficiently.</p>
                         </div>
 
                         <div class="floating-widget">
@@ -772,7 +772,7 @@
                                 </div>
                                 <div class="toggle-switch"></div>
                             </div>
-                            <p style="color: var(--text-muted); font-size: 12px; margin-top: -5px;">Yuk support admin biar semangat updatenya 😍</p>
+                            <p style="color: var(--text-muted); font-size: 11px; margin: 0;">Yuk support admin biar semangat updatenya 😍</p>
                         </div>
 
                         <div class="glass-card feature-card-lg" onclick="switchTab('surat-jalan-ao')">
@@ -783,7 +783,7 @@
                                 </div>
                                 <div class="toggle-switch"></div>
                             </div>
-                            <p style="color: var(--text-muted); font-size: 12px; margin-top: -5px;">Upload & cetak Surat Jalan (Kop Asli AO).</p>
+                            <p style="color: var(--text-muted); font-size: 11px; margin: 0;">Upload & cetak Surat Jalan (Kop Asli AO).</p>
                         </div>
 
                         <div class="glass-card feature-card-lg" onclick="switchTab('surat-jalan-gme')">
@@ -794,7 +794,7 @@
                                 </div>
                                 <div class="toggle-switch"></div>
                             </div>
-                            <p style="color: var(--text-muted); font-size: 12px; margin-top: -5px;">Upload & cetak Surat Jalan (Kop Format GME).</p>
+                            <p style="color: var(--text-muted); font-size: 11px; margin: 0;">Upload & cetak Surat Jalan (Kop Format GME).</p>
                         </div>
                         
                         <div class="glass-card feature-card-lg" onclick="switchTab('alamat')">
@@ -805,7 +805,7 @@
                                 </div>
                                 <div class="toggle-switch"></div>
                             </div>
-                            <p style="color: var(--text-muted); font-size: 12px; margin-top: -5px;">Cetak label alamat langsung terhubung database.</p>
+                            <p style="color: var(--text-muted); font-size: 11px; margin: 0;">Cetak label alamat langsung terhubung database.</p>
                         </div>
 
                         <div class="glass-card feature-card-lg" onclick="switchTab('memo')">
@@ -816,7 +816,7 @@
                                 </div>
                                 <div class="toggle-switch"></div>
                             </div>
-                            <p style="color: var(--text-muted); font-size: 12px; margin-top: -5px;">Arsip dokumen, memo, dan regulasi internal.</p>
+                            <p style="color: var(--text-muted); font-size: 11px; margin: 0;">Arsip dokumen, memo, dan regulasi internal.</p>
                         </div>
 
                         <div class="glass-card feature-card-lg" onclick="switchTab('maksi')">
@@ -827,7 +827,7 @@
                                 </div>
                                 <div class="toggle-switch"></div>
                             </div>
-                            <p style="color: var(--text-muted); font-size: 12px; margin-top: -5px;">Lihat jadwal dan menu makan siang bulan ini.</p>
+                            <p style="color: var(--text-muted); font-size: 11px; margin: 0;">Lihat jadwal dan menu makan siang bulan ini.</p>
                         </div>
                         
                         <div class="glass-card feature-card-lg" onclick="switchTab('twidytools')">
@@ -838,7 +838,7 @@
                                 </div>
                                 <div class="toggle-switch"></div>
                             </div>
-                            <p style="color: var(--text-muted); font-size: 12px; margin-top: -5px;">Koleksi utilitas, PDF converter, dan AI tools.</p>
+                            <p style="color: var(--text-muted); font-size: 11px; margin: 0;">Koleksi utilitas, PDF converter, dan AI tools.</p>
                         </div>
                     </div>
                 </div>
