@@ -88,6 +88,7 @@
             overflow: hidden;
             white-space: nowrap;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
         .snack-marquee {
@@ -625,7 +626,7 @@
     
     <!-- ELEMEN RUNNING TEXT / SNACK ALARM BANNER -->
     <div id="snackAlarmBanner" class="snack-banner">
-        <div class="snack-marquee">
+        <div class="snack-marquee" id="snackMarqueeText">
             ☕ <strong>SNACK TIME:</strong> Silakan menikmati kudapan dan minuman di meja kerja masing-masing untuk menemani melanjutkan aktivitas.
         </div>
     </div>
@@ -996,7 +997,7 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                     Tutup Modul
                 </button>
-                <iframe src="Menu_Maksi_Agustus_2026_Revisi_Final.pdf#toolbar=0&navpanes=0&scrollbar=0&view=FitH" title="Menu Makan Siang" style="border: none; border-radius: 20px;"></iframe>
+                <iframe src="Menu_Maksi_September_2026.pdf#toolbar=0&navpanes=0&scrollbar=0&view=FitH" title="Menu Makan Siang" style="border: none; border-radius: 20px;"></iframe>
             </div>
 
             <!-- ================= VIEW: TWIDY TOOLS ================= -->
@@ -1222,27 +1223,55 @@
         }
         window.addEventListener('resize', () => { initFireflies(); });
 
-        // ================= LOGIKA ALARM SNACK TIME (PILIHAN 1, JAM 09:30 & 15:00, DURASI 45 DETIK) =================
-        function cekJamSnack() {
+        // ================= LOGIKA ALARM OTOMATIS BERDASARKAN JADWAL =================
+        function cekJadwalNotifikasi() {
             const now = new Date();
             const jam = now.getHours();
             const menit = now.getMinutes();
             
-            // Target: Jam 09:30 atau Jam 15:00
-            const isJamSnack = (jam === 9 && menit === 30) || (jam === 15 && menit === 0);
-            
             const banner = document.getElementById('snackAlarmBanner');
-            if (isJamSnack && banner.style.display !== 'block') {
-                banner.style.display = 'block'; // Munculkan running text
-                
-                // Otomatis sembunyikan lagi setelah 45 detik
+            const marqueeText = document.getElementById('snackMarqueeText');
+            
+            // Cek apakah banner sedang aktif menampilkan pesan
+            if (banner.style.display === 'block') return;
+
+            let pesanBaru = "";
+            let warnaBackground = "#eab308"; // Default kuning snack time
+            let warnaTeks = "#000000";
+
+            // Jam 09:29 atau 14:59 -> Snack Time
+            if ((jam === 9 && menit === 29) || (jam === 14 && menit === 59)) {
+                pesanBaru = "☕ <strong>SNACK TIME:</strong> Silakan menikmati kudapan dan minuman di meja kerja masing-masing untuk menemani melanjutkan aktivitas.";
+                warnaBackground = "#eab308";
+                warnaTeks = "#000000";
+            }
+            // Jam 11:59 -> Lunch Break Time
+            else if (jam === 11 && menit === 59) {
+                pesanBaru = "🍱 <strong>LUNCH BREAK TIME:</strong> Waktunya sejenak merehatkan pikiran dari layar monitor. Silakan menikmati santap siang dan memulihkan energi sebelum kembali melanjutkan pekerjaan. 🍱✨";
+                warnaBackground = "#3b82f6"; // Biru profesional
+                warnaTeks = "#ffffff";
+            }
+            // Jam 16:44 -> Shift Is Over
+            else if (jam === 16 && menit === 44) {
+                pesanBaru = "🚪 <strong>SHIFT IS OVER:</strong> Mari kita kita sudahi pekerjaan kita, matikan komputer dan lakukan clock-out. Hati-hati dijalan dan sampai jumpa kembali esok hari ^_^";
+                warnaBackground = "#10B981"; // Hijau korporat / sukses
+                warnaTeks = "#ffffff";
+            }
+
+            if (pesanBaru !== "") {
+                marqueeText.innerHTML = pesanBaru;
+                banner.style.background = warnaBackground;
+                banner.style.color = warnaTeks;
+                banner.style.display = 'block';
+
+                // Otomatis sembunyikan banner setelah 45 detik
                 setTimeout(() => {
                     banner.style.display = 'none';
                 }, 45000);
             }
         }
         // Cek setiap 30 detik
-        setInterval(cekJamSnack, 30000);
+        setInterval(cekJadwalNotifikasi, 30000);
 
         function showToast(title, message, isError = false) {
             const toast = document.getElementById('toast');
@@ -2193,3 +2222,4 @@
     </script>
 </body>
 </html>
+```[cite: 2]
