@@ -72,6 +72,36 @@
         ::-webkit-scrollbar-thumb:hover { background: rgba(150,150,150,0.5); }
 
         /* =========================================================
+           STYLE RUNNING TEXT / SNACK ALARM BANNER (PILIHAN 1)
+        ========================================================= */
+        .snack-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: #eab308;
+            color: #000;
+            font-weight: bold;
+            padding: 10px 0;
+            z-index: 99999;
+            display: none;
+            overflow: hidden;
+            white-space: nowrap;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .snack-marquee {
+            display: inline-block;
+            padding-left: 100%;
+            animation: marquee 15s linear infinite;
+        }
+
+        @keyframes marquee {
+            0%   { transform: translate(0, 0); }
+            100% { transform: translate(-100%, 0); }
+        }
+
+        /* =========================================================
            1.B. LOGIN SCREEN CSS
         ========================================================= */
         #login-screen {
@@ -593,6 +623,13 @@
 </head>
 <body>
     
+    <!-- ELEMEN RUNNING TEXT / SNACK ALARM BANNER -->
+    <div id="snackAlarmBanner" class="snack-banner">
+        <div class="snack-marquee">
+            ☕ <strong>SNACK TIME:</strong> Silakan menikmati kudapan dan minuman di meja kerja masing-masing untuk menemani melanjutkan aktivitas.
+        </div>
+    </div>
+
     <div id="print-area"></div>
     
     <div id="toast" class="toast-notification">
@@ -1184,6 +1221,28 @@
             } 
         }
         window.addEventListener('resize', () => { initFireflies(); });
+
+        // ================= LOGIKA ALARM SNACK TIME (PILIHAN 1, JAM 09:30 & 15:00, DURASI 45 DETIK) =================
+        function cekJamSnack() {
+            const now = new Date();
+            const jam = now.getHours();
+            const menit = now.getMinutes();
+            
+            // Target: Jam 09:30 atau Jam 15:00
+            const isJamSnack = (jam === 9 && menit === 30) || (jam === 15 && menit === 0);
+            
+            const banner = document.getElementById('snackAlarmBanner');
+            if (isJamSnack && banner.style.display !== 'block') {
+                banner.style.display = 'block'; // Munculkan running text
+                
+                // Otomatis sembunyikan lagi setelah 45 detik
+                setTimeout(() => {
+                    banner.style.display = 'none';
+                }, 45000);
+            }
+        }
+        // Cek setiap 30 detik
+        setInterval(cekJamSnack, 30000);
 
         function showToast(title, message, isError = false) {
             const toast = document.getElementById('toast');
@@ -2101,7 +2160,7 @@
 
             setTimeout(() => {
                 const namaFilePDF = noSO ? `Surat_${activeSuratMode}_${noSO}.pdf` : `Surat_${activeSuratMode}_${id}.pdf`;
-                html2pdf().set(getOpsiPDF(namaFilePDF)).from(wrapperCetak).save().then(() => {
+                html2pdf().set(getOpsiPDF(namaFilePDF)).from(wrapperCetrk ?? wrapperCetak).save().then(() => {
                     document.body.classList.remove('exporting');
                     if(tombolUnduh) { tombolUnduh.innerText = teksAsli; tombolUnduh.disabled = false; }
                 }).catch(err => {
