@@ -2053,7 +2053,11 @@
                     }
                 });
                 if (barangTemp) pageBarang.push(barangTemp);
-                pageBarang.reverse(); dataBarang = dataBarang.concat(pageBarang);
+                
+                // PERBAIKAN URUTAN DI SINI: pageBarang.reverse() DIHAPUS 
+                // supaya urutannya tetap persis sama seperti di file PDF asli.
+                
+                dataBarang = dataBarang.concat(pageBarang);
             }
             return { noSO, keterangan, pelanggan, dataBarang };
         }
@@ -2189,7 +2193,7 @@
 
             setTimeout(() => {
                 const namaFilePDF = noSO ? `Surat_${activeSuratMode}_${noSO}.pdf` : `Surat_${activeSuratMode}_${id}.pdf`;
-                html2pdf().set(getOpsiPDF(namaFilePDF)).from(wrapperCetrk ?? wrapperCetak).save().then(() => {
+                html2pdf().set(getOpsiPDF(namaFilePDF)).from(wrapperCetak).save().then(() => {
                     document.body.classList.remove('exporting');
                     if(tombolUnduh) { tombolUnduh.innerText = teksAsli; tombolUnduh.disabled = false; }
                 }).catch(err => {
