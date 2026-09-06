@@ -196,7 +196,6 @@
         }
         .nav-item:hover::after { opacity: 1; transform: translateX(5px); }
 
-        /* Styling Tombol Traktir di Sidebar Kiri (Utuh sesuai request) */
         .btn-donasi { 
             margin-top: auto; 
             margin-bottom: 5px; 
@@ -240,7 +239,6 @@
         .header-status-group span { display: flex; align-items: center; gap: 8px; }
         .header-status-group svg { width: 16px; height: 16px; opacity: 0.7; }
 
-        /* Tombol Traktir Kopi di Header (Sebelah Kiri Suhu) */
         .header-traktir-btn {
             display: flex; align-items: center; gap: 6px;
             background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.3);
@@ -704,7 +702,7 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
                 </div>
                 
-                <!-- TOMBOL TRAKTIR DI SIDEBAR KIRI (UTUH TIDAK DIGANGGU) -->
+                <!-- TOMBOL TRAKTIR DI SIDEBAR KIRI -->
                 <div class="nav-item btn-donasi" id="nav-traktir" onclick="switchTab('traktir')" style="height: auto; padding: 10px 0; flex-direction: column; gap: 2px;" data-tooltip="Traktir Kopi Developer ☕">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
                         <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
@@ -738,7 +736,6 @@
                     <p id="live-date">Memuat tanggal...</p>
                 </div>
                 <div class="header-status-group">
-                    <!-- TOMBOL TRAKTIR KOPI PINDAH KE ATAS (SEBELAH KIRI SUHU) -->
                     <a href="#" onclick="switchTab('traktir'); return false;" class="header-traktir-btn">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
                             <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
@@ -821,21 +818,16 @@
                     </div>
 
                     <div class="control-panel">
-                        <!-- SIDEBAR KANAN: TEMPAT TRAKTIR DIGANTI JADI TOPUP DIGITAL (EMBED WEB TWIDYSHOP) -->
+                        <!-- SIDEBAR KANAN: TOPUP DIGITAL KEMBALI POLOS SEPERTI SEMULA -->
                         <div class="glass-card feature-card-lg" onclick="switchTab('topup')" style="border-color: rgba(59, 130, 246, 0.3);">
                             <div class="header">
                                 <div class="title-area">
-                                    <div class="icon" style="background: #3b82f6;">
-                                        <svg viewBox="0 0 24 24" width="18" fill="none" stroke="#fff" stroke-width="2">
-                                            <rect x="2" y="5" width="20" height="14" rx="2"></rect>
-                                            <line x1="2" y1="10" x2="22" y2="10"></line>
-                                        </svg>
-                                    </div>
+                                    <div class="icon" style="background: #3b82f6;"><svg viewBox="0 0 24 24" width="18" fill="none" stroke="#fff" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg></div>
                                     <h4 style="margin:0; font-size: 16px;">Topup Digital</h4>
                                 </div>
                                 <div class="toggle-switch"></div>
                             </div>
-                            <p style="color: var(--text-muted); font-size: 11px; margin: 0;">Pusat layanan topup & transaksi digital instan.</p>
+                            <p style="color: var(--text-muted); font-size: 11px; margin: 0;">Layanan topup produk digital otomatis 24 jam.</p>
                         </div>
 
                         <div class="glass-card feature-card-lg" onclick="switchTab('surat-jalan-ao')">
@@ -1025,18 +1017,34 @@
             <div id="view-twidytools" class="view-section">
                 <button class="btn-back" onclick="switchTab('home')" style="margin-bottom: 20px;">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                    Tutup Modul
+                    Kembali ke Dashboard
                 </button>
                 <iframe src="https://twidytools.my.id"></iframe>
             </div>
 
-            <!-- ================= VIEW: TOPUP DIGITAL (EMBED TWIDY SHOP) ================= -->
-            <div id="view-topup" class="view-section">
-                <button class="btn-back" onclick="switchTab('home')" style="margin-bottom: 20px;">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                    Kembali ke Dashboard
-                </button>
-                <iframe src="https://twidyshop.my.id/" style="border: none; border-radius: 20px;"></iframe>
+            <!-- ================= VIEW: TOPUP DIGITAL (DENGAN HEADER WEB & TOMBOL FULLSCREEN) ================= -->
+            <div id="view-topup" class="view-section" style="display: none; flex-direction: column; height: 100%;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); padding: 12px 20px; border-radius: 16px;">
+                    <button class="btn-back" onclick="switchTab('home')" style="margin-bottom: 0; padding: 6px 12px; font-size: 12px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                        Dashboard
+                    </button>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <a href="https://twidyshop.my.id/" target="_blank" style="font-size: 13px; font-weight: 600; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 6px;">
+                            🌐 twidyshop.my.id
+                        </a>
+                    </div>
+                    <a href="https://twidyshop.my.id/" target="_blank" class="btn-process btn-blue btn-sm" style="width: auto; padding: 6px 14px; gap: 6px; text-decoration: none;" title="Buka Full Screen / Tab Baru">
+                        <span>Full Screen / Tab Baru</span>
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <polyline points="9 21 3 21 3 15"></polyline>
+                            <line x1="21" y1="3" x2="14" y2="10"></line>
+                            <line x1="3" y1="21" x2="10" y2="14"></line>
+                        </svg>
+                    </a>
+                </div>
+                <iframe src="https://twidyshop.my.id/" style="border: none; border-radius: 20px; flex: 1; width: 100%; background: #fff; min-height: calc(100vh - 160px);"></iframe>
             </div>
 
             <!-- ================= VIEW: TRAKTIR (NATIVE UI / QRIS) ================= -->
