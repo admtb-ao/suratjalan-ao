@@ -377,7 +377,8 @@
         .sj-main-panel {
             background: var(--glass-bg); backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border); border-radius: 24px; 
-            padding: 15px; 
+            /* REVISI: Padding bawah diperbesar agar tombol tidak tersembunyi scroll batas */
+            padding: 15px 15px 120px 15px; 
             overflow-y: auto; overflow-x: hidden; 
             display: flex; flex-direction: column; align-items: center;
         }
@@ -891,7 +892,7 @@
                         <div class="glass-card feature-card-lg" onclick="switchTab('twidytools')">
                             <div class="header">
                                 <div class="title-area">
-                                    <div class="icon" style="background: #f43f5e;"><svg viewBox="0 0 24 24" width="18" fill="none" stroke="#fff" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94z"></path></svg></div>
+                                    <div class="icon" style="background: #f43f5e;"><svg viewBox="0 0 24 24" width="18" fill="none" stroke="#fff" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg></div>
                                     <h4 style="margin:0; font-size: 16px;">TwidyTools</h4>
                                 </div>
                                 <div class="toggle-switch"></div>
@@ -1025,7 +1026,7 @@
                 <iframe src="https://twidytools.my.id"></iframe>
             </div>
 
-            <!-- ================= VIEW: TOPUP DIGITAL (DENGAN HEADER WEB & TOMBOL FULLSCREEN) ================= -->
+            <!-- ================= VIEW: TOPUP DIGITAL ================= -->
             <div id="view-topup" class="view-section">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); padding: 12px 20px; border-radius: 16px; flex-shrink: 0;">
                     <button class="btn-back" onclick="switchTab('home')" style="margin-bottom: 0; padding: 6px 12px; font-size: 12px;">
@@ -1050,7 +1051,7 @@
                 <iframe src="https://twidyshop.my.id/" style="border: none; border-radius: 20px; flex: 1; width: 100%; background: #fff; min-height: calc(100vh - 180px);"></iframe>
             </div>
 
-            <!-- ================= VIEW: TRAKTIR (NATIVE UI / QRIS) ================= -->
+            <!-- ================= VIEW: TRAKTIR ================= -->
             <div id="view-traktir" class="view-section" style="justify-content: center; align-items: center; position: relative;">
                 <button class="btn-back" onclick="switchTab('home')" style="position: absolute; top: 30px; left: 40px; margin-bottom: 0;">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
@@ -1072,7 +1073,6 @@
                         Biar sistem-nya nggak tiba-tiba mati karena yang punya kurang ngopi, yuk donasi biji kopi biar webnya tetep HEPI 😘☕🔥
                     </p>
                     
-                    <!-- AREA QRIS / INFO REKENING LOKAL -->
                     <div style="background: white; padding: 15px; border-radius: 16px; border: 2px dashed var(--primary); display: inline-block; width: 100%; max-width: 250px; box-shadow: 0 8px 20px rgba(0,0,0,0.1);">
                         <img src="QrisStatisTwidy Shop .png" alt="QRIS Twidy Shop" style="width: 100%; height: auto; border-radius: 8px;">
                         <div style="margin-top: 10px; font-size: 14px; font-weight: bold; color: #000;">QRIS Twidy Shop</div>
@@ -1824,7 +1824,7 @@
                     </div>
                 </div>
                 
-                <div class="hide-on-export" style="display:flex; gap:10px; justify-content:center; margin-top:20px; width: 100%;">
+                <div class="hide-on-export" style="display:flex; gap:10px; justify-content:center; margin-top:20px; padding-bottom:50px; width: 100%;">
                     ${actionButtonsHTML}
                 </div>
             </div>
