@@ -218,8 +218,7 @@
         ========================================================= */
         .main-content {
             flex: 1; display: flex; flex-direction: column;
-            position: relative; height: 100%; 
-            overflow-y: auto; /* FIX 1: Mengizinkan area utama scrolling jika dipaksa layar kecil */
+            position: relative; height: 100%; overflow-y: auto;
         }
 
         .smart-header {
@@ -254,11 +253,9 @@
 
         .view-section {
             display: none; padding: 0 40px 40px 40px;
-            animation: fadeIn 0.4s ease forwards; 
-            flex: 1;
+            animation: fadeIn 0.4s ease forwards; flex: 1;
             flex-direction: column;
-            overflow-y: auto; /* FIX 2: Buka gembok di dalam section, agar panel di dalamnya bisa bebas berkreasi */
-            min-height: 0; 
+            overflow: hidden;
         }
         .view-section.active { display: flex; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -361,40 +358,29 @@
         .feature-card-lg .icon { width: 32px; height: 32px; background: var(--primary); color: #fff; border-radius: 10px; display: flex; justify-content: center; align-items: center;}
 
         /* =========================================================
-           5. CSS UMUM UNTUK WORKSPACE & RE-PRINT (100% FIXED SCROLL)
+           5. CSS UMUM UNTUK WORKSPACE & RE-PRINT
         ========================================================= */
         .sj-workspace-grid {
             display: grid; 
-            grid-template-columns: 290px 1fr; 
+            grid-template-columns: 270px 1fr; 
             gap: 20px; 
-            flex: 1;         
-            min-height: 0; 
+            height: calc(100vh - 160px);
         }
 
         .sj-sidebar-panel {
             background: var(--glass-bg); backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border); border-radius: 24px; 
             padding: 18px; 
-            display: flex; flex-direction: column; gap: 14px; 
-            height: 100%; 
-            overflow-y: auto; /* FIX 3: INILAH SOLUSI UTAMANYA! Scroll diizinkan langsung di dalam kotaknya */
-        }
-        
-        .riwayat-list-container, .memo-list-container {
-            display: flex; flex-direction: column; gap: 8px;
-            flex: 1; 
-            overflow-y: auto; 
-            padding-right: 5px; 
-            min-height: 0; 
+            display: flex; flex-direction: column; gap: 16px; overflow-y: auto;
         }
 
         .sj-main-panel {
             background: var(--glass-bg); backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border); border-radius: 24px; 
+            /* REVISI: Padding bawah diperbesar agar tombol tidak tersembunyi scroll batas */
             padding: 15px 15px 120px 15px; 
             overflow-y: auto; overflow-x: hidden; 
             display: flex; flex-direction: column; align-items: center;
-            height: 100%; 
         }
         
         .file-item { 
@@ -836,7 +822,7 @@
                     </div>
 
                     <div class="control-panel">
-                        <!-- SIDEBAR KANAN -->
+                        <!-- SIDEBAR KANAN: TOPUP DIGITAL KEMBALI POLOS SEPERTI SEMULA -->
                         <div class="glass-card feature-card-lg" onclick="switchTab('topup')" style="border-color: rgba(59, 130, 246, 0.3);">
                             <div class="header">
                                 <div class="title-area">
@@ -919,31 +905,31 @@
 
             <!-- ================= VIEW: SURAT JALAN TERINTEGRASI ================= -->
             <div id="view-surat-jalan" class="view-section">
-                <button class="btn-back" onclick="switchTab('home')" style="margin-bottom: 20px; flex-shrink: 0;">
+                <button class="btn-back" onclick="switchTab('home')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                     Kembali ke Dashboard
                 </button>
 
                 <div class="sj-workspace-grid">
                     <div class="sj-sidebar-panel">
-                        <h3 id="sj-module-title" style="font-size: 16px; font-weight: 600; flex-shrink: 0;">Modul Surat Jalan</h3>
+                        <h3 id="sj-module-title" style="font-size: 16px; font-weight: 600;">Modul Surat Jalan</h3>
                         
-                        <div class="drop-zone" id="dropArea" onclick="document.getElementById('fileSoInput').click()" style="flex-shrink: 0;">
+                        <div class="drop-zone" id="dropArea" onclick="document.getElementById('fileSoInput').click()">
                             <input type="file" id="fileSoInput" accept="application/pdf" multiple>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                             <span class="title">Tarik & Lepas PDF</span>
                             <span class="subtitle">Atau klik untuk pilih file</span>
                         </div>
-                        <div class="file-info" id="fileInfo" style="flex-shrink: 0;"></div>
+                        <div class="file-info" id="fileInfo"></div>
                         
-                        <div style="display: flex; gap: 8px; flex-shrink: 0;">
+                        <div style="display: flex; gap: 8px;">
                             <button class="btn-process" id="btnProses" onclick="prosesBanyakPDF()" disabled style="flex: 1;">Mulai Proses PDF</button>
                             <button class="btn-process btn-outline" style="width: auto; padding: 14px; background: rgba(128,128,128,0.1); border: 1px solid var(--glass-border); color: var(--text-main);" onclick="openManualModal()" title="Buat Manual">✍️</button>
                         </div>
 
-                        <hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 5px 0; flex-shrink: 0;">
+                        <hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 5px 0;">
 
-                        <div style="display: flex; flex-direction: column; gap: 10px; flex-shrink: 0;">
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <label style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Database Tersimpan</label>
                                 <button onclick="loadRiwayatData()" style="background: none; border: none; color: var(--primary); font-size: 11px; cursor: pointer; font-weight: 500;">🔄 Refresh DB</button>
@@ -962,8 +948,7 @@
                             </div>
                         </div>
 
-                        <!-- DIV DATABASE INI SEKARANG PASTI BISA SCROLL -->
-                        <div id="sidebar-riwayat-container" class="riwayat-list-container">
+                        <div id="sidebar-riwayat-container" style="display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto; padding-right: 2px;">
                             <span style="font-size: 11px; color: var(--text-muted); text-align: center; padding: 15px;">Klik Refresh DB untuk memuat data...</span>
                         </div>
                     </div>
@@ -988,7 +973,7 @@
 
             <!-- ================= VIEW: ADDRESS LABEL ================= -->
             <div id="view-alamat" class="view-section">
-                <button class="btn-back" onclick="switchTab('home')" style="margin-bottom: 20px; flex-shrink: 0;">
+                <button class="btn-back" onclick="switchTab('home')" style="margin-bottom: 20px;">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                     Tutup Modul
                 </button>
@@ -997,19 +982,19 @@
 
             <!-- ================= VIEW: MEMO ================= -->
             <div id="view-memo" class="view-section">
-                <button class="btn-back" onclick="switchTab('home')" style="margin-bottom: 20px; flex-shrink: 0;">
+                <button class="btn-back" onclick="switchTab('home')" style="margin-bottom: 20px;">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                     Kembali ke Dashboard
                 </button>
 
                 <div class="sj-workspace-grid">
                     <div class="sj-sidebar-panel">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-shrink: 0;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                             <h3 style="font-size: 16px; font-weight: 600;">Daftar Memo</h3>
                             <button onclick="loadMemoDariDrive()" style="background: none; border: none; color: var(--primary); font-size: 11px; cursor: pointer; font-weight: 500;">🔄 Refresh</button>
                         </div>
-                        <input type="text" id="input-search-memo" class="form-input" style="padding: 10px 12px; margin-bottom: 5px; flex-shrink: 0;" placeholder="🔍 Cari nama memo..." oninput="filterMemoList()">
-                        <div id="daftar-memo" class="memo-list-container">
+                        <input type="text" id="input-search-memo" class="form-input" style="padding: 10px 12px; margin-bottom: 5px;" placeholder="🔍 Cari nama memo..." oninput="filterMemoList()">
+                        <div id="daftar-memo" style="display: flex; flex-direction: column; gap: 5px; overflow-y: auto; max-height: calc(100vh - 300px);">
                             <div class="file-item">Memuat data...</div>
                         </div>
                     </div>
@@ -1025,7 +1010,7 @@
 
             <!-- ================= VIEW: MENU MAKAN SIANG ================= -->
             <div id="view-maksi" class="view-section">
-                <button class="btn-back" onclick="switchTab('home')" style="margin-bottom: 20px; flex-shrink: 0;">
+                <button class="btn-back" onclick="switchTab('home')" style="margin-bottom: 20px;">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                     Tutup Modul
                 </button>
@@ -1034,33 +1019,11 @@
 
             <!-- ================= VIEW: TWIDY TOOLS ================= -->
             <div id="view-twidytools" class="view-section">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); padding: 12px 20px; border-radius: 16px; flex-shrink: 0;">
-                    <button class="btn-back" onclick="switchTab('home')" style="margin-bottom: 0; padding: 6px 12px; font-size: 12px;">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                        Dashboard
-                    </button>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <a href="https://twidytools.my.id/" target="_blank" style="font-size: 13px; font-weight: 600; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 6px;">
-                            🌐 twidytools.my.id
-                        </a>
-                    </div>
-                    <div style="display: flex; gap: 10px;">
-                        <button class="btn-process btn-yellow btn-sm" style="width: auto; padding: 6px 14px; gap: 6px; color: #000;" onclick="refreshIframe('iframe-twidytools')" title="Refresh TwidyTools">
-                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-                            Refresh
-                        </button>
-                        <a href="https://twidytools.my.id/" target="_blank" class="btn-process btn-blue btn-sm" style="width: auto; padding: 6px 14px; gap: 6px; text-decoration: none;" title="Buka Full Screen / Tab Baru">
-                            <span>Full Screen</span>
-                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="15 3 21 3 21 9"></polyline>
-                                <polyline points="9 21 3 21 3 15"></polyline>
-                                <line x1="21" y1="3" x2="14" y2="10"></line>
-                                <line x1="3" y1="21" x2="10" y2="14"></line>
-                            </svg>
-                        </a>
-                    </div>
-                </div>
-                <iframe id="iframe-twidytools" src="https://twidytools.my.id" style="border: none; border-radius: 20px; flex: 1; width: 100%; background: #fff; min-height: calc(100vh - 180px);"></iframe>
+                <button class="btn-back" onclick="switchTab('home')" style="margin-bottom: 20px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    Kembali ke Dashboard
+                </button>
+                <iframe src="https://twidytools.my.id"></iframe>
             </div>
 
             <!-- ================= VIEW: TOPUP DIGITAL ================= -->
@@ -1071,27 +1034,21 @@
                         Dashboard
                     </button>
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <a href="https://twidyshop.my.id/" target="_blank" style="font-size: 13px; font-weight: 600; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 6px;">
+                        <a href="https://twidytools.my.id/" target="_blank" style="font-size: 13px; font-weight: 600; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 6px;">
                             🌐 twidyshop.my.id
                         </a>
                     </div>
-                    <div style="display: flex; gap: 10px;">
-                        <button class="btn-process btn-yellow btn-sm" style="width: auto; padding: 6px 14px; gap: 6px; color: #000;" onclick="refreshIframe('iframe-topup')" title="Refresh Topup">
-                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-                            Refresh
-                        </button>
-                        <a href="https://twidyshop.my.id/" target="_blank" class="btn-process btn-blue btn-sm" style="width: auto; padding: 6px 14px; gap: 6px; text-decoration: none;" title="Buka Full Screen / Tab Baru">
-                            <span>Full Screen</span>
-                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="15 3 21 3 21 9"></polyline>
-                                <polyline points="9 21 3 21 3 15"></polyline>
-                                <line x1="21" y1="3" x2="14" y2="10"></line>
-                                <line x1="3" y1="21" x2="10" y2="14"></line>
-                            </svg>
-                        </a>
-                    </div>
+                    <a href="https://twidyshop.my.id/" target="_blank" class="btn-process btn-blue btn-sm" style="width: auto; padding: 6px 14px; gap: 6px; text-decoration: none;" title="Buka Full Screen / Tab Baru">
+                        <span>Full Screen / Tab Baru</span>
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <polyline points="9 21 3 21 3 15"></polyline>
+                            <line x1="21" y1="3" x2="14" y2="10"></line>
+                            <line x1="3" y1="21" x2="10" y2="14"></line>
+                        </svg>
+                    </a>
                 </div>
-                <iframe id="iframe-topup" src="https://twidyshop.my.id/" style="border: none; border-radius: 20px; flex: 1; width: 100%; background: #fff; min-height: calc(100vh - 180px);"></iframe>
+                <iframe src="https://twidyshop.my.id/" style="border: none; border-radius: 20px; flex: 1; width: 100%; background: #fff; min-height: calc(100vh - 180px);"></iframe>
             </div>
 
             <!-- ================= VIEW: TRAKTIR ================= -->
@@ -1173,15 +1130,6 @@
          SCRIPT LOGIKA SISTEM UTAMA
     =========================================== -->
     <script>
-        // Fungsi baru untuk menyegarkan spesifik iframe
-        function refreshIframe(iframeId) {
-            const iframe = document.getElementById(iframeId);
-            if (iframe) {
-                iframe.src = iframe.src;
-                showToast("Berhasil", "Halaman berhasil disegarkan.");
-            }
-        }
-
         const API_URL_AO = 'https://script.google.com/macros/s/AKfycbyPhh5vp1usJ8PUl4YG0JfVmTnVvqYI50mXSbIwvV5j_H9Cts_fF5ngjhFUlN0AQ7A0yA/exec';
         const API_URL_GME = 'https://script.google.com/macros/s/AKfycbzABIiq9cFNFd0DXvsRp4vVAsKxj6CA0PZdkDmILsJ_Ly-W4_Ngp7dMM2GQo2gCDqdK/exec';
         const DRIVE_API_URL = 'https://script.google.com/macros/s/AKfycbxUo0_Y9zjqqDL-tJJjQRv-CaYHTK48c5PWAlXKXer9-qJEbFMN4y3HfHTjqVEckvoL/exec?action=getMemo';
