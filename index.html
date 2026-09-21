@@ -477,7 +477,7 @@
         }
         .btn-back:hover { background: rgba(128,128,128,0.2); }
 
-        #view-twidytools, #view-alamat, #view-maksi, #view-memo, #view-traktir, #view-topup { padding-top: 0; }
+        #view-twidytools, #view-alamat, #view-maksi, #view-memo, #view-traktir, #view-topup, #view-kopiwheel { padding-top: 0; }
         iframe {
             flex: 1; width: 100%; border: 1px solid var(--glass-border); border-radius: 20px;
             min-height: calc(100vh - 150px); background: #fff;
@@ -756,6 +756,12 @@
                     <p id="live-date">Memuat tanggal...</p>
                 </div>
                 <div class="header-status-group">
+                    
+                    <!-- MENU KOPI WHEEL -->
+                    <a href="#" onclick="switchTab('kopiwheel'); return false;" style="text-decoration: none; color: var(--text-main); font-size: 10px; font-weight: 800; line-height: 1.2; text-align: center; letter-spacing: 0.5px; transition: var(--transition);" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        KOPI<br>WHEEL
+                    </a>
+
                     <a href="#" onclick="switchTab('traktir'); return false;" class="header-traktir-btn">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
                             <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
@@ -1095,6 +1101,37 @@
                     </div>
                 </div>
                 <iframe id="iframe-topup" src="https://twidyshop.my.id/" style="border: none; border-radius: 20px; flex: 1; width: 100%; background: #fff; min-height: calc(100vh - 180px);"></iframe>
+            </div>
+
+            <!-- ================= VIEW: KOPI WHEEL ================= -->
+            <div id="view-kopiwheel" class="view-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); padding: 12px 20px; border-radius: 16px; flex-shrink: 0;">
+                    <button class="btn-back" onclick="switchTab('home')" style="margin-bottom: 0; padding: 6px 12px; font-size: 12px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                        Dashboard
+                    </button>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <a href="https://coffeeroulette-puce.vercel.app/" target="_blank" style="font-size: 13px; font-weight: 600; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 6px;">
+                            🌐 KopiWheel (Coffee Roulette)
+                        </a>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn-process btn-yellow btn-sm" style="width: auto; padding: 6px 14px; gap: 6px; color: #000;" onclick="refreshIframe('iframe-kopiwheel')" title="Refresh KopiWheel">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                            Refresh
+                        </button>
+                        <a href="https://coffeeroulette-puce.vercel.app/" target="_blank" class="btn-process btn-blue btn-sm" style="width: auto; padding: 6px 14px; gap: 6px; text-decoration: none;" title="Buka Full Screen / Tab Baru">
+                            <span>Full Screen</span>
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="15 3 21 3 21 9"></polyline>
+                                <polyline points="9 21 3 21 3 15"></polyline>
+                                <line x1="21" y1="3" x2="14" y2="10"></line>
+                                <line x1="3" y1="21" x2="10" y2="14"></line>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <iframe id="iframe-kopiwheel" src="https://coffeeroulette-puce.vercel.app/" style="border: none; border-radius: 20px; flex: 1; width: 100%; background: #fff; min-height: calc(100vh - 180px);"></iframe>
             </div>
 
             <!-- ================= VIEW: TRAKTIR ================= -->
@@ -1451,6 +1488,7 @@
                 'maksi': 'Menu Makan Siang',
                 'twidytools': 'Modul: TwidyTools',
                 'topup': 'Modul: Topup Digital',
+                'kopiwheel': 'Modul: KopiWheel',
                 'traktir': 'Traktir Kopi Developer'
             };
             document.getElementById('top-title').innerText = titles[tabId] || titles['home'];
