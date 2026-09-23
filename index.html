@@ -242,15 +242,18 @@
         .header-status-group span { display: flex; align-items: center; gap: 8px; }
         .header-status-group svg { width: 16px; height: 16px; opacity: 0.7; }
 
-        .header-splitbill-btn {
-            display: flex; align-items: center; gap: 6px;
-            background: rgba(14, 165, 233, 0.1); border: 1px solid rgba(14, 165, 233, 0.3);
-            color: #0ea5e9; padding: 6px 12px; border-radius: 12px;
-            font-size: 12px; font-weight: 600; cursor: pointer; transition: var(--transition);
-            text-decoration: none;
+        /* Gaya Khusus Untuk Tombol Smart BSOFT di Header Agar Terlihat Clickable */
+        .header-smartbsoft-btn {
+            display: flex; align-items: center; gap: 8px;
+            background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.3);
+            color: #6366f1; padding: 8px 16px; border-radius: 12px;
+            font-size: 13px; font-weight: 600; cursor: pointer; transition: var(--transition);
+            text-decoration: none; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
-        .header-splitbill-btn:hover {
-            background: rgba(14, 165, 233, 0.2); transform: translateY(-1px);
+        .header-smartbsoft-btn:hover {
+            background: rgba(99, 102, 241, 0.15); 
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
         }
 
         .view-section {
@@ -477,7 +480,7 @@
         }
         .btn-back:hover { background: rgba(128,128,128,0.2); }
 
-        #view-twidytools, #view-alamat, #view-maksi, #view-memo, #view-traktir, #view-topup, #view-kopiwheel, #view-splitbill { padding-top: 0; }
+        #view-twidytools, #view-alamat, #view-maksi, #view-memo, #view-traktir, #view-topup, #view-kopiwheel, #view-smartbsoft { padding-top: 0; }
         iframe {
             flex: 1; width: 100%; border: 1px solid var(--glass-border); border-radius: 20px;
             min-height: calc(100vh - 150px); background: #fff;
@@ -721,8 +724,17 @@
                 <div class="nav-item" id="nav-twidytools" onclick="switchTab('twidytools')" data-tooltip="TwidyTools">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
                 </div>
+
+                <!-- MENU KOPI WHEEL (Dipindah ke sini) -->
+                <div class="nav-item" id="nav-kopiwheel" onclick="switchTab('kopiwheel')" data-tooltip="KopiWheel">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <circle cx="12" cy="12" r="6"></circle>
+                        <circle cx="12" cy="12" r="2"></circle>
+                    </svg>
+                </div>
                 
-                <!-- TOMBOL TRAKTIR DI SIDEBAR KIRI (TETAP ADA) -->
+                <!-- TOMBOL TRAKTIR DI SIDEBAR KIRI -->
                 <div class="nav-item btn-donasi" id="nav-traktir" onclick="switchTab('traktir')" style="height: auto; padding: 10px 0; flex-direction: column; gap: 2px;" data-tooltip="Traktir Kopi Developer ☕">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
                         <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
@@ -756,20 +768,16 @@
                     <p id="live-date">Memuat tanggal...</p>
                 </div>
                 <div class="header-status-group">
-                    
-                    <!-- MENU KOPI WHEEL -->
-                    <a href="#" onclick="switchTab('kopiwheel'); return false;" style="text-decoration: none; color: var(--text-main); font-size: 10px; font-weight: 800; line-height: 1.2; text-align: center; letter-spacing: 0.5px; transition: var(--transition);" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                        KOPI<br>WHEEL
-                    </a>
 
-                    <!-- MENU SPLIT BILL MENGGANTIKAN TRAKTIR DI HEADER -->
-                    <a href="#" onclick="switchTab('splitbill'); return false;" class="header-splitbill-btn">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
-                            <path d="M4 2v20l2-2 2 2 2-2 2 2 2-2 2 2 2-2 2 2V2l-2 2-2-2-2 2-2-2-2 2-2-2-2 2Z"></path>
-                            <line x1="8" y1="10" x2="16" y2="10"></line>
-                            <line x1="8" y1="14" x2="16" y2="14"></line>
+                    <!-- MENU SMART BSOFT (Tombol Lebih Menonjol & Terlihat Interaktif) -->
+                    <a href="#" onclick="switchTab('smartbsoft'); return false;" class="header-smartbsoft-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                            <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                            <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                            <line x1="6" y1="6" x2="6.01" y2="6"></line>
+                            <line x1="6" y1="18" x2="6.01" y2="18"></line>
                         </svg>
-                        <span>Split Bill</span>
+                        <span>Smart BSOFT</span>
                     </a>
 
                     <span>
@@ -1133,24 +1141,24 @@
                 <iframe id="iframe-kopiwheel" src="https://coffeeroulette-puce.vercel.app/" style="border: none; border-radius: 20px; flex: 1; width: 100%; background: #fff; min-height: calc(100vh - 180px);"></iframe>
             </div>
 
-            <!-- ================= VIEW: SPLIT BILL ================= -->
-            <div id="view-splitbill" class="view-section">
+            <!-- ================= VIEW: SMART BSOFT ================= -->
+            <div id="view-smartbsoft" class="view-section">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); padding: 12px 20px; border-radius: 16px; flex-shrink: 0;">
                     <button class="btn-back" onclick="switchTab('home')" style="margin-bottom: 0; padding: 6px 12px; font-size: 12px;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                         Dashboard
                     </button>
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <a href="https://twidybill.netlify.app/" target="_blank" style="font-size: 13px; font-weight: 600; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 6px;">
-                            🌐 twidybill.netlify.app
+                        <a href="https://andihub.vercel.app/" target="_blank" style="font-size: 13px; font-weight: 600; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 6px;">
+                            🌐 andihub.vercel.app
                         </a>
                     </div>
                     <div style="display: flex; gap: 10px;">
-                        <button class="btn-process btn-yellow btn-sm" style="width: auto; padding: 6px 14px; gap: 6px; color: #000;" onclick="refreshIframe('iframe-splitbill')" title="Refresh Split Bill">
+                        <button class="btn-process btn-yellow btn-sm" style="width: auto; padding: 6px 14px; gap: 6px; color: #000;" onclick="refreshIframe('iframe-smartbsoft')" title="Refresh Smart BSOFT">
                             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
                             Refresh
                         </button>
-                        <a href="https://twidybill.netlify.app/" target="_blank" class="btn-process btn-blue btn-sm" style="width: auto; padding: 6px 14px; gap: 6px; text-decoration: none;" title="Buka Full Screen / Tab Baru">
+                        <a href="https://andihub.vercel.app/" target="_blank" class="btn-process btn-blue btn-sm" style="width: auto; padding: 6px 14px; gap: 6px; text-decoration: none;" title="Buka Full Screen / Tab Baru">
                             <span>Full Screen</span>
                             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <polyline points="15 3 21 3 21 9"></polyline>
@@ -1161,7 +1169,7 @@
                         </a>
                     </div>
                 </div>
-                <iframe id="iframe-splitbill" src="https://twidybill.netlify.app/" allow="clipboard-read; clipboard-write" style="border: none; border-radius: 20px; flex: 1; width: 100%; background: #fff; min-height: calc(100vh - 180px);"></iframe>
+                <iframe id="iframe-smartbsoft" src="https://andihub.vercel.app/" allow="clipboard-read; clipboard-write" style="border: none; border-radius: 20px; flex: 1; width: 100%; background: #fff; min-height: calc(100vh - 180px);"></iframe>
             </div>
 
             <!-- ================= VIEW: TRAKTIR (Dipanggil Lewat Sidebar) ================= -->
@@ -1519,7 +1527,7 @@
                 'twidytools': 'Modul: TwidyTools',
                 'topup': 'Modul: Topup Digital',
                 'kopiwheel': 'Modul: KopiWheel',
-                'splitbill': 'Modul: Split Bill',
+                'smartbsoft': 'Modul: Smart BSOFT',
                 'traktir': 'Traktir Kopi Developer'
             };
             document.getElementById('top-title').innerText = titles[tabId] || titles['home'];
