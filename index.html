@@ -242,7 +242,7 @@
         .header-status-group span { display: flex; align-items: center; gap: 8px; }
         .header-status-group svg { width: 16px; height: 16px; opacity: 0.7; }
 
-        /* Gaya Khusus Untuk Tombol Smart BSOFT di Header Agar Terlihat Clickable */
+        /* Gaya Khusus Untuk Tombol Smart Lookup di Header Agar Terlihat Clickable */
         .header-smartbsoft-btn {
             display: flex; align-items: center; gap: 8px;
             background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.3);
@@ -769,7 +769,7 @@
                 </div>
                 <div class="header-status-group">
 
-                    <!-- MENU SMART BSOFT (Tombol Lebih Menonjol & Terlihat Interaktif) -->
+                    <!-- MENU Smart Lookup (Tombol Lebih Menonjol & Terlihat Interaktif) -->
                     <a href="#" onclick="switchTab('smartbsoft'); return false;" class="header-smartbsoft-btn">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
                             <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
@@ -777,7 +777,7 @@
                             <line x1="6" y1="6" x2="6.01" y2="6"></line>
                             <line x1="6" y1="18" x2="6.01" y2="18"></line>
                         </svg>
-                        <span>Smart BSOFT</span>
+                        <span>Smart Lookup</span>
                     </a>
 
                     <span>
@@ -1045,7 +1045,7 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                     Tutup Modul
                 </button>
-                <iframe src="Menu_Maksi_Gabungan_Final.pdf#toolbar=0&navpanes=0&scrollbar=0&view=FitH" title="Menu Makan Siang" style="border: none; border-radius: 20px;"></iframe>
+                <iframe src="Menu_Maksi_Oktober_2026.pdf#toolbar=0&navpanes=0&scrollbar=0&view=FitH" title="Menu Makan Siang" style="border: none; border-radius: 20px;"></iframe>
             </div>
 
             <!-- ================= VIEW: TWIDY TOOLS ================= -->
@@ -1141,7 +1141,7 @@
                 <iframe id="iframe-kopiwheel" src="https://coffeeroulette-puce.vercel.app/" style="border: none; border-radius: 20px; flex: 1; width: 100%; background: #fff; min-height: calc(100vh - 180px);"></iframe>
             </div>
 
-            <!-- ================= VIEW: SMART BSOFT ================= -->
+            <!-- ================= VIEW: Smart Lookup ================= -->
             <div id="view-smartbsoft" class="view-section">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); padding: 12px 20px; border-radius: 16px; flex-shrink: 0;">
                     <button class="btn-back" onclick="switchTab('home')" style="margin-bottom: 0; padding: 6px 12px; font-size: 12px;">
@@ -1154,7 +1154,7 @@
                         </a>
                     </div>
                     <div style="display: flex; gap: 10px;">
-                        <button class="btn-process btn-yellow btn-sm" style="width: auto; padding: 6px 14px; gap: 6px; color: #000;" onclick="refreshIframe('iframe-smartbsoft')" title="Refresh Smart BSOFT">
+                        <button class="btn-process btn-yellow btn-sm" style="width: auto; padding: 6px 14px; gap: 6px; color: #000;" onclick="refreshIframe('iframe-smartbsoft')" title="Refresh Smart Lookup">
                             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
                             Refresh
                         </button>
@@ -1527,7 +1527,7 @@
                 'twidytools': 'Modul: TwidyTools',
                 'topup': 'Modul: Topup Digital',
                 'kopiwheel': 'Modul: KopiWheel',
-                'smartbsoft': 'Modul: Smart BSOFT',
+                'smartbsoft': 'Modul: Smart Lookup',
                 'traktir': 'Traktir Kopi Developer'
             };
             document.getElementById('top-title').innerText = titles[tabId] || titles['home'];
