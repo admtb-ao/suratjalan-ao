@@ -57,7 +57,7 @@ module.exports=async function handler(req,res) {
       if(/gme|surat pengantar/.test(q)) tasks.push(["Riwayat GME",SOURCES.gme]);
       if(/surat jalan|nomor so|no.?so|pelanggan|riwayat|database ao|barang/.test(q)) tasks.push(["Riwayat Surat Jalan AO",SOURCES.ao]);
       if(/memo|dokumen|file pdf|drive/.test(q)) tasks.push(["Daftar memo Google Drive",SOURCES.memo]);
-      const result=await Promise.all(tasks.map(async ([name,url])=>{try{const raw=await fetchSource(url),rows=flatten(raw),matches=searchRows(rows,message);return{name,status:"ok",matches:matches.length?matches:rows.slice(0,2)}}catch{return{name,status:"unavailable",matches:[]}}}));
+      const result=await Promise.all(tasks.map(async ([name,url])=>{try{const raw=await fetchSource(url),rows=flatten(raw),matches=searchRows(rows,message);return{name,status:"ok",matches}}catch{return{name,status:"unavailable",matches:[]}}}));
       liveContext="\nSumber data live (hanya bukti ini, jangan mengarang):\n"+JSON.stringify(result).slice(0,12000);
     }
     const contents=[...history,{role:"user",parts:[{text:"Pertanyaan: "+message+"\nKonteks situs:\n"+SITE_CONTEXT+liveContext}]}];
