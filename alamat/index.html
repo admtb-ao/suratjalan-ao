@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
-<head>
+<head>\n    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Cetak Alamat Customer - CV ANDI OFFSET</title>
@@ -530,6 +530,16 @@
 (function () {
   const style = document.createElement('style');
   style.textContent = `
+    
+    #ao-chat-launcher{background:linear-gradient(145deg,#087f5b,#064e3b 72%,#0f766e);border:1px solid #b7f7dd;box-shadow:0 10px 30px #064e3b55, inset 0 1px 0 #ffffff66}
+    #ao-chat-launcher:before{content:"";position:absolute;inset:-5px;border:1px solid #10b98170;border-radius:50%;pointer-events:none}
+    #ao-chat-head{background:linear-gradient(120deg,#064e3b,#087f5b 60%,#0f766e)}.ao-chat-brand{display:flex;align-items:center;gap:10px}.ao-chat-mark{width:38px;height:38px;border-radius:12px;background:#ffffff22;display:grid;place-items:center;border:1px solid #ffffff30}
+    #ao-chat-form{padding:10px 12px 12px;border-top:1px solid #e4eee8;background:white}
+    #ao-chat-drop{display:flex;align-items:center;gap:9px;padding:8px 10px;border:1px dashed #b6c9bf;border-radius:12px;color:#087f5b;cursor:pointer;background:#f8fcf9;margin-bottom:8px}
+    #ao-chat-drop>span{font-size:23px;line-height:1}#ao-chat-drop b{display:block;font-size:12px}#ao-chat-drop small{display:block;font-size:10px;color:#6b7c73}#ao-chat-drop.dragging{background:#dcfce7;border-color:#087f5b}
+    #ao-chat-attachments{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:7px}.ao-chat-file-chip{display:flex;align-items:center;gap:6px;max-width:100%;padding:4px 7px;border-radius:8px;background:#e8f7ef;color:#14532d;font-size:11px}.ao-chat-file-chip b{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ao-chat-file-chip button{border:0;background:none;color:#14532d;font-size:17px;cursor:pointer}
+    #ao-chat-compose{display:flex;gap:8px;align-items:flex-end}#ao-chat-send{width:42px;height:42px;display:grid;place-items:center;flex-shrink:0}
+    @media(max-width:480px){#ao-chat-panel{height:min(680px,calc(100dvh - 100px))}}
     #ao-chat-launcher{position:fixed;right:24px;bottom:24px;z-index:100000;width:56px;height:56px;border:0;border-radius:50%;background:#087f5b;color:#fff;box-shadow:0 8px 28px #0003;cursor:pointer;display:none;align-items:center;justify-content:center;font-size:25px;transition:transform .18s}
     #ao-chat-launcher:hover{transform:translateY(-2px)}
     #ao-chat-panel{position:fixed;right:24px;bottom:92px;z-index:100000;width:min(390px,calc(100vw - 28px));height:min(570px,calc(100dvh - 120px));background:#fff;color:#17211d;border:1px solid #dce7e1;border-radius:20px;box-shadow:0 20px 70px #001b1233;display:none;overflow:hidden;font:14px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
@@ -543,20 +553,34 @@
     @media(max-width:480px){#ao-chat-launcher{right:16px;bottom:16px}#ao-chat-panel{right:10px;bottom:82px;width:calc(100vw - 20px);height:min(600px,calc(100dvh - 100px));border-radius:18px}}
   `;
   document.head.appendChild(style);
-  const launcher=document.createElement('button');launcher.id='ao-chat-launcher';launcher.type='button';launcher.title='Tanya Admin AO';launcher.setAttribute('aria-label','Buka chatbot');launcher.textContent='✦';
+  const launcher=document.createElement('button');launcher.id='ao-chat-launcher';launcher.type='button';launcher.title='Tanya Admin AO';launcher.setAttribute('aria-label','Buka chatbot');launcher.innerHTML='<svg viewBox="0 0 48 48" width="31" height="31" aria-hidden="true"><defs><linearGradient id="aoBotGrad" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffffff"/><stop offset="1" stop-color="#b9ffe3"/></linearGradient></defs><path d="M24 3 29 15 42 19 30 25 26 39 20 27 7 23 19 17Z" fill="url(#aoBotGrad)"/><circle cx="34" cy="9" r="3" fill="#fef08a"/><path d="M10 34h9M14.5 29.5v9" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg>';
   const panel=document.createElement('section');panel.id='ao-chat-panel';panel.setAttribute('aria-label','Chatbot Admin AO');
-  panel.innerHTML='<div id="ao-chat-head"><div><strong>Asisten Admin AO</strong><small>Informasi fitur & pencarian data</small></div><button id="ao-chat-close" type="button" aria-label="Tutup chatbot">×</button></div><div id="ao-chat-messages" aria-live="polite"></div><div id="ao-chat-suggestions"><button class="ao-chat-suggest" type="button">Fitur web ini apa saja?</button><button class="ao-chat-suggest" type="button">Cari alamat customer</button><button class="ao-chat-suggest" type="button">Cari nomor SO</button></div><form id="ao-chat-form"><textarea id="ao-chat-input" rows="1" maxlength="1200" placeholder="Tanyakan sesuatu..." aria-label="Pesan chatbot"></textarea><button id="ao-chat-send" type="submit">Kirim</button></form>';
+  panel.innerHTML='<div id="ao-chat-head"><div class="ao-chat-brand"><span class="ao-chat-mark"><svg viewBox="0 0 48 48" width="25" height="25" aria-hidden="true"><path d="M24 3 29 15 42 19 30 25 26 39 20 27 7 23 19 17Z" fill="white"/><circle cx="35" cy="9" r="3" fill="#fef08a"/></svg></span><div><strong>Asisten Admin AO</strong><small>Portal • Smart Lookup • Lampiran</small></div></div><button id="ao-chat-close" type="button" aria-label="Tutup chatbot">×</button></div><div id="ao-chat-messages" aria-live="polite"></div><div id="ao-chat-suggestions"><button class="ao-chat-suggest" type="button">Fitur web ini apa saja?</button><button class="ao-chat-suggest" type="button">Cari alamat customer</button><button class="ao-chat-suggest" type="button">Cari buku di Smart Lookup</button></div><form id="ao-chat-form"><div id="ao-chat-attachments" aria-live="polite"></div><div id="ao-chat-drop" tabindex="0"><span>＋</span><div><b>Lampirkan file</b><small>Upload atau tarik file ke sini</small></div><input id="ao-chat-file" type="file" multiple accept=".txt,.csv,.json,.md,.pdf,.xlsx,.xls,.docx" hidden></div><div id="ao-chat-compose"><textarea id="ao-chat-input" rows="1" maxlength="1200" placeholder="Tanyakan sesuatu..." aria-label="Pesan chatbot"></textarea><button id="ao-chat-send" type="submit" aria-label="Kirim pesan"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></button></div></form>';
   document.body.append(launcher,panel);
-  const messages=panel.querySelector('#ao-chat-messages'),form=panel.querySelector('#ao-chat-form'),input=panel.querySelector('#ao-chat-input'),send=panel.querySelector('#ao-chat-send');
-  let history=[],busy=false;
+  const messages=panel.querySelector('#ao-chat-messages'),form=panel.querySelector('#ao-chat-form'),input=panel.querySelector('#ao-chat-input'),send=panel.querySelector('#ao-chat-send'),fileInput=panel.querySelector('#ao-chat-file'),drop=panel.querySelector('#ao-chat-drop'),attachmentList=panel.querySelector('#ao-chat-attachments');
+  let history=[],busy=false,attachments=[];
+  const fileIcons={pdf:'PDF',csv:'CSV',xlsx:'XLS',xls:'XLS',docx:'DOC',txt:'TXT',md:'TXT',json:'JSON'};
+  function renderAttachments(){attachmentList.innerHTML='';attachments.forEach((f,i)=>{const chip=document.createElement('span');chip.className='ao-chat-file-chip';chip.innerHTML='<b></b><button type="button" aria-label="Hapus lampiran">×</button>';chip.querySelector('b').textContent=f.name;chip.querySelector('button').onclick=()=>{attachments.splice(i,1);renderAttachments();};attachmentList.appendChild(chip);});}
+  async function readAttachment(file){const ext=(file.name.split('.').pop()||'').toLowerCase();if(file.size>8*1024*1024)throw Error(file.name+' melebihi batas 8 MB.');let text='';
+    if(['txt','csv','json','md'].includes(ext)) text=await file.text();
+    else if(['xlsx','xls'].includes(ext)){if(!window.XLSX)throw Error('Pembaca Excel belum siap.');const wb=XLSX.read(await file.arrayBuffer(),{type:'array'});text=wb.SheetNames.map(n=>'Sheet: '+n+'\n'+XLSX.utils.sheet_to_csv(wb.Sheets[n])).join('\n\n');}
+    else if(ext==='pdf'){if(!window.pdfjsLib)throw Error('Pembaca PDF belum siap.');pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';const pdf=await pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise;for(let p=1;p<=Math.min(pdf.numPages,30);p++){const page=await pdf.getPage(p);const c=await page.getTextContent();text+='[Halaman '+p+'] '+c.items.map(x=>x.str).join(' ')+'\n';}}
+    else if(ext==='docx'){if(!window.mammoth)throw Error('Pembaca DOCX belum siap.');text=(await mammoth.extractRawText({arrayBuffer:await file.arrayBuffer()})).value;}
+    else throw Error('Format file belum didukung: '+file.name);
+    return {name:file.name,text:text.slice(0,18000)};}
+  async function addFiles(fileList){for(const file of Array.from(fileList||[])){if(attachments.length>=4){addMessage('Maksimal 4 file sekali kirim.','bot',true);break;}try{const data=await readAttachment(file);attachments.push(data);}catch(err){addMessage(err.message||'File tidak bisa dibaca.','bot',true);}}renderAttachments();fileInput.value='';}
+  drop.addEventListener('click',()=>fileInput.click());fileInput.addEventListener('change',()=>addFiles(fileInput.files));
+  ['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('dragging');}));
+  ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('dragging');}));
+  drop.addEventListener('drop',e=>addFiles(e.dataTransfer.files));
   function addMessage(text,role,error){const el=document.createElement('div');el.className='ao-chat-msg '+role+(error?' error':'');el.textContent=text;messages.appendChild(el);messages.scrollTop=messages.scrollHeight;return el;}
   function visibility(){const login=document.getElementById('login-screen');const allowed=!login||(sessionStorage.getItem('isLoggedIn')==='true'&&login.style.display==='none');launcher.style.display=allowed?'flex':'none';if(!allowed)panel.classList.remove('open');}
   launcher.addEventListener('click',function(){panel.classList.toggle('open');if(panel.classList.contains('open')&&!messages.childElementCount)addMessage('Halo! Aku bisa menjelaskan fitur portal dan mencari data dari sumber aplikasi yang tersedia. Tulis nama, nomor SO, atau kata kunci yang cukup spesifik.','bot');if(panel.classList.contains('open'))input.focus();});
   panel.querySelector('#ao-chat-close').addEventListener('click',()=>panel.classList.remove('open'));
   panel.querySelectorAll('.ao-chat-suggest').forEach(b=>b.addEventListener('click',()=>{input.value=b.textContent;form.requestSubmit();}));
   input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();form.requestSubmit();}});
-  form.addEventListener('submit',async e=>{e.preventDefault();const message=input.value.trim();if(!message||busy)return;busy=true;send.disabled=true;input.value='';addMessage(message,'user');const pending=addMessage('Sedang mencari jawaban…','bot');
-    try{const response=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message,history})});const data=await response.json();pending.remove();if(!response.ok){addMessage(data.error||'Chatbot belum bisa menjawab saat ini.','bot',true);return;}addMessage(data.answer,'bot');history.push({role:'user',text:message},{role:'model',text:data.answer});history=history.slice(-8);}
+  form.addEventListener('submit',async e=>{e.preventDefault();const message=input.value.trim();if((!message&&!attachments.length)||busy)return;busy=true;send.disabled=true;input.value='';addMessage(message+(attachments.length?'\n📎 '+attachments.map(f=>f.name).join(', '):''),'user');const pending=addMessage('Sedang mencari jawaban…','bot');
+    try{const response=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message,history,attachments})});const data=await response.json();pending.remove();if(!response.ok){addMessage(data.error||'Chatbot belum bisa menjawab saat ini.','bot',true);return;}addMessage(data.answer,'bot');history.push({role:'user',text:message},{role:'model',text:data.answer});history=history.slice(-8);attachments=[];renderAttachments();}
     catch(_){pending.remove();addMessage('Tidak bisa terhubung ke chatbot. Pastikan situs sudah dideploy di Vercel.','bot',true);}finally{busy=false;send.disabled=false;input.focus();}});
   const originalCheckLogin=window.checkLogin;
   if(typeof originalCheckLogin==='function')window.checkLogin=function(){const result=originalCheckLogin.apply(this,arguments);visibility();return result;};
