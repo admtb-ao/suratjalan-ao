@@ -36,7 +36,7 @@ function parseCSV(text) {
     if(c==='"'&&quoted&&text[i+1]==='"'){cell+='"';i++;}
     else if(c==='"') quoted=!quoted;
     else if(c===','&&!quoted){row.push(cell);cell="";}
-    else if((c==='\\n'||c==='\\r')&&!quoted){if(c==='\\r'&&text[i+1]==='\\n')i++;row.push(cell);if(row.some(v=>v.trim()))rows.push(row);row=[];cell="";}
+    else if((c==='\n'||c==='\r')&&!quoted){if(c==='\r'&&text[i+1]==='\n')i++;row.push(cell);if(row.some(v=>v.trim()))rows.push(row);row=[];cell="";}
     else cell+=c;
   }
   if(cell.length||row.length){row.push(cell);rows.push(row);}
@@ -44,11 +44,14 @@ function parseCSV(text) {
   const headers=rows.shift().map(h=>h.trim());
   return rows.map(r=>Object.fromEntries(headers.map((h,i)=>[h,(r[i]||"").trim()]))).filter(r=>Object.values(r).some(Boolean));
 }
+async function fetchCSVText(url) {
+  const controller=new AbortController(), timer=setTimeout(()=>controller.abort(),9000);
+  try { const r=await fetch(url,{signal:controller.signal,headers:{Accept:"text/csv,text/plain"}}); if(!r.ok) throw Error("CSV source unavailable"); return await r.text(); }
+  finally { clearTimeout(timer); }
+}
 async function fetchSmartLookup(query) {
-  const [main,orin]=await Promise.all([fetchSource(SOURCES.smartMain),fetchSource(SOURCES.smartOrin)]);
-  const mainRows=parseCSV(typeof main==="string"?main:JSON.stringify(main));
-  const orinRows=parseCSV(typeof orin==="string"?orin:JSON.stringify(orin));
-  const rows=[...mainRows,...orinRows];
+  const [main,orin]=await Promise.all([fetchCSVText(SOURCES.smartMain),fetchCSVText(SOURCES.smartOrin)]);
+  const rows=[...parseCSV(main),...parseCSV(orin)];
   const matches=searchRows(rows,query).slice(0,12);
   return {name:"Smart Lookup buku & ORIN",status:"ok",totalRecords:rows.length,matches};
 }
@@ -153,7 +156,7 @@ module.exports=async function handler(req,res) {
       }
       liveContext="\nSumber data live (hanya bukti ini; jangan mengarang):\n"+JSON.stringify(result).slice(0,12000);
     }
-    const contents=[...history,{role:"user",parts:[{text:"Pertanyaan: "+message+"\nKonteks situs:\n"+SITE_CONTEXT+liveContext}]}];
+    const contents=[...history,{role:"user",parts:[{text:"Pertanyaan: "+message+"\nKonteks situs:\n"+SITE_CONTEXT+liveContext+attachmentContext}]}];
     const response=await fetch("https://generativelanguage.googleapis.com/v1beta/models/"+GEMINI_MODEL+":generateContent?key="+encodeURIComponent(process.env.GEMINI_API_KEY),{
       method:"POST",headers:{"Content-Type":"application/json"},
       body:JSON.stringify({systemInstruction:{parts:[{text:SITE_CONTEXT}]},contents,generationConfig:{temperature:0.25,maxOutputTokens:900}})
