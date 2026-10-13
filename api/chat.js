@@ -27,10 +27,50 @@ function flatten(value, out=[], depth=0) {
   }
   return out;
 }
+function sourceRows(raw) {
+  if (Array.isArray(raw)) return raw.filter(x => x && typeof x === "object" && !Array.isArray(x));
+  if (raw && Array.isArray(raw.data)) return raw.data.filter(x => x && typeof x === "object" && !Array.isArray(x));
+  if (raw && raw.data && typeof raw.data === "object") return Object.values(raw.data).filter(x => x && typeof x === "object" && !Array.isArray(x));
+  return [];
+}
 function searchRows(rows, query) {
   const terms=query.toLowerCase().split(/[^a-z0-9\u00c0-\u024f]+/i).filter(x=>x.length>1);
+  if (!terms.length) return [];
   return rows.map(row=>({row,score:terms.reduce((n,t)=>n+(Object.values(row).join(" ").toLowerCase().includes(t)?1:0),0)}))
-    .filter(x=>x.score>0).sort((a,b)=>b.score-a.score).slice(0,8).map(x=>x.row);
+    .filter(x=>x.score>0).sort((a,b)=>b.score-a.score).slice(0,10).map(x=>x.row);
+}
+const MONTHS_ID = {januari:1,februari:2,maret:3,april:4,mei:5,juni:6,juli:7,agustus:8,september:9,oktober:10,november:11,desember:12};
+function localTodayKey() {
+  const parts = new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Jakarta",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
+  const get = type => parts.find(p=>p.type===type)?.value;
+  return get("year")+"-"+get("month")+"-"+get("day");
+}
+function dateKey(value) {
+  if (value == null || value === "") return null;
+  if (typeof value === "number" && value > 1000000000) {
+    const d = new Date(value > 1e12 ? value : value * 1000);
+    if (!Number.isNaN(d.getTime())) return new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Jakarta",year:"numeric",month:"2-digit",day:"2-digit"}).format(d);
+  }
+  const text = String(value).trim().toLowerCase();
+  let m = text.match(/(20\d{2})[-/](\d{1,2})[-/](\d{1,2})/);
+  if (m) return m[1]+"-"+m[2].padStart(2,"0")+"-"+m[3].padStart(2,"0");
+  m = text.match(/(\d{1,2})[/-](\d{1,2})[/-](20\d{2})/);
+  if (m) return m[3]+"-"+m[2].padStart(2,"0")+"-"+m[1].padStart(2,"0");
+  m = text.match(/(\d{1,2})\s+([a-z]+)\s+(20\d{2})/i);
+  if (m) {
+    const month=MONTHS_ID[m[2]];
+    if (month) return m[3]+"-"+String(month).padStart(2,"0")+"-"+m[1].padStart(2,"0");
+  }
+  return null;
+}
+function rowDateKey(row) {
+  for (const key of ["createdAt","created_at","waktuDibuat","tanggalDibuat","created","timestamp","tanggal","date","tgl","tanggalSurat"]) {
+    if (row[key] != null) { const parsed=dateKey(row[key]); if(parsed) return parsed; }
+  }
+  return null;
+}
+function isCountTodayQuestion(q) {
+  return /(berapa|jumlah|total|ada)\b/.test(q) && /(surat jalan|surat pengantar)/.test(q) && /(hari ini|today|tanggal ini|sekarang)/.test(q);
 }
 async function fetchSource(url) {
   const controller=new AbortController(), timer=setTimeout(()=>controller.abort(),6500);
@@ -51,14 +91,36 @@ module.exports=async function handler(req,res) {
     const history=Array.isArray(body?.history)?body.history.slice(-8).filter(m=>["user","model"].includes(m?.role)&&typeof m?.text==="string").map(m=>({role:m.role,parts:[{text:m.text.slice(0,1000)}]})):[];
     let liveContext="";
     const q=message.toLowerCase();
+    const countToday=isCountTodayQuestion(q);
     if(/surat jalan|surat pengantar|nomor so|no.?so|pelanggan|riwayat|database ao|database gme|barang|memo|dokumen|alamat|instansi|customer|telepon|telp/.test(q)) {
       const tasks=[];
       if(/alamat|instansi|customer|telepon|telp|penerima/.test(q)) tasks.push(["Database alamat",SOURCES.alamat]);
       if(/gme|surat pengantar/.test(q)) tasks.push(["Riwayat GME",SOURCES.gme]);
       if(/surat jalan|nomor so|no.?so|pelanggan|riwayat|database ao|barang/.test(q)) tasks.push(["Riwayat Surat Jalan AO",SOURCES.ao]);
       if(/memo|dokumen|file pdf|drive/.test(q)) tasks.push(["Daftar memo Google Drive",SOURCES.memo]);
-      const result=await Promise.all(tasks.map(async ([name,url])=>{try{const raw=await fetchSource(url),rows=flatten(raw),matches=searchRows(rows,message);return{name,status:"ok",matches}}catch{return{name,status:"unavailable",matches:[]}}}));
-      liveContext="\nSumber data live (hanya bukti ini, jangan mengarang):\n"+JSON.stringify(result).slice(0,12000);
+      const result=await Promise.all(tasks.map(async ([name,url])=>{
+        try {
+          const raw=await fetchSource(url), rows=sourceRows(raw);
+          if (countToday && name==="Riwayat Surat Jalan AO") {
+            const today=localTodayKey(), dated=rows.map(row=>({row,key:rowDateKey(row)}));
+            const todayRows=dated.filter(x=>x.key===today);
+            return {name,status:"ok",today,timezone:"Asia/Jakarta",totalRecords:rows.length,datedRecords:dated.filter(x=>x.key).length,countToday:todayRows.length,records:todayRows.map(x=>({noSO:x.row.noSO||"",tanggal:x.row.tanggal||"",pelanggan:x.row.pelanggan||""})).slice(0,30)};
+          }
+          return {name,status:"ok",totalRecords:rows.length,matches:searchRows(rows,message)};
+        } catch { return {name,status:"unavailable",matches:[]}; }
+      }));
+      if (countToday) {
+        const ao=result.find(x=>x.name==="Riwayat Surat Jalan AO");
+        if (ao?.status==="ok" && ao.datedRecords>0) {
+          const fmt=new Intl.DateTimeFormat("id-ID",{timeZone:"Asia/Jakarta",day:"numeric",month:"long",year:"numeric"}).format(new Date(ao.today+"T12:00:00+07:00"));
+          return res.status(200).json({answer:ao.countToday===0
+            ? "Berdasarkan data Surat Jalan AO yang berhasil dibaca, tidak ada surat jalan bertanggal "+fmt+". Penghitungan memakai tanggal/waktu yang tersimpan pada data."
+            : "Berdasarkan data Surat Jalan AO yang berhasil dibaca, ada "+ao.countToday+" surat jalan bertanggal "+fmt+". Penghitungan memakai tanggal/waktu yang tersimpan pada data."});
+        }
+        if (ao?.status==="ok") return res.status(200).json({answer:"Aku belum bisa memastikan jumlah surat jalan hari ini karena "+(ao.totalRecords===0?"sumber data tidak mengembalikan rekaman.":"tanggal pada rekaman tidak terbaca dengan format yang dikenali.")+" Aku tidak akan menebak jumlahnya."});
+        return res.status(200).json({answer:"Aku belum bisa menghitung jumlah surat jalan hari ini karena sumber data Surat Jalan AO sedang tidak bisa diakses. Aku tidak akan menebak jumlahnya."});
+      }
+      liveContext="\nSumber data live (hanya bukti ini; jangan mengarang):\n"+JSON.stringify(result).slice(0,12000);
     }
     const contents=[...history,{role:"user",parts:[{text:"Pertanyaan: "+message+"\nKonteks situs:\n"+SITE_CONTEXT+liveContext}]}];
     const response=await fetch("https://generativelanguage.googleapis.com/v1beta/models/"+GEMINI_MODEL+":generateContent?key="+encodeURIComponent(process.env.GEMINI_API_KEY),{
