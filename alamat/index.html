@@ -526,5 +526,42 @@
 
         function clearData() { if(confirm("Bersihkan layar preview (Tidak akan menghapus data di Google Sheets)?")) { dataAlamat = []; updatePreview(); } }
     </script>
+<script>
+(function () {
+  const style = document.createElement('style');
+  style.textContent = `
+    #ao-chat-launcher{position:fixed;right:24px;bottom:24px;z-index:100000;width:56px;height:56px;border:0;border-radius:50%;background:#087f5b;color:#fff;box-shadow:0 8px 28px #0003;cursor:pointer;display:none;align-items:center;justify-content:center;font-size:25px;transition:transform .18s}
+    #ao-chat-launcher:hover{transform:translateY(-2px)}
+    #ao-chat-panel{position:fixed;right:24px;bottom:92px;z-index:100000;width:min(390px,calc(100vw - 28px));height:min(570px,calc(100dvh - 120px));background:#fff;color:#17211d;border:1px solid #dce7e1;border-radius:20px;box-shadow:0 20px 70px #001b1233;display:none;overflow:hidden;font:14px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+    #ao-chat-panel.open{display:flex;flex-direction:column}#ao-chat-head{padding:16px 18px;background:#087f5b;color:white;display:flex;align-items:center;justify-content:space-between}
+    #ao-chat-head strong{font-size:15px;display:block}#ao-chat-head small{opacity:.82;font-size:12px}#ao-chat-close{border:0;background:#ffffff20;color:white;border-radius:8px;width:32px;height:32px;font-size:20px;cursor:pointer}
+    #ao-chat-messages{flex:1;overflow:auto;padding:16px;background:#f7faf8;display:flex;flex-direction:column;gap:10px}
+    .ao-chat-msg{max-width:90%;padding:10px 12px;border-radius:14px;white-space:pre-wrap;overflow-wrap:anywhere}.ao-chat-msg.bot{align-self:flex-start;background:#fff;border:1px solid #e1e9e4;border-bottom-left-radius:4px}.ao-chat-msg.user{align-self:flex-end;background:#087f5b;color:#fff;border-bottom-right-radius:4px}.ao-chat-msg.error{border-color:#fecaca;color:#b91c1c}
+    #ao-chat-suggestions{display:flex;gap:6px;flex-wrap:wrap;padding:0 12px 10px;background:#fff}.ao-chat-suggest{font:12px system-ui;background:#fff;border:1px solid #d5e3da;border-radius:20px;padding:6px 9px;cursor:pointer;color:#245640}
+    #ao-chat-form{display:flex;gap:8px;padding:12px;border-top:1px solid #e5ece7;background:white}#ao-chat-input{min-width:0;flex:1;resize:none;max-height:100px;border:1px solid #d4dfd8;border-radius:12px;padding:11px 12px;font:14px system-ui;outline:none}#ao-chat-input:focus{border-color:#087f5b;box-shadow:0 0 0 2px #087f5b20}
+    #ao-chat-send{border:0;border-radius:12px;padding:0 14px;background:#087f5b;color:white;font-weight:600;cursor:pointer}#ao-chat-send:disabled{opacity:.55;cursor:wait}
+    @media(max-width:480px){#ao-chat-launcher{right:16px;bottom:16px}#ao-chat-panel{right:10px;bottom:82px;width:calc(100vw - 20px);height:min(600px,calc(100dvh - 100px));border-radius:18px}}
+  `;
+  document.head.appendChild(style);
+  const launcher=document.createElement('button');launcher.id='ao-chat-launcher';launcher.type='button';launcher.title='Tanya Admin AO';launcher.setAttribute('aria-label','Buka chatbot');launcher.textContent='✦';
+  const panel=document.createElement('section');panel.id='ao-chat-panel';panel.setAttribute('aria-label','Chatbot Admin AO');
+  panel.innerHTML='<div id="ao-chat-head"><div><strong>Asisten Admin AO</strong><small>Informasi fitur & pencarian data</small></div><button id="ao-chat-close" type="button" aria-label="Tutup chatbot">×</button></div><div id="ao-chat-messages" aria-live="polite"></div><div id="ao-chat-suggestions"><button class="ao-chat-suggest" type="button">Fitur web ini apa saja?</button><button class="ao-chat-suggest" type="button">Cari alamat customer</button><button class="ao-chat-suggest" type="button">Cari nomor SO</button></div><form id="ao-chat-form"><textarea id="ao-chat-input" rows="1" maxlength="1200" placeholder="Tanyakan sesuatu..." aria-label="Pesan chatbot"></textarea><button id="ao-chat-send" type="submit">Kirim</button></form>';
+  document.body.append(launcher,panel);
+  const messages=panel.querySelector('#ao-chat-messages'),form=panel.querySelector('#ao-chat-form'),input=panel.querySelector('#ao-chat-input'),send=panel.querySelector('#ao-chat-send');
+  let history=[],busy=false;
+  function addMessage(text,role,error){const el=document.createElement('div');el.className='ao-chat-msg '+role+(error?' error':'');el.textContent=text;messages.appendChild(el);messages.scrollTop=messages.scrollHeight;return el;}
+  function visibility(){const login=document.getElementById('login-screen');const allowed=!login||(sessionStorage.getItem('isLoggedIn')==='true'&&login.style.display==='none');launcher.style.display=allowed?'flex':'none';if(!allowed)panel.classList.remove('open');}
+  launcher.addEventListener('click',function(){panel.classList.toggle('open');if(panel.classList.contains('open')&&!messages.childElementCount)addMessage('Halo! Aku bisa menjelaskan fitur portal dan mencari data dari sumber aplikasi yang tersedia. Tulis nama, nomor SO, atau kata kunci yang cukup spesifik.','bot');if(panel.classList.contains('open'))input.focus();});
+  panel.querySelector('#ao-chat-close').addEventListener('click',()=>panel.classList.remove('open'));
+  panel.querySelectorAll('.ao-chat-suggest').forEach(b=>b.addEventListener('click',()=>{input.value=b.textContent;form.requestSubmit();}));
+  input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();form.requestSubmit();}});
+  form.addEventListener('submit',async e=>{e.preventDefault();const message=input.value.trim();if(!message||busy)return;busy=true;send.disabled=true;input.value='';addMessage(message,'user');const pending=addMessage('Sedang mencari jawaban…','bot');
+    try{const response=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message,history})});const data=await response.json();pending.remove();if(!response.ok){addMessage(data.error||'Chatbot belum bisa menjawab saat ini.','bot',true);return;}addMessage(data.answer,'bot');history.push({role:'user',text:message},{role:'model',text:data.answer});history=history.slice(-8);}
+    catch(_){pending.remove();addMessage('Tidak bisa terhubung ke chatbot. Pastikan situs sudah dideploy di Vercel.','bot',true);}finally{busy=false;send.disabled=false;input.focus();}});
+  const originalCheckLogin=window.checkLogin;
+  if(typeof originalCheckLogin==='function')window.checkLogin=function(){const result=originalCheckLogin.apply(this,arguments);visibility();return result;};
+  visibility();
+})();
+</script>
 </body>
 </html>
