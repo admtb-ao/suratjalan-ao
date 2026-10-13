@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AndiHub - Bsoft Inventory System</title>
+    
+    <!-- CSS & UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Data Processing Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] },
+                    colors: { primary: '#3b82f6' }
+                }
+            }
+        }
+        // Cek Tema Awal
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+
+    <style>
+        body { -webkit-font-smoothing: antialiased; padding-bottom: 80px; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Loader & Animations */
+        .spinner-small { width: 18px; height: 18px; border: 2.5px solid currentColor; border-left-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; opacity: 0.5; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        select { -webkit-appearance: none; -moz-appearance: none; appearance: none; }
+        
+        /* Modals */
+        .modal-overlay { display: none; opacity: 0; transition: opacity 0.3s; }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-content { transform: scale(0.95); transition: transform 0.3s; }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300 relative min-h-screen">
+
+    <!-- Sync/Toast Notification -->
+    <div id="bgSyncLoader" class="fixed top-20 right-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-lg rounded-xl p-3 flex items-center gap-3 z-50 transition-all duration-500 transform translate-y-0 opacity-100 hidden">
+        <div class="spinner-small text-blue-600 dark:text-blue-400" id="syncSpinner"></div>
+        <div>
+            <h3 class="text-xs font-bold text-slate-700 dark:text-slate-200" id="syncTitle">Menyinkronkan Database...</h3>
+            <p class="text-[10px] text-slate-500 dark:text-slate-400" id="syncDesc">Sedang diproses - mohon ditunggu</p>
+        </div>
+    </div>
+
+    <!-- Header / Navbar -->
+    <header class="bg-white dark:bg-slate-800 sticky top-0 z-40 border-b border-slate-200 dark:border-slate-700 shadow-sm transition-colors duration-300">
+        <div class="max-w-5xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <svg class="w-8 h-8 text-blue-600 dark:text-blue-500" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 22h5.5l4.5-9 4.5 9H22L12 2z"/></svg>
+                <div>
+                    <h1 class="text-lg font-bold text-slate-800 dark:text-white leading-tight">AndiHub</h1>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-none">Bsoft Inventory System</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4 text-slate-500 dark:text-slate-400">
+                <button onclick="focusSearch()" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors" title="Cari Data"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></button>
+                <button onclick="openModal('notifModal')" class="hover:text-blue-600 dark:hover:text-blue-400 relative transition-colors" title="Notifikasi Export">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                    <span id="notifBadge" class="hidden absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-slate-800"></span>
+                </button>
+                <button onclick="toggleTheme()" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors" title="Ganti Tema Mode">
+                    <svg id="themeIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto p-4 md:p-6 space-y-6">
+        <!-- Welcome Banner -->
+        <div class="bg-gradient-to-r from-blue-100 to-blue-200/50 dark:from-blue-900/40 dark:to-slate-800 rounded-2xl p-6 flex justify-between items-center relative overflow-hidden transition-colors duration-300">
+            <div class="relative z-10">
+                <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">SELAMAT DATANG</p>
+                <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-2">Tim AO 👋</h2>
+                <p class="text-sm text-slate-600 dark:text-slate-300 max-w-xs">Cari dan kelola data buku dengan cepat, mudah dan akurat.</p>
+            </div>
+            <div class="relative z-10 hidden sm:block">
+                <svg class="w-24 h-24 text-blue-500 dark:text-blue-400 opacity-80" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg>
+            </div>
+            <div class="absolute top-0 right-0 w-32 h-32 bg-blue-300 dark:bg-blue-600 rounded-full blur-3xl opacity-30 -translate-y-1/2 translate-x-1/3"></div>
+            <div class="absolute bottom-0 left-10 w-24 h-24 bg-blue-400 dark:bg-blue-500 rounded-full blur-2xl opacity-20 translate-y-1/2"></div>
+        </div>
+
+        <!-- Tab Selection -->
+        <div class="grid grid-cols-2 gap-4">
+            <button onclick="switchMode('single')" id="btn-single" class="bg-blue-600 text-white rounded-xl p-4 flex items-center justify-between shadow-lg shadow-blue-500/30 transition-transform active:scale-95">
+                <div class="flex items-center gap-3 text-left">
+                    <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-sm">Single Lookup</h3>
+                        <p class="text-[10px] text-blue-100 hidden sm:block">Cari data kelola satu per satu</p>
+                    </div>
+                </div>
+                <svg class="w-5 h-5 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </button>
+            
+            <button onclick="switchMode('batch')" id="btn-batch" class="bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-xl p-4 flex items-center justify-between shadow-sm hover:border-blue-300 dark:hover:border-blue-500 transition-all active:scale-95">
+                <div class="flex items-center gap-3 text-left">
+                    <div class="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-sm" id="batchTitleTxt">Batch Lookup</h3>
+                        <p class="text-[10px] text-slate-500 dark:text-slate-400 hidden sm:block">Proses data dari file Excel</p>
+                    </div>
+                </div>
+                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </button>
+        </div>
+
+        <!-- ================= SINGLE LOOKUP ================= -->
+        <div id="view-single" class="tab-content active space-y-6">
+            
+            <!-- Filter Box -->
+            <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-5 transition-colors duration-300">
+                <div class="flex justify-between items-center mb-5">
+                    <div class="flex items-center gap-2 text-slate-800 dark:text-white font-bold">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                        Filter Pencarian
+                    </div>
+                    <button onclick="resetFilters()" class="text-xs text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-1 font-medium transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                        Reset Filter
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-5">
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">Kategori Buku</label>
+                        <div class="relative">
+                            <select id="singleKategori" onchange="executeSearch()" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg px-3 py-2.5 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 cursor-pointer">
+                                <option value="">Semua Kategori</option>
+                            </select>
+                            <svg class="w-4 h-4 text-slate-400 absolute right-3 top-3 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">Pengarang</label>
+                        <div class="relative">
+                            <select id="singlePengarang" onchange="executeSearch()" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg px-3 py-2.5 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 cursor-pointer">
+                                <option value="">Semua Pengarang</option>
+                            </select>
+                            <svg class="w-4 h-4 text-slate-400 absolute right-3 top-3 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">Tahun Terbit</label>
+                        <div class="relative mb-1.5">
+                            <select id="singleTahun" onchange="executeSearch()" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg px-3 py-2.5 outline-none focus:border-blue-500 cursor-pointer">
+                                <option value="">Pilih Tahun (Dropdown)</option>
+                            </select>
+                            <svg class="w-4 h-4 text-slate-400 absolute right-3 top-3 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                        <div class="flex gap-2">
+                            <input type="number" id="thnMin" placeholder="Min Thn" oninput="executeSearch()" class="w-1/2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs rounded-lg px-2.5 py-2 outline-none focus:border-blue-500">
+                            <input type="number" id="thnMax" placeholder="Max Thn" oninput="executeSearch()" class="w-1/2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs rounded-lg px-2.5 py-2 outline-none focus:border-blue-500">
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">Sisa Stok</label>
+                        <div class="relative mb-1.5">
+                            <select id="singleStok" onchange="executeSearch()" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg px-3 py-2.5 outline-none focus:border-blue-500 cursor-pointer">
+                                <option value="all">Semua Kondisi Stok</option>
+                                <option value="aman">Stok Aman (>= 100)</option>
+                                <option value="kritis">Stok Kritis (0 - 99)</option>
+                            </select>
+                            <svg class="w-4 h-4 text-slate-400 absolute right-3 top-3 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                        <div class="flex gap-2">
+                            <input type="number" id="stokMin" placeholder="Min Stok" oninput="executeSearch()" class="w-1/2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs rounded-lg px-2.5 py-2 outline-none focus:border-blue-500">
+                            <input type="number" id="stokMax" placeholder="Max Stok" oninput="executeSearch()" class="w-1/2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs rounded-lg px-2.5 py-2 outline-none focus:border-blue-500">
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5 lg:col-span-2">
+                        <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">Harga GP1</label>
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <div class="relative w-full sm:w-1/2">
+                                <select id="singleHarga" onchange="executeSearch()" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg px-3 py-2.5 outline-none focus:border-blue-500 cursor-pointer">
+                                    <option value="all">Pilih Rentang Harga</option>
+                                    <option value="0-50000">Di bawah Rp 50.000</option>
+                                    <option value="50000-100000">Rp 50.000 - Rp 100.000</option>
+                                    <option value="100000-999999999">Di atas Rp 100.000</option>
+                                </select>
+                                <svg class="w-4 h-4 text-slate-400 absolute right-3 top-3 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
+                            <div class="flex gap-2 w-full sm:w-1/2">
+                                <input type="number" id="hrgMin" placeholder="Min Rp" oninput="executeSearch()" class="w-1/2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg px-3 py-2 outline-none focus:border-blue-500">
+                                <input type="number" id="hrgMax" placeholder="Max Rp" oninput="executeSearch()" class="w-1/2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg px-3 py-2 outline-none focus:border-blue-500">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search Input -->
+                <div class="relative mt-2">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                    <input type="text" id="searchInput" placeholder="Cari berdasarkan ID ORIN, ID Item, ISBN, Judul atau Pengarang..." class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg pl-10 pr-4 py-3 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-sm" oninput="executeSearch()" onkeypress="if(event.key === 'Enter') { saveHistory(this.value); this.blur(); }">
+                </div>
+            </div>
+
+            <!-- Hasil Pencarian -->
+            <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden transition-colors duration-300">
+                <div class="p-4 border-b border-slate-100 dark:border-slate-700 flex flex-wrap gap-2 justify-between items-center bg-white dark:bg-slate-800">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-5 h-5 text-slate-700 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                        <h3 class="font-bold text-slate-800 dark:text-white text-sm">Hasil Pencarian</h3>
+                        <span class="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-semibold px-2 py-0.5 rounded-md" id="resultCountBadge">0 data</span>
+                    </div>
+                    <div class="relative">
+                        <select id="sortSelect" onchange="executeSearch()" class="appearance-none bg-transparent text-xs text-slate-600 dark:text-slate-300 font-medium pr-6 py-1 cursor-pointer outline-none text-right">
+                            <option value="default">Urutkan: Relevansi</option>
+                            <option value="harga_asc">Harga (Rendah ke Tinggi)</option>
+                            <option value="harga_desc">Harga (Tinggi ke Rendah)</option>
+                            <option value="stok_desc">Stok (Terbanyak)</option>
+                            <option value="stok_asc">Stok (Tersedikit)</option>
+                            <option value="tahun_desc">Tahun (Terbaru)</option>
+                        </select>
+                        <svg class="w-3 h-3 text-slate-400 absolute right-0 top-1.5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </div>
+
+                <!-- List Container -->
+                <div id="resultContainer" class="divide-y divide-slate-100 dark:divide-slate-700 max-h-[500px] overflow-y-auto bg-white dark:bg-slate-800"></div>
+                
+                <div class="p-4 text-center border-t border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800" id="loadMoreContainer" style="display: none;">
+                    <button onclick="loadMoreSingle()" class="text-blue-600 dark:text-blue-400 text-xs font-bold hover:underline">Muat Lebih Banyak...</button>
+                </div>
+
+                <!-- Export Buttons -->
+                <div class="grid grid-cols-2 gap-px bg-slate-100 dark:bg-slate-700 border-t border-slate-100 dark:border-slate-700">
+                    <button onclick="triggerExport('excel')" class="bg-white dark:bg-slate-800 p-3 flex justify-center items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+                        <div class="w-5 h-5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded flex items-center justify-center"><svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8.5 12H9l-1.5-2.5L6 15H4.5l2.25-3.5L4.5 8H6l1.5 2.5L9 8h1.5l-2.25 3.5L10.5 15z"/></svg></div>
+                        Export Excel
+                    </button>
+                    <button onclick="triggerExport('pdf')" class="bg-white dark:bg-slate-800 p-3 flex justify-center items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+                        <div class="w-5 h-5 bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 rounded flex items-center justify-center"><svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9.5 8.5H8V13h1.5v-1.5zm6.5 0h-1.5V13H16v-1.5zm-6.5-4H8V9h1.5V7.5zm6.5 0h-1.5V9H16V7.5z"/></svg></div>
+                        Export PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= BATCH LOOKUP ================= -->
+        <div id="view-batch" class="tab-content space-y-6">
+            <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-6 text-center transition-colors">
+                
+                <div class="border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-xl p-10 cursor-pointer hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-slate-700/50 transition-colors mb-6" onclick="document.getElementById('fileInput').click()">
+                    <input type="file" id="fileInput" accept=".xlsx, .xls" class="hidden" onchange="handleFileSelect(event)">
+                    <div class="w-16 h-16 bg-blue-50 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                    </div>
+                    <h3 class="font-bold text-slate-700 dark:text-slate-200 mb-1" id="fileStatusText">Pilih atau letakkan file Excel di sini</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Sistem pintar mendeteksi header secara otomatis (Fuzzy Match)</p>
+                </div>
+
+                <div id="batchActionArea" class="text-left pt-2">
+                    <h4 class="font-bold text-slate-800 dark:text-slate-200 text-sm mb-3">Pilih kolom yang ditarik:</h4>
+                    <!-- Grid disesuaikan dan tinggi maksimal ditambah agar teks panjang tidak tumpang tindih -->
+                    <div id="column-checkboxes" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5 max-h-60 overflow-y-auto p-2">
+                        <p class="text-xs text-slate-400 col-span-2">Memuat pilihan kolom...</p>
+                    </div>
+                    <button onclick="executeBatchProcess()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-colors shadow-lg shadow-blue-500/30">Mulai Proses Batch</button>
+                </div>
+            </div>
+
+            <div id="batchResultArea" class="hidden bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-white dark:bg-slate-800">
+                    <h3 class="font-bold text-slate-800 dark:text-white text-sm">Preview Hasil Batch</h3>
+                    <button onclick="triggerBatchExport()" class="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 px-3 py-1.5 rounded-lg text-xs font-bold border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-800 transition-colors">Download Excel Full</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs whitespace-nowrap">
+                        <thead class="text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700" id="batchTableHead"></thead>
+                        <tbody id="batchTableBody" class="divide-y divide-slate-100 dark:divide-slate-700 text-slate-700 dark:text-slate-300"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 w-full bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 flex justify-around items-center h-16 pb-safe z-40 text-[10px] font-semibold text-slate-400 dark:text-slate-500 transition-colors duration-300">
+        <div class="flex flex-col items-center gap-1 nav-item active cursor-pointer p-2 w-16" onclick="switchMode('single'); focusNav(this)">
+            <svg class="w-5 h-5 nav-icon stroke-blue-600 dark:stroke-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            <span class="nav-text text-blue-600 dark:text-blue-400">Beranda</span>
+        </div>
+        <div class="flex flex-col items-center gap-1 cursor-pointer hover:text-slate-600 dark:hover:text-slate-300 p-2 w-16 nav-item" onclick="openModal('historyModal')">
+            <svg class="w-5 h-5 nav-icon stroke-currentColor" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span class="nav-text">Riwayat</span>
+        </div>
+        <div class="flex flex-col items-center gap-1 cursor-pointer hover:text-slate-600 dark:hover:text-slate-300 p-2 w-16 nav-item" onclick="switchMode('batch'); focusNav(this)">
+            <svg class="w-5 h-5 nav-icon stroke-currentColor" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+            <span class="nav-text">Batch</span>
+        </div>
+        <div class="flex flex-col items-center gap-1 cursor-pointer hover:text-slate-600 dark:hover:text-slate-300 p-2 w-16 nav-item" onclick="openModal('settingsModal')">
+            <svg class="w-5 h-5 nav-icon stroke-currentColor" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            <span class="nav-text">Pengaturan</span>
+        </div>
+    </nav>
+
+    <!-- Modals -->
+    <!-- Notif Modal -->
+    <div id="notifModal" class="modal-overlay fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 items-center justify-center p-4">
+        <div class="modal-content bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-sm overflow-hidden border border-slate-200 dark:border-slate-700">
+            <div class="p-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+                <h3 class="font-bold text-slate-800 dark:text-white text-sm">Riwayat Export (Notifikasi)</h3>
+                <button onclick="closeModal('notifModal')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            </div>
+            <div class="p-4 max-h-60 overflow-y-auto space-y-3" id="notifList">
+                <p class="text-xs text-slate-500 dark:text-slate-400 text-center py-4">Belum ada riwayat export.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Modal -->
+    <div id="historyModal" class="modal-overlay fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 items-center justify-center p-4">
+        <div class="modal-content bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-sm overflow-hidden border border-slate-200 dark:border-slate-700">
+            <div class="p-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+                <h3 class="font-bold text-slate-800 dark:text-white text-sm">Riwayat Pencarian</h3>
+                <button onclick="closeModal('historyModal')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            </div>
+            <div class="p-2 max-h-60 overflow-y-auto" id="historyList"></div>
+            <div class="p-3 border-t border-slate-100 dark:border-slate-700 text-center">
+                <button onclick="clearHistory()" class="text-xs font-bold text-rose-500 hover:text-rose-600">Hapus Semua Riwayat</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal-overlay fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 items-center justify-center p-4">
+        <div class="modal-content bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-sm overflow-hidden border border-slate-200 dark:border-slate-700">
+            <div class="p-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+                <h3 class="font-bold text-slate-800 dark:text-white text-sm">Pengaturan Lokal</h3>
+                <button onclick="closeModal('settingsModal')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            </div>
+            <div class="p-4 space-y-4">
+                <button onclick="toggleTheme()" class="w-full flex items-center justify-between bg-slate-50 dark:bg-slate-700/50 p-3 rounded-lg border border-slate-200 dark:border-slate-600 hover:border-blue-300 transition-colors">
+                    <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Mode Gelap (Dark Mode)</span>
+                    <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                </button>
+                <button onclick="clearCache()" class="w-full flex items-center justify-between bg-rose-50 dark:bg-rose-900/20 p-3 rounded-lg border border-rose-100 dark:border-rose-900/50 hover:border-rose-300 transition-colors">
+                    <span class="text-sm font-medium text-rose-600 dark:text-rose-400">Hapus Cache & Data Lokal</span>
+                    <svg class="w-5 h-5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- THEME, MODALS & NAV LOGIC ---
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            document.getElementById('themeIcon').innerHTML = isDark ? 
+                '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>' : 
+                '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>';
+        }
+        
+        if (document.documentElement.classList.contains('dark')) {
+            document.getElementById('themeIcon').innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>';
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+            if(id === 'historyModal') renderHistory();
+            if(id === 'notifModal') document.getElementById('notifBadge').classList.add('hidden');
+        }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        function focusSearch() {
+            switchMode('single');
+            const searchInput = document.getElementById('searchInput');
+            searchInput.focus();
+            searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function focusNav(el) {
+            document.querySelectorAll('.nav-item').forEach(n => {
+                n.classList.remove('active');
+                n.querySelector('.nav-icon').classList.remove('stroke-blue-600', 'dark:stroke-blue-400');
+                n.querySelector('.nav-icon').classList.add('stroke-currentColor');
+                n.querySelector('.nav-text').classList.remove('text-blue-600', 'dark:text-blue-400');
+            });
+            el.classList.add('active');
+            el.querySelector('.nav-icon').classList.remove('stroke-currentColor');
+            el.querySelector('.nav-icon').classList.add('stroke-blue-600', 'dark:stroke-blue-400');
+            el.querySelector('.nav-text').classList.add('text-blue-600', 'dark:text-blue-400');
+        }
+
+        function switchMode(mode) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById('view-' + mode).classList.add('active');
+            
+            const btnSingle = document.getElementById('btn-single');
+            const btnBatch = document.getElementById('btn-batch');
+            
+            if(mode === 'single') {
+                btnSingle.className = "bg-blue-600 text-white rounded-xl p-4 flex items-center justify-between shadow-lg shadow-blue-500/30 transition-transform active:scale-95";
+                btnSingle.querySelector('.text-blue-100')?.classList.remove('hidden');
+                btnSingle.querySelector('.w-10').classList.replace('bg-slate-50', 'bg-white/20');
+                btnSingle.querySelector('.w-10').classList.replace('dark:bg-slate-900/30', 'bg-white/20');
+                btnSingle.querySelector('.w-10').classList.replace('text-blue-600', 'text-white');
+                btnSingle.querySelector('.w-10').classList.replace('dark:text-blue-400', 'text-white');
+                
+                btnBatch.className = "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-xl p-4 flex items-center justify-between shadow-sm hover:border-blue-300 dark:hover:border-blue-500 transition-all active:scale-95";
+                btnBatch.querySelector('h3').classList.remove('text-white');
+                btnBatch.querySelector('h3').classList.add('text-slate-800', 'dark:text-white');
+                btnBatch.querySelector('.w-10').className = "w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400";
+                
+                focusNav(document.querySelectorAll('.nav-item')[0]);
+            } else {
+                btnBatch.className = "bg-blue-600 text-white rounded-xl p-4 flex items-center justify-between shadow-lg shadow-blue-500/30 transition-transform active:scale-95";
+                btnBatch.querySelector('h3').classList.remove('text-slate-800', 'dark:text-white');
+                btnBatch.querySelector('h3').classList.add('text-white');
+                btnBatch.querySelector('.w-10').className = "w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white";
+
+                btnSingle.className = "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-xl p-4 flex items-center justify-between shadow-sm hover:border-blue-300 dark:hover:border-blue-500 transition-all active:scale-95";
+                btnSingle.querySelector('.text-blue-100')?.classList.add('hidden');
+                btnSingle.querySelector('.w-10').className = "w-10 h-10 rounded-full bg-blue-50 dark:bg-slate-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400";
+                
+                focusNav(document.querySelectorAll('.nav-item')[2]);
+            }
+        }
+
+        // --- HISTORY & CACHE ---
+        function saveHistory(query) {
+            if(!query.trim()) return;
+            let hist = JSON.parse(localStorage.getItem('bsoft_history') || '[]');
+            hist = hist.filter(h => h.toLowerCase() !== query.toLowerCase());
+            hist.unshift(query.trim());
+            if(hist.length > 15) hist.pop();
+            localStorage.setItem('bsoft_history', JSON.stringify(hist));
+        }
+
+        function renderHistory() {
+            let hist = JSON.parse(localStorage.getItem('bsoft_history') || '[]');
+            const container = document.getElementById('historyList');
+            if(hist.length === 0) {
+                container.innerHTML = '<p class="text-xs text-slate-500 text-center py-4">Belum ada riwayat pencarian.</p>';
+                return;
+            }
+            container.innerHTML = hist.map(h => `
+                <div onclick="applyHistory('${h}')" class="p-3 border-b border-slate-100 dark:border-slate-700 flex items-center gap-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span class="text-sm text-slate-700 dark:text-slate-200">${h}</span>
+                </div>
+            `).join('');
+        }
+
+        function applyHistory(query) {
+            document.getElementById('searchInput').value = query;
+            closeModal('historyModal');
+            executeSearch();
+        }
+
+        function clearHistory() {
+            localStorage.removeItem('bsoft_history');
+            renderHistory();
+        }
+
+        function clearCache() {
+            localStorage.removeItem('bsoft_history');
+            localStorage.removeItem('bsoft_notifs');
+            alert('Cache dan riwayat lokal berhasil dihapus!');
+            closeModal('settingsModal');
+        }
+
+        // --- NOTIFICATIONS ---
+        function addNotification(type, filename, count) {
+            let notifs = JSON.parse(localStorage.getItem('bsoft_notifs') || '[]');
+            const time = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            notifs.unshift({ type, filename, count, time, date: new Date().toLocaleDateString('id-ID') });
+            if(notifs.length > 20) notifs.pop();
+            localStorage.setItem('bsoft_notifs', JSON.stringify(notifs));
+            
+            document.getElementById('notifBadge').classList.remove('hidden');
+            renderNotifs();
+        }
+
+        function renderNotifs() {
+            let notifs = JSON.parse(localStorage.getItem('bsoft_notifs') || '[]');
+            const container = document.getElementById('notifList');
+            if(notifs.length === 0) return;
+            
+            container.innerHTML = notifs.map(n => `
+                <div class="p-3 bg-slate-50 dark:bg-slate-700/30 rounded-lg border border-slate-100 dark:border-slate-700">
+                    <div class="flex items-center gap-2 mb-1">
+                        <div class="w-2 h-2 rounded-full ${n.type === 'excel' ? 'bg-emerald-500' : 'bg-rose-500'}"></div>
+                        <h4 class="text-xs font-bold text-slate-700 dark:text-slate-200">Export ${n.type.toUpperCase()} Berhasil</h4>
+                        <span class="text-[10px] text-slate-400 ml-auto">${n.time}</span>
+                    </div>
+                    <p class="text-[10px] text-slate-500 dark:text-slate-400">File <span class="font-semibold text-slate-600 dark:text-slate-300">${n.filename}</span> diunduh. Total: ${n.count} data.</p>
+                </div>
+            `).join('');
+        }
+
+        // --- DATA PROCESSING & SINKRONISASI ---
+        const GSHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1oOR3gFw363uttAx6nFnf1ffVvVjY4v-dxn9C0Ij4VLU/export?format=csv";
+        const GSHEET_ORIN_URL = "https://docs.google.com/spreadsheets/d/1U2jYvdm-ZYXOSh2MQe04nQJXNkfOExIiFvmh8K-hNkM/export?format=csv";
+        
+        let rawHeaders = [], allData = [];
+        let dataMapById = new Map(), dataMapByIsbn = new Map(), dataMapByJudul = new Map(), dataMapByOrin = new Map();
+        
+        let currentSingleData = [], singleRenderIndex = 0;
+        const ITEMS_PER_PAGE = 30; 
+        let pendingBatchData = null, batchSelectedHeaders = [], currentBatchResult = [];
+
+        // --- IDLE TIMER SYSTEM (30 Menit) ---
+        let idleTimeout;
+        const IDLE_LIMIT = 30 * 60 * 1000; // 30 Menit
+
+        function resetIdleTimer() {
+            clearTimeout(idleTimeout);
+            idleTimeout = setTimeout(() => {
+                syncData(true); 
+            }, IDLE_LIMIT);
+        }
+
+        function setupIdleTimer() {
+            document.addEventListener('mousemove', resetIdleTimer);
+            document.addEventListener('keypress', resetIdleTimer);
+            document.addEventListener('touchstart', resetIdleTimer);
+            document.addEventListener('scroll', resetIdleTimer);
+            resetIdleTimer();
+        }
+
+        window.onload = () => {
+            renderNotifs(); 
+            setupIdleTimer();
+            syncData(false); 
+        };
+
+        function clearSelectOptions(elementId) {
+            const el = document.getElementById(elementId);
+            while (el.options.length > 1) el.remove(1);
+        }
+
+        // Helper fungsi tarik CSV
+        function fetchCSV(url) {
+            return new Promise((resolve, reject) => {
+                Papa.parse(url, {
+                    download: true, header: true, skipEmptyLines: true,
+                    complete: resolve, error: reject
+                });
+            });
+        }
+
+        async function syncData(isAutoRefresh = false) {
+            const loader = document.getElementById('bgSyncLoader');
+            loader.classList.remove('hidden');
+            loader.style.opacity = '1';
+            
+            document.getElementById('syncSpinner').outerHTML = `<div class="spinner-small text-blue-600 dark:text-blue-400" id="syncSpinner"></div>`;
+            document.getElementById('syncTitle').innerText = isAutoRefresh ? "Auto-Refresh Data..." : "Menyinkronkan Database...";
+            document.getElementById('syncTitle').className = "text-xs font-bold text-slate-700 dark:text-slate-200";
+            document.getElementById('syncDesc').innerText = "Sedang diproses - mohon ditunggu";
+
+            try {
+                // Tarik kedua GSheet secara pararel
+                const [resMain, resOrin] = await Promise.all([
+                    fetchCSV(GSHEET_CSV_URL),
+                    fetchCSV(GSHEET_ORIN_URL)
+                ]);
+
+                rawHeaders = resMain.meta.fields || [];
+                allData = [];
+                dataMapById.clear();
+                dataMapByIsbn.clear();
+                dataMapByJudul.clear();
+                dataMapByOrin.clear();
+                
+                clearSelectOptions('singleKategori');
+                clearSelectOptions('singlePengarang');
+                clearSelectOptions('singleTahun');
+
+                processRawData(resMain.data);
+                processOrinData(resOrin.data);
+                
+                renderBatchCheckboxes();
+                
+                document.getElementById('syncSpinner').outerHTML = `<svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+                document.getElementById('syncTitle').innerText = isAutoRefresh ? "Auto-Refresh Selesai!" : "Data Siap!";
+                document.getElementById('syncTitle').className = "text-xs font-bold text-emerald-600 dark:text-emerald-400";
+                document.getElementById('syncDesc').innerText = "Database berhasil diperbarui";
+                
+                executeSearch();
+
+                setTimeout(() => {
+                    loader.style.opacity = '0';
+                    setTimeout(() => loader.classList.add('hidden'), 500);
+                }, 2500);
+                
+                resetIdleTimer();
+            } catch (error) {
+                document.getElementById('syncSpinner').outerHTML = `<svg class="w-5 h-5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>`;
+                document.getElementById('syncTitle').innerText = "Gagal Sinkronisasi";
+                document.getElementById('syncTitle').className = "text-xs font-bold text-rose-600 dark:text-rose-400";
+                setTimeout(() => {
+                    loader.style.opacity = '0';
+                    setTimeout(() => loader.classList.add('hidden'), 500);
+                }, 2500);
+            }
+        }
+
+        function processRawData(rawData) {
+            let kategoris = new Set(), pengarangs = new Set(), tahuns = new Set();
+            
+            rawData.forEach(row => {
+                const keys = Object.keys(row);
+                const judul = row['judul'] || row[keys[1]] || '';
+                if (String(judul).trim().toLowerCase().startsWith('*e-')) return; 
+
+                const id = row['iditem'] || row[keys[0]] || '';
+                const pengarang = row['pengarang'] || row[keys[2]] || '-';
+                const edisi = row['edisi'] || row[keys[3]] || '-'; 
+                const isbn = row['isbn'] || row[keys[5]] || '-';
+                
+                let tahunRaw = row['tahun_terbit'] || row[keys[6]];
+                let tahun_terbit = parseInt(tahunRaw) || 0;
+                if(tahun_terbit > 20000) {
+                    tahun_terbit = new Date((tahun_terbit - (25567 + 2)) * 86400 * 1000).getFullYear();
+                }
+                
+                const subTipe = row['sub_tipe_stok'] || row[keys[12]] || '';
+                const gol = row['golongan'] || row[keys[13]] || '';
+                const kategori = (subTipe || gol) ? `${subTipe} ${gol ? '/ '+gol : ''}` : '-';
+                
+                const hargaGP1 = parseFloat(row[keys[14]]) || 0;
+                const hargaGP2 = parseFloat(row[keys[15]]) || 0;
+                const hargaGP3 = parseFloat(row[keys[16]]) || 0;
+                const stok = parseInt(row[keys[keys.length - 1]]) || 0;
+
+                const itemObj = { 
+                    id, judul, pengarang, edisi, isbn, tahun_terbit, 
+                    kategori, subTipe, gol, hargaGP1, hargaGP2, hargaGP3, stok, rawRow: row 
+                };
+                
+                allData.push(itemObj);
+                
+                if(id) dataMapById.set(String(id).trim().toLowerCase(), itemObj);
+                if(isbn && isbn !== '-') dataMapByIsbn.set(String(isbn).trim().toLowerCase(), itemObj);
+                if(judul) dataMapByJudul.set(String(judul).trim().toLowerCase(), itemObj);
+
+                if(subTipe) kategoris.add(subTipe);
+                if(pengarang && pengarang !== '-') pengarangs.add(pengarang);
+                if(tahun_terbit > 1900 && tahun_terbit <= new Date().getFullYear()+1) tahuns.add(tahun_terbit);
+            });
+
+            populateSelect('singleKategori', kategoris); 
+            populateSelect('singlePengarang', pengarangs);
+            
+            const tahunSelect = document.getElementById('singleTahun');
+            Array.from(tahuns).sort((a,b)=>b-a).forEach(val => {
+                const opt = document.createElement('option'); opt.value = val; opt.innerText = val;
+                tahunSelect.appendChild(opt);
+            });
+        }
+
+        // Modul pemrosesan Database Kedua (ID ORIN ke BSOFT)
+        function processOrinData(rawData) {
+            rawData.forEach(row => {
+                const keys = Object.keys(row);
+                // Mendeteksi nilai berdasarkan Header (Mendukung "ID ORIN" atau indeks pilar fallback)
+                let idOrin = row['ID ORIN'] || row['id orin'] || row[keys[1]];
+                let kodeBsoft = row['KODE BSOFT'] || row['kode bsoft'] || row[keys[2]];
+                
+                if (idOrin && kodeBsoft) {
+                    idOrin = String(idOrin).trim().toLowerCase();
+                    kodeBsoft = String(kodeBsoft).trim().toLowerCase();
+                    
+                    const item = dataMapById.get(kodeBsoft);
+                    if (item) {
+                        item.idOrin = idOrin; // Menyuntikkan properti ID ORIN ke dataset Master
+                        dataMapByOrin.set(idOrin, item);
+                    }
+                }
+            });
+        }
+
+        function populateSelect(elementId, set) {
+            const el = document.getElementById(elementId);
+            Array.from(set).sort().forEach(val => {
+                const opt = document.createElement('option');
+                opt.value = val; opt.innerText = val.length > 30 ? val.substring(0,30)+'...' : val;
+                el.appendChild(opt);
+            });
+        }
+
+        function resetFilters() {
+            ['singleKategori', 'singlePengarang', 'singleTahun', 'thnMin', 'thnMax', 'singleStok', 'stokMin', 'stokMax', 'singleHarga', 'hrgMin', 'hrgMax', 'searchInput'].forEach(id => {
+                document.getElementById(id).value = (id === 'singleStok' || id === 'singleHarga') ? 'all' : '';
+            });
+            executeSearch();
+        }
+
+        function executeSearch() {
+            if(allData.length === 0) return;
+            
+            const input = document.getElementById('searchInput').value.toLowerCase().trim();
+            const kat = document.getElementById('singleKategori').value;
+            const peng = document.getElementById('singlePengarang').value;
+            
+            const thnDrop = document.getElementById('singleTahun').value;
+            const tMin = document.getElementById('thnMin').value;
+            const tMax = document.getElementById('thnMax').value;
+            
+            const stokDrop = document.getElementById('singleStok').value;
+            const sMin = document.getElementById('stokMin').value;
+            const sMax = document.getElementById('stokMax').value;
+            
+            const hrgDrop = document.getElementById('singleHarga').value;
+            const hMin = document.getElementById('hrgMin').value;
+            const hMax = document.getElementById('hrgMax').value;
+            
+            const sortMode = document.getElementById('sortSelect').value;
+
+            currentSingleData = allData.filter(d => {
+                if(input) {
+                    const matchId = String(d.id).toLowerCase().includes(input);
+                    const matchJudul = String(d.judul).toLowerCase().includes(input);
+                    const matchIsbn = String(d.isbn).toLowerCase().includes(input);
+                    const matchPeng = String(d.pengarang).toLowerCase().includes(input);
+                    const matchOrin = d.idOrin ? String(d.idOrin).toLowerCase().includes(input) : false;
+                    
+                    if (!(matchId || matchJudul || matchIsbn || matchPeng || matchOrin)) return false;
+                }
+                
+                if(kat && d.subTipe !== kat) return false;
+                if(peng && d.pengarang !== peng) return false;
+                
+                // Tahun Logic
+                if(tMin && d.tahun_terbit < parseInt(tMin)) return false;
+                if(tMax && d.tahun_terbit > parseInt(tMax)) return false;
+                if(!tMin && !tMax && thnDrop && d.tahun_terbit.toString() !== thnDrop) return false;
+                
+                // Stok Logic (Habis tergabung di Kritis)
+                if(sMin && d.stok < parseInt(sMin)) return false;
+                if(sMax && d.stok > parseInt(sMax)) return false;
+                if(!sMin && !sMax) {
+                    if(stokDrop === 'aman' && d.stok < 100) return false;
+                    if(stokDrop === 'kritis' && d.stok >= 100) return false;
+                }
+                
+                // Harga Logic
+                if(hMin && d.hargaGP1 < parseFloat(hMin)) return false;
+                if(hMax && d.hargaGP1 > parseFloat(hMax)) return false;
+                if(!hMin && !hMax && hrgDrop !== 'all') {
+                    const [min, max] = hrgDrop.split('-');
+                    if(d.hargaGP1 < parseFloat(min) || d.hargaGP1 > parseFloat(max)) return false;
+                }
+                
+                return true;
+            });
+
+            // Sorting Logic
+            if(sortMode !== 'default') {
+                currentSingleData.sort((a,b) => {
+                    if(sortMode === 'harga_asc') return a.hargaGP1 - b.hargaGP1;
+                    if(sortMode === 'harga_desc') return b.hargaGP1 - a.hargaGP1;
+                    if(sortMode === 'stok_desc') return b.stok - a.stok;
+                    if(sortMode === 'stok_asc') return a.stok - b.stok;
+                    if(sortMode === 'tahun_desc') return b.tahun_terbit - a.tahun_terbit;
+                    return 0;
+                });
+            }
+
+            document.getElementById('resultCountBadge').innerText = `${currentSingleData.length.toLocaleString('id-ID')} data`;
+            document.getElementById('resultContainer').innerHTML = '';
+            singleRenderIndex = 0;
+            loadMoreSingle();
+        }
+
+        function loadMoreSingle() {
+            const container = document.getElementById('resultContainer');
+            const end = Math.min(singleRenderIndex + ITEMS_PER_PAGE, currentSingleData.length);
+            
+            let htmlChunk = '';
+            for(let i = singleRenderIndex; i < end; i++) {
+                const item = currentSingleData[i];
+                
+                let stockLabel, stockClass, iconPath;
+                // Logika Stok: 0-99 adalah Stok Kritis
+                if (item.stok < 100) {
+                    stockLabel = `Stok Kritis (${item.stok})`;
+                    stockClass = 'bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 border-rose-100 dark:border-rose-800';
+                    iconPath = 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z';
+                } else {
+                    stockLabel = `Stok Tersedia (${item.stok})`;
+                    stockClass = 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800';
+                    iconPath = 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z';
+                }
+                
+                htmlChunk += `
+                    <div class="p-4 flex gap-3 sm:gap-4 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+                        <div class="text-slate-400 dark:text-slate-500 font-medium text-xs sm:text-sm pt-1">${i + 1}</div>
+                        <div class="flex-1 min-w-0 flex flex-col">
+                            <div class="font-bold text-slate-800 dark:text-slate-200 text-sm sm:text-base line-clamp-3 mb-1.5 leading-snug" title="${item.judul}">${item.judul}</div>
+                            
+                            <div class="flex justify-between items-start gap-2 mb-1.5">
+                                <div class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 line-clamp-2">${item.pengarang} <span class="text-[10px]">(${item.tahun_terbit})</span></div>
+                                <div class="${stockClass} text-[9px] sm:text-[10px] px-2 py-0.5 rounded flex items-center gap-1 font-bold border flex-shrink-0">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${iconPath}"></path></svg>
+                                    ${stockLabel}
+                                </div>
+                            </div>
+
+                            <div class="flex justify-between items-end gap-2 mt-auto">
+                                <div class="text-[10px] sm:text-xs text-slate-400 dark:text-slate-500 space-y-0.5">
+                                    <div>ISBN ${item.isbn}</div>
+                                    <div>ID ITEM ${item.id}</div>
+                                    ${item.idOrin ? `<div class="text-blue-500 dark:text-blue-400 font-semibold">ID ORIN ${item.idOrin.toUpperCase()}</div>` : ''}
+                                </div>
+                                <div class="text-right flex-shrink-0">
+                                    <div class="font-extrabold text-slate-800 dark:text-slate-200 text-sm">Rp ${item.hargaGP1.toLocaleString('id-ID')} <span class="text-[9px] sm:text-[10px] text-slate-400 font-medium">(GP1)</span></div>
+                                    <div class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center justify-end gap-1">
+                                        <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+                                        <span class="truncate max-w-[120px] sm:max-w-[180px]">${item.kategori}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+            }
+            container.insertAdjacentHTML('beforeend', htmlChunk);
+            singleRenderIndex = end;
+            
+            const btnContainer = document.getElementById('loadMoreContainer');
+            if(singleRenderIndex < currentSingleData.length) {
+                btnContainer.style.display = 'block';
+            } else { 
+                btnContainer.style.display = 'none'; 
+            }
+        }
+
+        // --- BATCH PROCESSING (DENGAN FUZZY MATCH HEADER & ID ORIN) ---
+        function renderBatchCheckboxes() {
+            const container = document.getElementById('column-checkboxes');
+            const defaultChecked = ['iditem', 'judul', 'isbn', 'pengarang', 'edisi', 'hargajual_gp1'];
+            let html = '';
+            rawHeaders.forEach(header => {
+                const isChecked = defaultChecked.includes(header.toLowerCase()) ? 'checked' : '';
+                html += `
+                    <label class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400">
+                        <input type="checkbox" value="${header}" class="batch-col-cb flex-shrink-0 mt-0.5 w-3.5 h-3.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500 bg-white dark:bg-slate-700" ${isChecked}>
+                        <span class="break-words leading-relaxed">${header}</span>
+                    </label>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            if(!files || files.length === 0) return;
+            const file = files[0];
+            
+            document.getElementById('fileStatusText').innerHTML = `<span class="text-emerald-600 dark:text-emerald-400">${file.name}</span> terpilih`;
+            
+            const reader = new FileReader();
+            reader.onload = e => {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, {type: 'array'});
+                const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                pendingBatchData = XLSX.utils.sheet_to_json(sheet, {header: 1}); 
+                
+                document.getElementById('batchResultArea').classList.add('hidden');
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function executeBatchProcess() {
+            if(allData.length === 0) return alert("Database utama belum selesai tersinkronisasi.");
+            if(!pendingBatchData || pendingBatchData.length === 0) return alert("File Excel kosong atau belum dipilih!");
+            
+            const cbs = document.querySelectorAll('.batch-col-cb:checked');
+            batchSelectedHeaders = Array.from(cbs).map(cb => cb.value);
+            if(batchSelectedHeaders.length === 0) return alert("Pilih minimal 1 kolom tambahan untuk ditarik!");
+
+            let maxCols = 0;
+            pendingBatchData.forEach(r => { if(r.length > maxCols) maxCols = r.length; });
+
+            let orinColIndex = -1, idColIndex = -1, isbnColIndex = -1, judulColIndex = -1;
+            currentBatchResult = [];
+
+            // KAMUS ALIAS (Fuzzy Match Rules - Support besar/kecil/tanpa spasi)
+            const cleanStr = (str) => String(str).toLowerCase().replace(/[^a-z0-9]/g, ''); // Hapus spasi & tanda baca
+            
+            // Aturan alias khusus ID ORIN
+            const orinAliases = ['idorin', 'axcode', 'kodeax', 'itemnumber', 'itemid'];
+            const idAliases = ['id', 'iditem', 'idbuku', 'kode', 'kodebsoft', 'sku', 'kodeproduk', 'kodeitem'];
+            const isbnAliases = ['isbn', 'barcode', 'ean', 'kodebarcode', 'noisbn'];
+            const judulAliases = ['judul', 'judulbuku', 'item', 'produk', 'list', 'listjudul', 'title', 'nama', 'namabuku', 'namaproduk', 'deskripsi', 'namaitem'];
+            const pengarangAliases = ['pengarang', 'penulis', 'pencipta', 'karya', 'ditulisoleh', 'author'];
+
+            for(let i = 0; i < pendingBatchData.length; i++) {
+                const row = pendingBatchData[i];
+                if (!row || row.length === 0) {
+                    let emptyRow = {};
+                    for(let c=0; c<maxCols; c++) emptyRow[`Kolom_${c+1}`] = '';
+                    batchSelectedHeaders.forEach(h => emptyRow[`BSOFT_${h}`] = '');
+                    emptyRow["Status Pencarian"] = "";
+                    currentBatchResult.push(emptyRow);
+                    continue;
+                }
+
+                // Bersihkan setiap cell untuk mendeteksi tipe Header
+                const rowClean = row.map(cell => cell ? cleanStr(cell) : '');
+                
+                const isHeader = rowClean.some(c => 
+                    orinAliases.includes(c) || idAliases.includes(c) || isbnAliases.includes(c) || judulAliases.includes(c) || pengarangAliases.includes(c)
+                );
+
+                let resultRow = {};
+                for(let c=0; c<maxCols; c++) {
+                    const colName = `Kolom_${c+1}`;
+                    resultRow[colName] = row[c] !== undefined ? row[c] : '';
+                }
+
+                if (isHeader) {
+                    // Update indeks kolom pencarian
+                    orinColIndex = rowClean.findIndex(c => orinAliases.includes(c));
+                    idColIndex = rowClean.findIndex(c => idAliases.includes(c));
+                    isbnColIndex = rowClean.findIndex(c => isbnAliases.includes(c));
+                    judulColIndex = rowClean.findIndex(c => judulAliases.includes(c));
+
+                    batchSelectedHeaders.forEach(h => resultRow[`BSOFT_${h}`] = `[HEADER]`);
+                    resultRow["Status Pencarian"] = "HEADER DATA";
+                    currentBatchResult.push(resultRow);
+                    continue;
+                }
+
+                let match = null;
+                // Ambil string asli
+                const valOrin = orinColIndex !== -1 ? String(row[orinColIndex] || '').trim().toLowerCase() : '';
+                const valId = idColIndex !== -1 ? String(row[idColIndex] || '').trim().toLowerCase() : '';
+                const valIsbn = isbnColIndex !== -1 ? String(row[isbnColIndex] || '').trim().toLowerCase() : '';
+                const valJudul = judulColIndex !== -1 ? String(row[judulColIndex] || '').trim().toLowerCase() : '';
+
+                // Abaikan baris total
+                const isSummaryRow = rowClean.some(c => c.includes('total') || c.includes('qty') || c.includes('subtotal'));
+
+                if (!isSummaryRow && (valJudul || valId || valIsbn || valOrin)) {
+                    // Prioritas Pencarian: ID ORIN -> KODE BSOFT -> ISBN -> JUDUL
+                    if (valOrin) { match = dataMapByOrin.get(valOrin); }
+                    if (!match && valId) { match = dataMapById.get(valId); }
+                    if (!match && valIsbn) { match = dataMapByIsbn.get(valIsbn); }
+                    if (!match && valJudul) { match = dataMapByJudul.get(valJudul); }
+
+                    if (match) {
+                        batchSelectedHeaders.forEach(h => resultRow[`BSOFT_${h}`] = match.rawRow[h] || '-');
+                        resultRow["Status Pencarian"] = `Berhasil`;
+                    } else {
+                        batchSelectedHeaders.forEach(h => resultRow[`BSOFT_${h}`] = 'Not Found');
+                        resultRow["Status Pencarian"] = "Gagal Ditemukan";
+                    }
+                } else {
+                    batchSelectedHeaders.forEach(h => resultRow[`BSOFT_${h}`] = '');
+                    resultRow["Status Pencarian"] = "";
+                }
+                currentBatchResult.push(resultRow);
+            }
+            
+            const headTr = document.getElementById('batchTableHead');
+            const bodyTb = document.getElementById('batchTableBody');
+            
+            const previewOriginalCount = Math.min(maxCols, 3); 
+            const previewBsoftHeaders = batchSelectedHeaders.slice(0, 3); 
+            
+            let headHtml = `<tr>`;
+            for(let c=1; c<=previewOriginalCount; c++) headHtml += `<th class="px-4 py-3 font-semibold text-xs">ASLI ${c}</th>`;
+            previewBsoftHeaders.forEach(h => headHtml += `<th class="px-4 py-3 font-semibold text-xs text-blue-600 dark:text-blue-400">TARIKAN ${h}</th>`);
+            headHtml += `<th class="px-4 py-3 font-semibold text-xs text-center">STATUS</th></tr>`;
+            headTr.innerHTML = headHtml;
+
+            let bodyHtml = currentBatchResult.slice(0, 30).map(row => {
+                let isHeaderData = row["Status Pencarian"] === "HEADER DATA";
+                let isFail = row["Status Pencarian"] === "Gagal Ditemukan";
+                
+                let bgClass = isHeaderData ? "bg-slate-100 dark:bg-slate-700 font-bold" : "";
+                let html = `<tr class="${bgClass} ${isFail ? 'opacity-50' : 'hover:bg-slate-50 dark:hover:bg-slate-700/50'}">`;
+                
+                for(let c=1; c<=previewOriginalCount; c++) {
+                    html += `<td class="px-4 py-3 text-[11px] truncate max-w-[120px]">${row[`Kolom_${c}`] || ''}</td>`;
+                }
+                
+                previewBsoftHeaders.forEach(h => {
+                    html += `<td class="px-4 py-3 text-[11px] truncate max-w-[150px] text-blue-700 dark:text-blue-400">${row[`BSOFT_${h}`] || ''}</td>`;
+                });
+                
+                const statusHtml = row["Status Pencarian"] === 'Berhasil' ? '<span class="text-emerald-500 font-bold bg-emerald-50 dark:bg-emerald-900/30 px-2 py-1 rounded">Berhasil</span>' :
+                                   isHeaderData ? '<span class="text-slate-500 font-bold">HEADER</span>' : 
+                                   isFail ? '<span class="text-rose-500 font-bold bg-rose-50 dark:bg-rose-900/30 px-2 py-1 rounded">Gagal</span>' : '';
+                                    
+                html += `<td class="px-4 py-3 text-[11px] text-center">${statusHtml}</td></tr>`;
+                return html;
+            }).join('');
+            
+            if(currentBatchResult.length > 30) bodyHtml += `<tr><td colspan="10" class="text-center py-4 text-xs font-semibold text-slate-500 bg-slate-50 dark:bg-slate-900/30">Menampilkan 30 baris pertama. Klik Download untuk melihat semua data.</td></tr>`;
+            
+            bodyTb.innerHTML = bodyHtml;
+            document.getElementById('batchResultArea').classList.remove('hidden');
+        }
+
+        // --- EXPORT FUNCTIONALITY ---
+        function triggerExport(type) {
+            const fileName = 'Laporan_BSOFT_' + new Date().getTime();
+            exportData(currentSingleData, type, fileName);
+            addNotification(type, fileName + (type==='excel'?'.xlsx':'.pdf'), currentSingleData.length);
+        }
+        
+        function triggerBatchExport() {
+            if(!currentBatchResult.length) return;
+            const fileName = 'Batch_Result_BSOFT_' + new Date().getTime();
+            exportBatchExcel(fileName);
+            addNotification('excel', fileName + '.xlsx', currentBatchResult.length);
+        }
+
+        function getJsonColWidths(jsonArr) {
+            if(!jsonArr.length) return [];
+            const keys = Object.keys(jsonArr[0]);
+            return keys.map(k => {
+                let max = k.length;
+                jsonArr.forEach(row => {
+                    const cellLen = row[k] ? String(row[k]).length : 0;
+                    if(cellLen > max) max = cellLen;
+                });
+                return { wch: Math.min(max + 2, 50) };
+            });
+        }
+
+        function exportBatchExcel(fileName) {
+            const ws = XLSX.utils.json_to_sheet(currentBatchResult);
+            ws['!cols'] = getJsonColWidths(currentBatchResult);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Batch_Result");
+            XLSX.writeFile(wb, fileName + ".xlsx");
+        }
+
+        function getAoaColWidths(headers, data) {
+            const cols = [];
+            headers[0].forEach((h, i) => {
+                let max = h.length;
+                data.forEach(row => {
+                    const cellLen = row[i] ? String(row[i]).length : 0;
+                    if(cellLen > max) max = cellLen;
+                });
+                cols.push({ wch: Math.min(max + 2, 50) });
+            });
+            return cols;
+        }
+
+        function exportData(dataSource, type, fileName) {
+            if(!dataSource || dataSource.length === 0) return alert('Tidak ada data yang bisa di-export.');
+            
+            const headers = [['ID ITEM', 'ID ORIN', 'ISBN', 'JUDUL', 'PENGARANG', 'EDISI', 'TAHUN', 'KATEGORI', 'STOK', 'HARGA GP1', 'HARGA GP2', 'HARGA GP3']];
+            const formatData = dataSource.map(d => [
+                d.id, (d.idOrin ? d.idOrin.toUpperCase() : '-'), d.isbn, d.judul, d.pengarang, d.edisi, d.tahun_terbit, d.kategori, d.stok, d.hargaGP1, d.hargaGP2, d.hargaGP3
+            ]);
+
+            if(type === 'excel') {
+                const ws = XLSX.utils.aoa_to_sheet([...headers, ...formatData]);
+                ws['!cols'] = getAoaColWidths(headers, formatData);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Data");
+                XLSX.writeFile(wb, `${fileName}.xlsx`);
+            } else if(type === 'pdf') {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('landscape', 'pt', 'a4');
+                doc.text(`Laporan Data BSOFT - ${new Date().toLocaleString('id-ID')}`, 40, 30);
+                doc.autoTable({
+                    startY: 40, head: headers, body: formatData, theme: 'grid',
+                    styles: { fontSize: 7, font: 'helvetica', cellPadding: 4 },
+                    headStyles: { fillColor: [59, 130, 246] },
+                    alternateRowStyles: { fillColor: [245, 247, 250] },
+                    margin: { top: 30, left: 20, right: 20 }
+                });
+                doc.save(`${fileName}.pdf`);
+            }
+        }
+    </script>
+</body>
+</html>
