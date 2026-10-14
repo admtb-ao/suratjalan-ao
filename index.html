@@ -1045,20 +1045,7 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                     Tutup Modul
                 </button>
-                <div class="maksi-native-sheet">
-                    <div class="maksi-native-toolbar">
-                        <div>
-                            <strong>Menu Makan Siang</strong>
-                            <p>Tampilan asli Google Spreadsheet</p>
-                        </div>
-                        <button type="button" id="maksi-native-reload">↻ Muat ulang</button>
-                    </div>
-                    <iframe id="maksi-native-frame"
-                        src="https://docs.google.com/spreadsheets/d/19rB-hqTazNGKmNawv_dRRhZyVf9X_C4G/edit?rm=minimal&amp;single=true&amp;widget=true&amp;headers=false"
-                        title="Menu Makan Siang — Google Spreadsheet"
-                        loading="lazy"
-                        referrerpolicy="strict-origin-when-cross-origin"></iframe>
-                </div>
+                <iframe src="Menu_Maksi_Oktober_2026.pdf#toolbar=0&amp;navpanes=0&amp;scrollbar=0&amp;view=FitH" title="Menu Makan Siang" style="border: none; border-radius: 20px; width: 100%; flex: 1; min-height: 0;"></iframe>
             </div>
 
             <!-- ================= VIEW: TWIDY TOOLS ================= -->
@@ -2452,29 +2439,7 @@
 </script>
 
 
-<style>
-#view-maksi .maksi-native-sheet{display:flex;flex-direction:column;flex:1;min-height:0;width:100%;overflow:hidden;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:20px}
-#view-maksi .maksi-native-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--glass-border);flex-shrink:0}
-#view-maksi .maksi-native-toolbar strong{font-size:14px;font-weight:600}
-#view-maksi .maksi-native-toolbar p{font-size:11px;color:var(--text-muted);margin-top:2px}
-#view-maksi #maksi-native-reload{border:1px solid var(--glass-border);border-radius:10px;padding:8px 12px;background:var(--glass-bg);color:var(--text-main);font:500 12px 'Poppins',sans-serif;cursor:pointer;white-space:nowrap}
-#view-maksi #maksi-native-reload:hover{border-color:var(--primary);color:var(--primary)}
-#view-maksi #maksi-native-frame{display:block;width:100%;flex:1;min-height:400px;border:0;background:#fff}
-@media(max-width:600px){#view-maksi .maksi-native-toolbar{padding:10px 12px}#view-maksi #maksi-native-frame{min-height:350px}}
-</style>
-<script>
-(function(){
- const frame=document.getElementById('maksi-native-frame');
- const button=document.getElementById('maksi-native-reload');
- if(!frame||!button)return;
- button.addEventListener('click',function(){
-  button.disabled=true;button.textContent='Memuat…';
-  const current=frame.src;
-  frame.src='about:blank';
-  setTimeout(function(){frame.src=current;button.disabled=false;button.textContent='↻ Muat ulang';},100);
- });
-})();
-</script>
+
 
 
 </body>
