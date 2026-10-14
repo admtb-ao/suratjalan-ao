@@ -2486,13 +2486,15 @@
    const table=payload.table;
    if(!table||!table.rows||!table.rows.length)throw new Error('Spreadsheet belum berisi data atau sheet pertama kosong.');
    let rows=table.rows.map(r=>(r.c||[]).map(cellValue));
-   const headers=(table.cols||[]).map((c,i)=>cellValue({v:c.label})||('Kolom '+String.fromCharCode(65+i)));
+   const headers=(table.cols||[]).map(c=>cellValue({v:c.label}));
    rows=rows.map(r=>{while(r.length&&r[r.length-1]==='')r.pop();return r;}).filter(r=>r.some(v=>v!==''));
    let last=-1;
    rows.forEach(r=>{for(let i=0;i<r.length;i++)if(r[i]!=='')last=Math.max(last,i);});
    headers.forEach((h,i)=>{if(h!=='')last=Math.max(last,i);});
    if(last<0||!rows.length)throw new Error('Tidak ditemukan data yang bisa ditampilkan.');
    const colCount=last+1;
+   while(headers.length<colCount)headers.push('');
+   for(let i=0;i<colCount;i++)if(!headers[i])headers[i]='Kolom '+String.fromCharCode(65+i);
    const normalized=rows.map(r=>Array.from({length:colCount},(_,i)=>r[i]||''));
    const tableEl=document.createElement('table');tableEl.className='maksi-sheet-table';
    const thead=document.createElement('thead'),headRow=document.createElement('tr');
