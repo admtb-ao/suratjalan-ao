@@ -1,26 +1,28 @@
-# suratjalan-ao
+# Admin AO Portal — Asisten Chatbot
 
-Admin AO Portal — deployed on Vercel.
+Chatbot tersedia di portal utama dan halaman Address Label. API key Gemini hanya disimpan di environment Vercel, tidak dikirim ke browser.
 
-## Gemini chatbot setup
+## Konfigurasi
 
-The floating assistant is available on the main portal and Address Label page. It uses the serverless function at `/api/chat`; the Gemini API key is never sent to the browser.
+1. Buka proyek Vercel yang terhubung ke repo ini.
+2. Pilih **Settings → Environment Variables**.
+3. Tambahkan `GEMINI_API_KEY` berisi API key Google AI.
+4. Aktifkan untuk Production (dan Preview/Development jika perlu), lalu redeploy.
 
-1. Open the Vercel project connected to this repository.
-2. Go to **Settings → Environment Variables**.
-3. Add `GEMINI_API_KEY` with your Gemini API key as the value.
-4. Enable it for Production (and Preview/Development if needed), then redeploy.
+Model teks default: `gemini-3.1-flash-lite-preview`. Model bisa diubah melalui `GEMINI_MODEL` ke ID model yang tersedia pada akun Google AI. Untuk membuat gambar, API mencoba model `gemini-2.5-flash-image`; bila model itu tidak tersedia di akun/proyek, atur `GEMINI_IMAGE_MODEL` ke model image-generation yang tersedia.
 
-The API currently uses model ID `gemini-3.1-flash-lite-preview`. If that model is not enabled for your Google AI project, update `GEMINI_MODEL` in `api/chat.js` to the exact model ID available in your Gemini API account.
+## Kemampuan
 
-## What the chatbot can answer
+- Menjawab pertanyaan tentang fitur portal dan membantu pencarian data operasional.
+- Mengambil data terbaru saat pertanyaan cocok dengan sumber Surat Jalan AO, Surat Pengantar GME, Address Label, Memo, dan Smart Lookup (buku/ORIN). API menggunakan `Cache-Control: no-store`; hasil tetap bergantung pada ketersediaan serta isi endpoint sumber.
+- Membuka menu portal melalui perintah seperti **“buka menu Memo”**, **“masuk ke Surat Jalan AO”**, atau **“buka Address Label”**.
+- Melampirkan TXT, CSV, JSON, Markdown, PDF, Excel, DOCX, serta gambar PNG/JPG/WEBP. Teks dokumen diekstrak di browser; gambar dikirim ke model sebagai input visual.
+- Menyimpan jawaban sebagai TXT/Markdown, mencetak atau menyimpannya sebagai PDF melalui dialog browser, dan mencoba membuat gambar saat diminta.
 
-- Explain the existing portal features.
-- Search records returned by the existing Google Apps Script sources for Surat Jalan AO, Surat Pengantar GME, address labels, and Memo.
-- It only returns matching records from a live search; it should not guess when a match is not found.
+## Batasan dan keamanan
 
-## Notes
-
-- This is a read-only Q&A/search assistant; it does not create, update, or delete records.
-- The chatbot can only search data exposed by the configured Apps Script endpoints. It does not automatically read every private file, every page, or the contents of PDFs stored in the repository.
-- The current login is implemented in client-side HTML. Do not treat it as strong authorization for sensitive data. Before exposing sensitive records to a wider audience, move authentication/authorization to a trusted server and add server-side access checks and rate limiting.
+- Asisten tidak membuat atau mengubah data operasional di Google Sheets/Drive; pencarian dan tanya jawab bersifat baca-saja.
+- Pembuatan gambar bergantung pada akses model image generation di Google AI API. Jika model tidak tersedia, cek `GEMINI_IMAGE_MODEL`.
+- PDF hasil scan yang tidak memiliki lapisan teks mungkin perlu dikirim sebagai gambar agar bisa dibaca.
+- Asisten hanya dapat membaca data yang memang disediakan endpoint Apps Script/CSV yang dikonfigurasi, bukan semua file privat atau seluruh isi setiap halaman secara otomatis.
+- Login saat ini sebagian berjalan di sisi klien. Jangan menganggapnya sebagai otorisasi kuat untuk data sensitif; sebelum membuka data sensitif lebih luas, pindahkan autentikasi dan pemeriksaan akses ke server serta tambahkan rate limiting.
