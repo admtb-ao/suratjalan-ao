@@ -39,25 +39,33 @@
         /* CSS KHUSUS CETAK/PRINT */
         @media print {
             @page { size: A4 portrait; margin: 10mm; }
-            body { background: white !important; margin: 0 !important; padding: 0 !important; }
-            .no-print { display: none !important; }
+            html, body { background: #fff !important; margin: 0 !important; padding: 0 !important; }
+            .no-print, #ao-chat-launcher, #ao-chat-panel { display: none !important; visibility: hidden !important; }
             #print-area { display: block !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
             .label-wrapper {
-                width: 100% !important; height: 270mm !important;
-                page-break-inside: avoid !important; page-break-after: always !important;
-                break-after: page !important; margin-bottom: 0 !important; padding: 0 !important;
-                display: flex !important; flex-direction: column !important;
+                width: 100% !important;
+                height: 265mm !important;
+                box-sizing: border-box !important;
+                page-break-inside: avoid !important;
+                page-break-after: always !important;
+                break-inside: avoid-page !important;
+                break-after: page !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                display: flex !important;
+                flex-direction: column !important;
+                opacity: 1 !important;
+                filter: none !important;
             }
-            .label-wrapper:last-of-type { page-break-after: auto !important; break-after: auto !important; }
+            /* Akhiri halaman pada label TERPILIH terakhir, bukan elemen terakhir yang mungkin tidak dipilih. */
+            .label-wrapper.last-selected-print { page-break-after: auto !important; break-after: auto !important; }
             .unselected-print { display: none !important; }
-
-            .print-content { height: 100%; display: flex; flex-direction: column; justify-content: space-evenly; gap: 20px; }
-            .box-label { flex: 1; max-height: 45%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px !important; }
-
-            .box-title { font-size: 20px !important; top: 25px; left: 30px; }
-            .box-label .text-xl { font-size: 2.2rem !important; line-height: 1.3 !important; margin-bottom: 1rem !important; }
-            .box-label .text-lg { font-size: 1.8rem !important; line-height: 1.3 !important; margin-bottom: 0.8rem !important; }
-            .box-label img { height: 120px !important; margin-bottom: 1.5rem !important; }
+            .print-content { height: 100% !important; min-height: 0 !important; box-sizing: border-box !important; display: flex !important; flex-direction: column !important; justify-content: space-evenly !important; gap: 12px !important; }
+            .box-label { box-sizing: border-box !important; flex: 0 0 46% !important; height: 46% !important; max-height: 46% !important; min-height: 0 !important; display: flex !important; flex-direction: column !important; justify-content: center !important; align-items: center !important; padding: 20px !important; overflow: hidden !important; }
+            .box-title { font-size: 20px !important; top: 18px !important; left: 22px !important; }
+            .box-label .text-xl { font-size: 2.2rem !important; line-height: 1.2 !important; margin-bottom: 0.6rem !important; }
+            .box-label .text-lg { font-size: 1.8rem !important; line-height: 1.2 !important; margin-bottom: 0.5rem !important; }
+            .box-label img { height: 100px !important; max-height: 100px !important; margin-bottom: 0.8rem !important; }
         }
     </style>
 </head>
@@ -439,6 +447,19 @@
         function cetakPrinter() {
             const hasSelected = dataAlamat.some(item => item.selected);
             if(dataAlamat.length === 0 || !hasSelected) return alert("Pilih minimal 1 label yang ingin dicetak!");
+
+            // Tandai label terpilih terakhir supaya browser tidak membuat halaman kosong
+            // ketika elemen terakhir pada daftar justru tidak dipilih.
+            document.querySelectorAll('#print-area .label-wrapper').forEach(el => el.classList.remove('last-selected-print'));
+            const selectedLabels = Array.from(document.querySelectorAll('#print-area .label-wrapper'))
+                .filter(el => !el.classList.contains('unselected-print') && el.style.display !== 'none');
+            if (selectedLabels.length) selectedLabels[selectedLabels.length - 1].classList.add('last-selected-print');
+
+            window.addEventListener('afterprint', function cleanupPrintClass() {
+                document.querySelectorAll('#print-area .last-selected-print').forEach(el => el.classList.remove('last-selected-print'));
+                window.removeEventListener('afterprint', cleanupPrintClass);
+            }, { once: true });
+
             window.print();
         }
 
