@@ -944,7 +944,7 @@
                 if (!files || !files.length) return;
 
                 const file = files[0];
-                if (!/\\.(xlsx|xls)$/i.test(file.name)) {
+                if (!/\.(xlsx|xls)$/i.test(file.name)) {
                     alert('Format file belum didukung. Silakan gunakan file Excel .xlsx atau .xls.');
                     return;
                 }
