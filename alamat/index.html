@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="id">
-<head>\n    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Cetak Alamat Customer - CV ANDI OFFSET</title>
@@ -445,22 +446,39 @@
 
         // FUNGSI LAINNYA
         function cetakPrinter() {
-            const hasSelected = dataAlamat.some(item => item.selected);
-            if(dataAlamat.length === 0 || !hasSelected) return alert("Pilih minimal 1 label yang ingin dicetak!");
+            const printArea = document.getElementById('print-area');
+            const selectedData = dataAlamat.filter(item => item.selected);
+            if (selectedData.length === 0) return alert("Pilih minimal 1 label yang ingin dicetak!");
 
-            // Tandai label terpilih terakhir supaya browser tidak membuat halaman kosong
-            // ketika elemen terakhir pada daftar justru tidak dipilih.
-            document.querySelectorAll('#print-area .label-wrapper').forEach(el => el.classList.remove('last-selected-print'));
-            const selectedLabels = Array.from(document.querySelectorAll('#print-area .label-wrapper'))
-                .filter(el => !el.classList.contains('unselected-print') && el.style.display !== 'none');
-            if (selectedLabels.length) selectedLabels[selectedLabels.length - 1].classList.add('last-selected-print');
+            // Simpan susunan preview asli, lalu tampilkan hanya label terpilih selama proses print.
+            // Ini mencegah label pencarian/print sebelumnya ikut terbawa ke print preview.
+            const originalNodes = Array.from(printArea.childNodes);
+            const selectedNodes = selectedData
+                .map(item => {
+                    const index = dataAlamat.indexOf(item);
+                    const el = document.getElementById(`label-el-${index}`);
+                    return el && el.style.display !== 'none' ? el : null;
+                })
+                .filter(Boolean);
 
-            window.addEventListener('afterprint', function cleanupPrintClass() {
-                document.querySelectorAll('#print-area .last-selected-print').forEach(el => el.classList.remove('last-selected-print'));
-                window.removeEventListener('afterprint', cleanupPrintClass);
-            }, { once: true });
+            if (selectedNodes.length === 0) return alert("Label terpilih tidak ditemukan di preview. Coba refresh data.");
 
+            printArea.replaceChildren(...selectedNodes);
+            printArea.querySelectorAll('.label-wrapper').forEach(el => el.classList.remove('last-selected-print', 'unselected-print'));
+            selectedNodes[selectedNodes.length - 1].classList.add('last-selected-print');
+
+            let restored = false;
+            const restorePreview = () => {
+                if (restored) return;
+                restored = true;
+                printArea.replaceChildren(...originalNodes);
+                window.removeEventListener('afterprint', restorePreview);
+            };
+            window.addEventListener('afterprint', restorePreview, { once: true });
+
+            // Fallback untuk browser yang tidak memicu afterprint dengan konsisten.
             window.print();
+            setTimeout(restorePreview, 1200);
         }
 
         function downloadPDFLangsung() {
