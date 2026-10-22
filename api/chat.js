@@ -1,5 +1,5 @@
 // Vercel Serverless Function — Gemini-powered assistant for Admin AO Portal.
-const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.1-flash-lite-preview";
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite-preview";
 const GEMINI_IMAGE_MODEL = process.env.GEMINI_IMAGE_MODEL || "gemini-2.5-flash-image";
 const SOURCES = {
   ao: "https://script.google.com/macros/s/AKfycbyPhh5vp1usJ8PUl4YG0JfVmTnVvqYI50mXSbIwvV5j_H9Cts_fF5ngjhFUlN0AQ7A0yA/exec",
